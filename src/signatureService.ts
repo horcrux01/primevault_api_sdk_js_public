@@ -38,7 +38,6 @@ export class KMSSignatureService extends BaseSignatureService {
   }
 
   async sign(data: string): Promise<Buffer | undefined> {
-    console.log('Signing data:', data)
     try {
       const input = {
         KeyId: this.keyId,
@@ -61,7 +60,6 @@ export function getSignatureService(
   keyId?: string
 ): BaseSignatureService {
   const signatureService = Config.getSignatureService()
-  console.log('Signature service:', signatureService)
   if (signatureService === SignatureServiceEnum.PRIVATE_KEY) {
     if (!privateKey)
       throw new Error(

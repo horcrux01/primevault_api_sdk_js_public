@@ -61,7 +61,7 @@ export async function generateAwsKmsKeyPair() {
   const keyId = response.KeyMetadata?.KeyId;
 
   const aliasInput = {
-    AliasName: 'alias/PrimeVaultSigningKey3', // update this to your desired alias
+    AliasName: 'alias/PrimeVaultSigningKey', // update this to your desired alias
     TargetKeyId: keyId
   };
   const aliasCommand = new CreateAliasCommand(aliasInput);

@@ -66,7 +66,7 @@ function generateAwsKmsKeyPair() {
         const response = yield kmsClient.send(command);
         const keyId = (_a = response.KeyMetadata) === null || _a === void 0 ? void 0 : _a.KeyId;
         const aliasInput = {
-            AliasName: 'alias/PrimeVaultSigningKey3', // update this to your desired alias
+            AliasName: 'alias/PrimeVaultSigningKey', // update this to your desired alias
             TargetKeyId: keyId
         };
         const aliasCommand = new client_kms_1.CreateAliasCommand(aliasInput);

@@ -1,0 +1,35 @@
+{
+  "name": "primevault_api_sdk_js_public",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint 'src/**/*.ts' --fix",
+    "format": "prettier --write 'src/**/*.ts'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.2.0",
+    "@types/elliptic": "6.4.18",
+    "@types/node": "20.12.10",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.1",
+    "globals": "^15.1.0",
+    "prettier": "3.2.5",
+    "typescript": "5.4.5",
+    "typescript-eslint": "^7.8.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-kms": "^3.569.0",
+    "axios": "1.6.8",
+    "base64url": "3.0.1"
+  }
+}

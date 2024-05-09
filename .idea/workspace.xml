@@ -4,7 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0bdd851f-fe92-4e50-aab3-deb623f3a4f7" name="Changes" comment="" />
+    <list default="true" id="0bdd851f-fe92-4e50-aab3-deb623f3a4f7" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/index.d.ts.map" beforeDir="false" afterPath="$PROJECT_DIR$/dist/index.d.ts.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/signatureService.d.ts.map" beforeDir="false" afterPath="$PROJECT_DIR$/dist/signatureService.d.ts.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/signatureService.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/signatureService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/utils.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/dist/utils.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/utils.d.ts.map" beforeDir="false" afterPath="$PROJECT_DIR$/dist/utils.d.ts.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/utils.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/utils.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -42,7 +53,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "/Users/vivekkumar/work/excheck/primevault_api_sdk_js_public/node_modules/typescript/lib",
+    "ts.external.directory.path": "/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -50,6 +61,13 @@
     <configuration name="Unnamed" type="NodeJSConfigurationType" nameIsGenerated="true" working-dir="$PROJECT_DIR$">
       <method v="2" />
     </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-1d06a55b98c1-91d5c284f522-JavaScript-WS-241.15989.105" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -61,7 +79,9 @@
       <updated>1715069743988</updated>
       <workItem from="1715069745204" duration="19553000" />
       <workItem from="1715140205937" duration="9858000" />
-      <workItem from="1715162918674" duration="5014000" />
+      <workItem from="1715162918674" duration="10287000" />
+      <workItem from="1715229229685" duration="953000" />
+      <workItem from="1715238810050" duration="402000" />
     </task>
     <servers />
   </component>

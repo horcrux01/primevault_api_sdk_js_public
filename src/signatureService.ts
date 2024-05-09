@@ -9,7 +9,7 @@ abstract class BaseSignatureService {
 }
 
 export class PrivateKeySignatureService extends BaseSignatureService {
-  private privateKey: any
+  private privateKey: string
 
   constructor(privateKey: string) {
     super()

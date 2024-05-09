@@ -42,7 +42,6 @@ class KMSSignatureService extends BaseSignatureService {
     }
     sign(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('Signing data:', data);
             try {
                 const input = {
                     KeyId: this.keyId,
@@ -64,7 +63,6 @@ class KMSSignatureService extends BaseSignatureService {
 exports.KMSSignatureService = KMSSignatureService;
 function getSignatureService(privateKey, keyId) {
     const signatureService = config_1.Config.getSignatureService();
-    console.log('Signature service:', signatureService);
     if (signatureService === constants_1.SignatureServiceEnum.PRIVATE_KEY) {
         if (!privateKey)
             throw new Error('Private key is required for PRIVATE_KEY signature service.');

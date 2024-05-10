@@ -13,21 +13,27 @@ exports.getSignatureService = exports.KMSSignatureService = exports.PrivateKeySi
 const config_1 = require("./config");
 const constants_1 = require("./constants");
 const client_kms_1 = require("@aws-sdk/client-kms");
+const utils_1 = require("./utils");
 const crypto = require('crypto');
 class BaseSignatureService {
 }
 class PrivateKeySignatureService extends BaseSignatureService {
-    constructor(privateKey) {
+    constructor(privateKeyHex) {
         super();
-        this.privateKey = privateKey;
+        const privateKeyDer = Buffer.from(privateKeyHex, 'hex');
+        // Create a private key object from DER format
+        this.privateKey = crypto.createPrivateKey({
+            key: privateKeyDer,
+            format: 'der',
+            type: 'pkcs8'
+        });
     }
     sign(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const sign = crypto.createSign('SHA256');
             sign.update(data);
             sign.end();
-            const signature = sign.sign(this.privateKey, 'hex');
-            return Buffer.from(signature, 'hex');
+            return sign.sign(this.privateKey, 'hex');
         });
     }
 }
@@ -42,31 +48,25 @@ class KMSSignatureService extends BaseSignatureService {
     }
     sign(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const input = {
-                    KeyId: this.keyId,
-                    Message: Buffer.from(data),
-                    MessageType: client_kms_1.MessageType.RAW,
-                    SigningAlgorithm: config_1.Config.getKmsSigningAlgorithm(),
-                };
-                const command = new client_kms_1.SignCommand(input);
-                const response = yield this.kmsClient.send(command);
-                return response.Signature;
-            }
-            catch (error) {
-                console.error(`An error occurred while signing: ${error}`);
-                return undefined;
-            }
+            const input = {
+                KeyId: this.keyId,
+                Message: Buffer.from(data),
+                MessageType: client_kms_1.MessageType.RAW,
+                SigningAlgorithm: config_1.Config.getKmsSigningAlgorithm(),
+            };
+            const command = new client_kms_1.SignCommand(input);
+            const response = yield this.kmsClient.send(command);
+            return (0, utils_1.uInt8ArrayToHex)(response.Signature);
         });
     }
 }
 exports.KMSSignatureService = KMSSignatureService;
-function getSignatureService(privateKey, keyId) {
+function getSignatureService(privateKeyHex, keyId) {
     const signatureService = config_1.Config.getSignatureService();
     if (signatureService === constants_1.SignatureServiceEnum.PRIVATE_KEY) {
-        if (!privateKey)
+        if (!privateKeyHex)
             throw new Error('Private key is required for PRIVATE_KEY signature service.');
-        return new PrivateKeySignatureService(privateKey);
+        return new PrivateKeySignatureService(privateKeyHex);
     }
     else if (signatureService === constants_1.SignatureServiceEnum.AWS_KMS) {
         if (!keyId)

@@ -15,9 +15,9 @@ const signatureService_1 = require("./signatureService");
 const utils_1 = require("./utils");
 const node_crypto_1 = require("node:crypto");
 class AuthTokenService {
-    constructor(apiKey, privateKey, keyId) {
+    constructor(apiKey, privateKeyHex, keyId) {
         this.apiKey = apiKey;
-        this.signatureService = (0, signatureService_1.getSignatureService)(privateKey, keyId);
+        this.signatureService = (0, signatureService_1.getSignatureService)(privateKeyHex, keyId);
     }
     generateAuthToken(urlPath, body) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -40,8 +40,8 @@ class AuthTokenService {
                 typ: 'JWT'
             };
             const encodedRequest = this.encodeRequest(headers, payload);
-            const signature = yield this.signatureService.sign(encodedRequest);
-            const encodedSignature = (0, utils_1.encodeBase64)(signature);
+            const signatureHexString = yield this.signatureService.sign(encodedRequest);
+            const encodedSignature = (0, utils_1.encodeBase64)(Buffer.from(signatureHexString, 'hex'));
             return `${encodedRequest}.${encodedSignature}`;
         });
     }

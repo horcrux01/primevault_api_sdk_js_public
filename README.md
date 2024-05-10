@@ -21,7 +21,7 @@ const response = generate_aws_kms_key_pair()
 const apiKey = "509bc039-65b5-4200-ac56-4827acc5a1ee" # replace this with the API user's key
 const apiUrl = "https://app.primevault.com"
 
-const privateKey = "-----BEGIN PRIVATE KEY-----\n....\n-----END PRIVATE KEY-----\n"
+const privateKey = "..."
 Config.set("SIGNATURE_SERVICE", "PRIVATE_KEY")
 
 const apiClient = new APIClient(apiKey, apiUrl, privateKey)

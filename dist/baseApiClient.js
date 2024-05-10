@@ -18,7 +18,7 @@ const authTokenService_1 = require("./authTokenService");
 const signatureService_1 = require("./signatureService");
 const utils_1 = require("./utils");
 class BaseAPIClient {
-    constructor(apiKey, apiUrl, privateKey, keyId) {
+    constructor(apiKey, apiUrl, privateKeyHex, keyId) {
         this.apiKey = apiKey;
         this.apiUrl = apiUrl;
         this.headers = {
@@ -26,8 +26,8 @@ class BaseAPIClient {
             Accept: 'application/json',
             'Api-Key': this.apiKey
         };
-        this.authTokenService = new authTokenService_1.AuthTokenService(apiKey, privateKey, keyId);
-        this.signatureService = (0, signatureService_1.getSignatureService)(privateKey, keyId);
+        this.authTokenService = new authTokenService_1.AuthTokenService(apiKey, privateKeyHex, keyId);
+        this.signatureService = (0, signatureService_1.getSignatureService)(privateKeyHex, keyId);
     }
     get(path, params) {
         return __awaiter(this, void 0, void 0, function* () {

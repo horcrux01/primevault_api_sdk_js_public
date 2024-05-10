@@ -19,7 +19,7 @@ export class BaseAPIClient {
   constructor(
     apiKey: string,
     apiUrl: string,
-    privateKey?: string,
+    privateKeyHex?: string,
     keyId?: string
   ) {
     this.apiKey = apiKey
@@ -29,8 +29,8 @@ export class BaseAPIClient {
       Accept: 'application/json',
       'Api-Key': this.apiKey
     }
-    this.authTokenService = new AuthTokenService(apiKey, privateKey, keyId)
-    this.signatureService = getSignatureService(privateKey, keyId)
+    this.authTokenService = new AuthTokenService(apiKey, privateKeyHex, keyId)
+    this.signatureService = getSignatureService(privateKeyHex, keyId)
   }
 
   async get(path: string, params?: Record<string, any>): Promise<any> {

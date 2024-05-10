@@ -11,23 +11,8 @@ import { Config } from './config'
 
 const crypto = require('crypto')
 
-function pemToOneLine(pemString: string) {
-  return pemString.replace(/\n/g, '\\n');
-}
-
-function convertDerToPem(derUint8Array: Uint8Array) {
-  const derBuffer = Buffer.from(derUint8Array);
-  const der = derBuffer.toString('base64');
-  let pem = '-----BEGIN PUBLIC KEY-----\n';
-  let offset = 0;
-  const length = 64;
-
-  while (offset < der.length) {
-    pem += der.substring(offset, offset + length) + '\n';
-    offset += length;
-  }
-  pem += '-----END PUBLIC KEY-----\n';
-  return pemToOneLine(pem);
+export function uInt8ArrayToHex(uInt8Array: Uint8Array) {
+  return Buffer.from(uInt8Array).toString('hex');
 }
 
 export async function generatePublicPrivateKeyPair() {
@@ -35,17 +20,17 @@ export async function generatePublicPrivateKeyPair() {
     namedCurve: 'prime256v1',
     publicKeyEncoding: {
       type: 'spki',
-      format: 'pem'
+      format: 'der'
     },
     privateKeyEncoding: {
       type: 'pkcs8',
-      format: 'pem'
+      format: 'der'
     }
   });
-  return {"publicKey": pemToOneLine(publicKey), "privateKey": pemToOneLine(privateKey)}
+  return {"publicKeyHex": publicKey.toString('hex'), "privateKeyHex": privateKey.toString('hex')};
 }
 
-export async function generateAwsKmsKeyPair() {
+export async function generateAwsKmsKeyPair(aliasName?: string) {
   const kmsClient = new KMS({
     region: Config.getAwsRegion()
   });
@@ -61,7 +46,7 @@ export async function generateAwsKmsKeyPair() {
   const keyId = response.KeyMetadata?.KeyId;
 
   const aliasInput = {
-    AliasName: 'alias/PrimeVaultSigningKey', // update this to your desired alias
+    AliasName: `alias/${aliasName || 'PrimeVaultSigningKey'}`, // update this to your desired alias
     TargetKeyId: keyId
   };
   const aliasCommand = new CreateAliasCommand(aliasInput);
@@ -73,7 +58,7 @@ export async function generateAwsKmsKeyPair() {
   const publicKeyCommand = new GetPublicKeyCommand(publicKeyInput);
   const publicKeyResponse = await kmsClient.send(publicKeyCommand);
 
-  return { publicKey: convertDerToPem(publicKeyResponse.PublicKey!), keyId };
+  return { publicKeyHex: uInt8ArrayToHex(publicKeyResponse.PublicKey!), keyId };
 }
 
 export function sortObjectKeys(obj: object): object {
@@ -90,6 +75,6 @@ export function sortObjectKeys(obj: object): object {
   return obj
 }
 
-export function encodeBase64(data: string) {
+export function encodeBase64(data: string | Buffer): string {
   return base64url.encode(data)
 }

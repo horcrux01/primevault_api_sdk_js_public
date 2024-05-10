@@ -12,45 +12,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.encodeBase64 = exports.sortObjectKeys = exports.generateAwsKmsKeyPair = exports.generatePublicPrivateKeyPair = void 0;
+exports.encodeBase64 = exports.sortObjectKeys = exports.generateAwsKmsKeyPair = exports.generatePublicPrivateKeyPair = exports.uInt8ArrayToHex = void 0;
 const base64url_1 = __importDefault(require("base64url"));
 const client_kms_1 = require("@aws-sdk/client-kms");
 const config_1 = require("./config");
 const crypto = require('crypto');
-function pemToOneLine(pemString) {
-    return pemString.replace(/\n/g, '\\n');
+function uInt8ArrayToHex(uInt8Array) {
+    return Buffer.from(uInt8Array).toString('hex');
 }
-function convertDerToPem(derUint8Array) {
-    const derBuffer = Buffer.from(derUint8Array);
-    const der = derBuffer.toString('base64');
-    let pem = '-----BEGIN PUBLIC KEY-----\n';
-    let offset = 0;
-    const length = 64;
-    while (offset < der.length) {
-        pem += der.substring(offset, offset + length) + '\n';
-        offset += length;
-    }
-    pem += '-----END PUBLIC KEY-----\n';
-    return pemToOneLine(pem);
-}
+exports.uInt8ArrayToHex = uInt8ArrayToHex;
 function generatePublicPrivateKeyPair() {
     return __awaiter(this, void 0, void 0, function* () {
         const { publicKey, privateKey } = yield crypto.generateKeyPairSync('ec', {
             namedCurve: 'prime256v1',
             publicKeyEncoding: {
                 type: 'spki',
-                format: 'pem'
+                format: 'der'
             },
             privateKeyEncoding: {
                 type: 'pkcs8',
-                format: 'pem'
+                format: 'der'
             }
         });
-        return { "publicKey": pemToOneLine(publicKey), "privateKey": pemToOneLine(privateKey) };
+        return { "publicKeyHex": publicKey.toString('hex'), "privateKeyHex": privateKey.toString('hex') };
     });
 }
 exports.generatePublicPrivateKeyPair = generatePublicPrivateKeyPair;
-function generateAwsKmsKeyPair() {
+function generateAwsKmsKeyPair(aliasName) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
         const kmsClient = new client_kms_1.KMS({
@@ -66,7 +54,7 @@ function generateAwsKmsKeyPair() {
         const response = yield kmsClient.send(command);
         const keyId = (_a = response.KeyMetadata) === null || _a === void 0 ? void 0 : _a.KeyId;
         const aliasInput = {
-            AliasName: 'alias/PrimeVaultSigningKey', // update this to your desired alias
+            AliasName: `alias/${aliasName || 'PrimeVaultSigningKey'}`, // update this to your desired alias
             TargetKeyId: keyId
         };
         const aliasCommand = new client_kms_1.CreateAliasCommand(aliasInput);
@@ -76,7 +64,7 @@ function generateAwsKmsKeyPair() {
         };
         const publicKeyCommand = new client_kms_1.GetPublicKeyCommand(publicKeyInput);
         const publicKeyResponse = yield kmsClient.send(publicKeyCommand);
-        return { publicKey: convertDerToPem(publicKeyResponse.PublicKey), keyId };
+        return { publicKeyHex: uInt8ArrayToHex(publicKeyResponse.PublicKey), keyId };
     });
 }
 exports.generateAwsKmsKeyPair = generateAwsKmsKeyPair;

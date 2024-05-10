@@ -7,9 +7,9 @@ export class AuthTokenService {
   private apiKey: string
   private signatureService: any
 
-  constructor(apiKey: string, privateKey?: string, keyId?: string) {
+  constructor(apiKey: string, privateKeyHex?: string, keyId?: string) {
     this.apiKey = apiKey
-    this.signatureService = getSignatureService(privateKey, keyId)
+    this.signatureService = getSignatureService(privateKeyHex, keyId)
   }
 
   async generateAuthToken(
@@ -35,8 +35,8 @@ export class AuthTokenService {
       typ: 'JWT'
     }
     const encodedRequest = this.encodeRequest(headers, payload)
-    const signature = await this.signatureService.sign(encodedRequest)
-    const encodedSignature = encodeBase64(signature)
+    const signatureHexString = await this.signatureService.sign(encodedRequest)
+    const encodedSignature = encodeBase64(Buffer.from(signatureHexString, 'hex'))
     return `${encodedRequest}.${encodedSignature}`
   }
 

@@ -98,12 +98,14 @@ export class APIClient extends BaseAPIClient {
   }
 
   async getVaults(
+    params: Record<string, string> = {},
     page: number = 1,
     limit: number = 20,
-    reverse: boolean = false
+    reverse: boolean = false,
   ) {
+    const query = new URLSearchParams(params).toString();
     return await this.get(
-      `/api/external/vaults/?limit=${limit}&page=${page}&reverse=${reverse}`
+      `/api/external/vaults/?limit=${limit}&page=${page}&reverse=${reverse}&${query}`
     )
   }
 
@@ -145,8 +147,9 @@ export class APIClient extends BaseAPIClient {
     )
   }
 
-  async getContacts(page: number = 1, limit: number = 20) {
-    return await this.get(`/api/external/contacts/?limit=${limit}&page=${page}`)
+  async getContacts(params: Record<string, string> = {}, page: number = 1, limit: number = 20) {
+    const query = new URLSearchParams(params).toString();
+    return await this.get(`/api/external/contacts/?limit=${limit}&page=${page}&${query}`)
   }
 
   async getContactById(contactId: string) {

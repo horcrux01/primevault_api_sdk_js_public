@@ -1,5 +1,5 @@
 {
-  "name": "primevault_api_sdk_js_public",
+  "name": "@primevault/js-api-sdk",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

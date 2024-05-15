@@ -8,6 +8,11 @@
     "dist",
     "src"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/horcrux01/primevault_api_sdk_js_public"
+  },
+  "homepage": "https://github.com/horcrux01/primevault_api_sdk_js_public",
   "scripts": {
     "build": "tsc",
     "lint": "eslint 'src/**/*.ts' --fix",

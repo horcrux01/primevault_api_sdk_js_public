@@ -10,19 +10,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16' # Specify your Node.js version
+          node-version: '21'
           registry-url: 'https://registry.npmjs.org/'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build your package # Optional, depends if you need a build script
+      - name: Build your package
         run: npm run build
+
+      - name: Run tests
+        env:
+          ACCESS_PRIVATE_KEY: ${{ secrets.ACCESS_PRIVATE_KEY_TEST }}
+        run: npm test
 
       - name: Publish to npm
         run: npm publish --provenance --access public

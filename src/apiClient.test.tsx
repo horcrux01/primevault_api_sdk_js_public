@@ -67,4 +67,27 @@ describe('APIClient', () => {
         expect(contacts[0].address).toBe('CEzN7mqP9xoxn2HdyW6fjEJ73t7qaX9Rp2zyS6hb3iEu')
         expect(contacts[0].status).toBe('APPROVED')
     })
+
+    test('createVault', async () => {
+        const data = {
+            "vaultName": "Ethereum Vault",
+            "defaultTransferSpendLimit": {
+                "action": {"actionType": "NEEDS_MORE_APPROVALS", "additionalApprovalCount": 1},
+                "spendLimit": "100",
+                "resetFrequency": "86400",
+            },
+            "defaultTradeSpendLimit": {
+                "action": {"actionType": "BLOCK_OPERATION"},
+                "spendLimit": "100",
+                "resetFrequency": "86400",
+            },
+        }
+        try {
+           await apiClient.createVault(data);
+        } catch (e: any) {
+            // vault already exists
+            expect(e).toBeDefined()
+            expect(e.message).toBe('400 Bad Request: Bad Request')
+        }
+    })
 })

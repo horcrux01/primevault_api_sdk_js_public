@@ -43,14 +43,21 @@ const apiClient = new APIClient(apiKey, apiUrl, privateKey)
 ### Creating transfer transaction
 ```
 // find the asset and chain
-const assets = await apiClient.getAssetsData()
-const ethereumAsset = assets.find((asset: Asset) => asset.blockChain === "ETHEREUM" && asset.symbol === "ETH")!;
+const assets = await apiClient.getAssetsData();
+const ethereumAsset = assets.find(
+  (asset: Asset) =>
+    asset.blockChain === "ETHEREUM" && asset.symbol === "ETH",
+)!;
 
-const sourceVaultResponse = await apiClient.getVaults({'vaultName': 'core-vault-1'});  // source
-const destinationContactResponse = await apiClient.getContacts({'name': 'Lynn Bell'});  // destination
+const sourceVaults = await apiClient.getVaults({
+  vaultName: "core-vault-1",
+}); // source
+const destinationContacts = await apiClient.getContacts({
+  name: "Lynn Bell",
+}); // destination
 
-const sourceId = sourceVaultResponse.results[0].id
-const destinationId = destinationContactResponse.results[0].id
+const sourceId = sourceVaults[0].id;
+const destinationId = destinationContacts[0].id;
 let txnResponse = await apiClient.createTransferTransaction(
     sourceId,
     destinationId,
@@ -58,8 +65,8 @@ let txnResponse = await apiClient.createTransferTransaction(
     ethereumAsset.symbol,
     ethereumAsset?.blockChain,
     {},
-    'externalId-1',
-)
+    "externalId-1",
+);
 
 while (true) {
     txnResponse = apiClient.getTransactionById(txnResponse.id)
@@ -73,16 +80,19 @@ while (true) {
 ### Creating a new vault
 ```
 const data = {
-    "vaultName": "Ethereum Vault",
-    "defaultTransferSpendLimit": {
-        "action": {"actionType": "NEEDS_MORE_APPROVALS", "additionalApprovalCount": 1},
-        "spendLimit": "100",
-        "resetFrequency": "86400",
+    "vaultName": "Ethereum Vault",                      // Vault name, should be unique
+    "defaultTransferSpendLimit": {                      // Default spend policy for transfer operations
+        "action": {
+           "actionType": "NEEDS_MORE_APPROVALS",
+           "additionalApprovalCount": 1
+        },
+        "spendLimit": "10000",                          // spend limit amount
+        "resetFrequency": "86400",                      // spend limit window, in seconds.
     },
-    "defaultTradeSpendLimit": {
+    "defaultTradeSpendLimit": {                         // Default spend limit for trade operations
         "action": {"actionType": "BLOCK_OPERATION"},
         "spendLimit": "100",
-        "resetFrequency": "86400",
+        "resetFrequency": "86400", 
     },
 }
 

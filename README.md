@@ -71,7 +71,7 @@ while (true) {
 ```
 
 ### Creating a new vault
-
+```
 const data = {
     "vaultName": "Ethereum Vault",
     "defaultTransferSpendLimit": {
@@ -86,5 +86,13 @@ const data = {
     },
 }
 
-const vaultResponse = await apiClient.createVault(data);
+let vaultResponse = await apiClient.createVault(data);
+while (true) {
+    vaultResponse = apiClient.getVaultById(vaultResponse.id);
+    if (vaultResponse.walletsGenerated) {
+      break
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000))
+}
 
+```

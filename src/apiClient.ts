@@ -1,18 +1,25 @@
-import { BaseAPIClient } from './baseApiClient'
+import { BaseAPIClient } from "./baseApiClient";
+import { Asset, Contact, Transaction, Vault } from "./types";
 
 export class APIClient extends BaseAPIClient {
-  async getAssetsData() {
-    return await this.get('/api/external/assets/')
+  async getAssetsData(): Promise<Asset[]> {
+    return await this.get("/api/external/assets/");
   }
 
-  async getTransactions(page: number = 1, limit: number = 20) {
-    return await this.get(
-      `/api/external/transactions/?page=${page}&limit=${limit}`
-    )
+  async getTransactions(
+    params: Record<string, string> = {},
+    page: number = 1,
+    limit: number = 20,
+  ): Promise<Transaction[]> {
+    const query = new URLSearchParams(params).toString();
+    const transactionsResponse = await this.get(
+      `/api/external/transactions/?page=${page}&limit=${limit}&${query}`,
+    );
+    return transactionsResponse.results;
   }
 
-  async getTransactionById(transactionId: string) {
-    return await this.get(`/api/external/transactions/${transactionId}/`)
+  async getTransactionById(transactionId: string): Promise<Transaction> {
+    return await this.get(`/api/external/transactions/${transactionId}/`);
   }
 
   async estimateFee(
@@ -20,7 +27,7 @@ export class APIClient extends BaseAPIClient {
     destinationId: string,
     amount: string,
     asset: string,
-    chain: string
+    chain: string,
   ) {
     const data = {
       sourceId,
@@ -28,9 +35,9 @@ export class APIClient extends BaseAPIClient {
       amount,
       asset,
       blockChain: chain,
-      category: 'TRANSFER'
-    }
-    return await this.post('/api/external/transactions/estimate_fee/', data)
+      category: "TRANSFER",
+    };
+    return await this.post("/api/external/transactions/estimate_fee/", data);
   }
 
   async createTransferTransaction(
@@ -42,21 +49,21 @@ export class APIClient extends BaseAPIClient {
     gasParams: Record<string, any> = {},
     externalId?: string,
     isAutomation: boolean = false,
-    executeAt?: string
-  ) {
+    executeAt?: string,
+  ): Promise<Transaction> {
     const data = {
       sourceId,
       destinationId,
       amount: String(amount),
       asset,
       blockChain: chain,
-      category: 'TRANSFER',
+      category: "TRANSFER",
       gasParams,
       externalId,
       isAutomation,
-      executeAt
-    }
-    return await this.post('/api/external/transactions/', data)
+      executeAt,
+    };
+    return await this.post("/api/external/transactions/", data);
   }
 
   async getTradeQuote(
@@ -66,7 +73,7 @@ export class APIClient extends BaseAPIClient {
     fromAmount: string,
     fromChain: string,
     toChain: string,
-    slippage: string
+    slippage: string,
   ) {
     const params = {
       vaultId,
@@ -75,26 +82,26 @@ export class APIClient extends BaseAPIClient {
       fromAmount,
       blockChain: fromChain,
       toBlockchain: toChain,
-      slippage
-    }
-    return await this.get('/api/external/transactions/trade_quote/', params)
+      slippage,
+    };
+    return await this.get("/api/external/transactions/trade_quote/", params);
   }
 
   async createTradeTransaction(
     vaultId: string,
     tradeRequestData: Record<string, any>,
     tradeResponseData: Record<string, any>,
-    externalId?: string
+    externalId?: string,
   ) {
     const data = {
       vaultId,
       tradeRequestData,
       tradeResponseData,
-      category: 'SWAP',
-      blockChain: tradeRequestData['blockChain'],
-      externalId
-    }
-    return await this.post('/api/external/transactions/', data)
+      category: "SWAP",
+      blockChain: tradeRequestData["blockChain"],
+      externalId,
+    };
+    return await this.post("/api/external/transactions/", data);
   }
 
   async getVaults(
@@ -102,58 +109,66 @@ export class APIClient extends BaseAPIClient {
     page: number = 1,
     limit: number = 20,
     reverse: boolean = false,
-  ) {
+  ): Promise<Vault[]> {
     const query = new URLSearchParams(params).toString();
-    return await this.get(
-      `/api/external/vaults/?limit=${limit}&page=${page}&reverse=${reverse}&${query}`
-    )
+    const vaultsResponse = await this.get(
+      `/api/external/vaults/?limit=${limit}&page=${page}&reverse=${reverse}&${query}`,
+    );
+    return vaultsResponse.results;
   }
 
-  async getVaultById(vaultId: string) {
-    return await this.get(`/api/external/vaults/${vaultId}/`)
+  async getVaultById(vaultId: string): Promise<Vault> {
+    return await this.get(`/api/external/vaults/${vaultId}/`);
   }
 
-  async createVault(data: Record<string, any>) {
-    return await this.post('/api/external/vaults/', data)
+  async createVault(data: Record<string, any>): Promise<Vault> {
+    return await this.post("/api/external/vaults/", data);
   }
 
   async getBalances(vaultId: string) {
-    return await this.get(`/api/external/vaults/${vaultId}/balances/`)
+    return await this.get(`/api/external/vaults/${vaultId}/balances/`);
   }
 
   async updateBalances(vaultId: string) {
-    return await this.post(`/api/external/vaults/${vaultId}/update_balances/`)
+    return await this.post(`/api/external/vaults/${vaultId}/update_balances/`);
   }
 
   async getOperationMessageToSign(operationId: string) {
     return await this.get(
-      `/api/external/operations/${operationId}/operation_message_to_sign/`
-    )
+      `/api/external/operations/${operationId}/operation_message_to_sign/`,
+    );
   }
 
   async updateUserAction(
     operationId: string,
     isApproved: boolean,
-    signatureHex: string
+    signatureHex: string,
   ) {
     const data = {
       isApproved,
       signatureHex,
-      operationId
-    }
+      operationId,
+    };
     return await this.post(
       `/api/external/operations/${operationId}/update_user_action/`,
-      data
-    )
+      data,
+    );
   }
 
-  async getContacts(params: Record<string, string> = {}, page: number = 1, limit: number = 20) {
+  async getContacts(
+    params: Record<string, string> = {},
+    page: number = 1,
+    limit: number = 20,
+  ): Promise<Contact[]> {
     const query = new URLSearchParams(params).toString();
-    return await this.get(`/api/external/contacts/?limit=${limit}&page=${page}&${query}`)
+    const contactsResponse = await this.get(
+      `/api/external/contacts/?limit=${limit}&page=${page}&${query}`,
+    );
+    return contactsResponse.results;
   }
 
-  async getContactById(contactId: string) {
-    return await this.get(`/api/external/contacts/${contactId}/`)
+  async getContactById(contactId: string): Promise<Contact> {
+    return await this.get(`/api/external/contacts/${contactId}/`);
   }
 
   async createContact(
@@ -161,15 +176,15 @@ export class APIClient extends BaseAPIClient {
     address: string,
     chain: string,
     tags?: string[],
-    externalId?: string
+    externalId?: string,
   ) {
     const data = {
       name,
       address,
       blockChain: chain,
       tags,
-      externalId
-    }
-    return await this.post('/api/external/contacts/', data)
+      externalId,
+    };
+    return await this.post("/api/external/contacts/", data);
   }
 }

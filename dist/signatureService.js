@@ -14,26 +14,26 @@ const config_1 = require("./config");
 const constants_1 = require("./constants");
 const client_kms_1 = require("@aws-sdk/client-kms");
 const utils_1 = require("./utils");
-const crypto = require('crypto');
+const crypto = require("crypto");
 class BaseSignatureService {
 }
 class PrivateKeySignatureService extends BaseSignatureService {
     constructor(privateKeyHex) {
         super();
-        const privateKeyDer = Buffer.from(privateKeyHex, 'hex');
+        const privateKeyDer = Buffer.from(privateKeyHex, "hex");
         // Create a private key object from DER format
         this.privateKey = crypto.createPrivateKey({
             key: privateKeyDer,
-            format: 'der',
-            type: 'pkcs8'
+            format: "der",
+            type: "pkcs8",
         });
     }
     sign(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const sign = crypto.createSign('SHA256');
+            const sign = crypto.createSign("SHA256");
             sign.update(data);
             sign.end();
-            return sign.sign(this.privateKey, 'hex');
+            return sign.sign(this.privateKey, "hex");
         });
     }
 }
@@ -43,7 +43,7 @@ class KMSSignatureService extends BaseSignatureService {
         super();
         this.keyId = keyId;
         this.kmsClient = new client_kms_1.KMS({
-            region: config_1.Config.getAwsRegion()
+            region: config_1.Config.getAwsRegion(),
         });
     }
     sign(data) {
@@ -65,12 +65,12 @@ function getSignatureService(privateKeyHex, keyId) {
     const signatureService = config_1.Config.getSignatureService();
     if (signatureService === constants_1.SignatureServiceEnum.PRIVATE_KEY) {
         if (!privateKeyHex)
-            throw new Error('Private key is required for PRIVATE_KEY signature service.');
+            throw new Error("Private key is required for PRIVATE_KEY signature service.");
         return new PrivateKeySignatureService(privateKeyHex);
     }
     else if (signatureService === constants_1.SignatureServiceEnum.AWS_KMS) {
         if (!keyId)
-            throw new Error('Key ID is required for AWS_KMS signature service.');
+            throw new Error("Key ID is required for AWS_KMS signature service.");
         return new KMSSignatureService(keyId);
     }
     else {

@@ -12,9 +12,11 @@ export class APIClient extends BaseAPIClient {
     limit: number = 20,
   ): Promise<Transaction[]> {
     const query = new URLSearchParams(params).toString();
-    const transactionsResponse = await this.get(
-      `/api/external/transactions/?page=${page}&limit=${limit}&${query}`,
-    );
+    let url = `/api/external/transactions/?limit=${limit}&page=${page}`;
+    if (query) {
+        url += `&${query}`;
+    }
+    const transactionsResponse = await this.get(url);
     return transactionsResponse.results;
   }
 
@@ -111,9 +113,11 @@ export class APIClient extends BaseAPIClient {
     reverse: boolean = false,
   ): Promise<Vault[]> {
     const query = new URLSearchParams(params).toString();
-    const vaultsResponse = await this.get(
-      `/api/external/vaults/?limit=${limit}&page=${page}&reverse=${reverse}&${query}`,
-    );
+    let url = `/api/external/vaults/?limit=${limit}&page=${page}&reverse=${reverse}`;
+    if (query) {
+      url += `&${query}`;
+    }
+    const vaultsResponse = await this.get(url);
     return vaultsResponse.results;
   }
 
@@ -161,9 +165,11 @@ export class APIClient extends BaseAPIClient {
     limit: number = 20,
   ): Promise<Contact[]> {
     const query = new URLSearchParams(params).toString();
-    const contactsResponse = await this.get(
-      `/api/external/contacts/?limit=${limit}&page=${page}&${query}`,
-    );
+    let url = `/api/external/contacts/?limit=${limit}&page=${page}`;
+    if (query) {
+      url += `&${query}`;
+    }
+    const contactsResponse = await this.get(url);
     return contactsResponse.results;
   }
 

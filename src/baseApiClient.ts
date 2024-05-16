@@ -26,7 +26,7 @@ export class BaseAPIClient {
     this.apiUrl = apiUrl;
     this.headers = {
       "Content-Type": "application/json",
-      Accept: "application/json",
+      "Accept": "application/json",
       "Api-Key": this.apiKey,
     };
     this.authTokenService = new AuthTokenService(apiKey, privateKeyHex, keyId);
@@ -62,9 +62,13 @@ export class BaseAPIClient {
 
     const axiosConfig: AxiosRequestConfig = {
       headers: this.headers,
-      params: params || {},
-      data: data || {},
     };
+    if (data && Object.keys(data).length > 0) {
+      axiosConfig.data = data;
+    }
+    if (params && Object.keys(params).length > 0) {
+      axiosConfig.params = params;
+    }
 
     try {
       const response = await axios.request({

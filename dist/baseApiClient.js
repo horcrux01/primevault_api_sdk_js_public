@@ -22,38 +22,42 @@ class BaseAPIClient {
         this.apiKey = apiKey;
         this.apiUrl = apiUrl;
         this.headers = {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            'Api-Key': this.apiKey
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Api-Key": this.apiKey,
         };
         this.authTokenService = new authTokenService_1.AuthTokenService(apiKey, privateKeyHex, keyId);
         this.signatureService = (0, signatureService_1.getSignatureService)(privateKeyHex, keyId);
     }
     get(path, params) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this._makeRequest('GET', { urlPath: path, params });
+            return this._makeRequest("GET", { urlPath: path, params });
         });
     }
     post(path, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this._makeRequest('POST', { urlPath: path, data });
+            return this._makeRequest("POST", { urlPath: path, data });
         });
     }
     _makeRequest(method, options) {
         return __awaiter(this, void 0, void 0, function* () {
             const { urlPath, params, data } = options;
-            const full_url = `${this.apiUrl}${urlPath || ''}`;
-            const api_token = yield this.authTokenService.generateAuthToken(urlPath || '', data);
-            this.headers['Authorization'] = `Bearer ${api_token}`;
+            const full_url = `${this.apiUrl}${urlPath || ""}`;
+            const api_token = yield this.authTokenService.generateAuthToken(urlPath || "", data);
+            this.headers["Authorization"] = `Bearer ${api_token}`;
             if (data) {
                 const dataSignature = yield this.signatureService.sign(JSON.stringify((0, utils_1.sortObjectKeys)(data)));
-                data['dataSignatureHex'] = dataSignature.toString('hex');
+                data["dataSignatureHex"] = dataSignature.toString("hex");
             }
             const axiosConfig = {
                 headers: this.headers,
-                params: params || {},
-                data: data || {}
             };
+            if (data && Object.keys(data).length > 0) {
+                axiosConfig.data = data;
+            }
+            if (params && Object.keys(params).length > 0) {
+                axiosConfig.params = params;
+            }
             try {
                 const response = yield axios_1.default.request(Object.assign({ method, url: full_url }, axiosConfig));
                 return response.data;

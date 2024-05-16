@@ -1,5 +1,5 @@
 import { APIClient } from "./apiClient";
-import {Asset, ContactStatus, VaultType} from "./types";
+import { Asset, ContactStatus, VaultType } from "./types";
 
 describe("APIClient", () => {
   const apiKey = process.env.API_KEY!;
@@ -146,4 +146,15 @@ describe("APIClient", () => {
       expect(e.message).toBe("400 Bad Request: Bad Request");
     }
   });
+
+  test("getTransactionsById", async () => {
+    const transaction = await apiClient.getTransactionById('f1cb568d-215e-426f-998a-4ba5be8288d4');
+    expect(transaction).toBeDefined();
+    expect(transaction).toBeInstanceOf(Object);
+    expect(transaction.id).toBe('f1cb568d-215e-426f-998a-4ba5be8288d4');
+    expect(transaction.status).toBe('PENDING');
+    expect(transaction.blockChain).toBe('ETHEREUM');
+    expect(transaction.externalId).toBeNull();
+    expect(transaction.toAddressName).toBe('Compound');
+  })
 });

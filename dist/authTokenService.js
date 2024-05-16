@@ -25,23 +25,23 @@ class AuthTokenService {
             const expiresIn = config_1.Config.getExpiresIn();
             body = body || {};
             const bodyJson = JSON.stringify((0, utils_1.sortObjectKeys)(body));
-            const hash = (0, node_crypto_1.createHash)('sha256');
+            const hash = (0, node_crypto_1.createHash)("sha256");
             hash.update(bodyJson);
-            const bodyHash = hash.digest('hex');
+            const bodyHash = hash.digest("hex");
             const payload = {
                 iat: timestamp,
                 exp: timestamp + expiresIn,
                 urlPath: urlPath,
                 userId: this.apiKey,
-                body: bodyHash
+                body: bodyHash,
             };
             const headers = {
-                alg: 'ES256',
-                typ: 'JWT'
+                alg: "ES256",
+                typ: "JWT",
             };
             const encodedRequest = this.encodeRequest(headers, payload);
             const signatureHexString = yield this.signatureService.sign(encodedRequest);
-            const encodedSignature = (0, utils_1.encodeBase64)(Buffer.from(signatureHexString, 'hex'));
+            const encodedSignature = (0, utils_1.encodeBase64)(Buffer.from(signatureHexString, "hex"));
             return `${encodedRequest}.${encodedSignature}`;
         });
     }

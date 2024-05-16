@@ -14,12 +14,18 @@ const baseApiClient_1 = require("./baseApiClient");
 class APIClient extends baseApiClient_1.BaseAPIClient {
     getAssetsData() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.get('/api/external/assets/');
+            return yield this.get("/api/external/assets/");
         });
     }
     getTransactions() {
-        return __awaiter(this, arguments, void 0, function* (page = 1, limit = 20) {
-            return yield this.get(`/api/external/transactions/?page=${page}&limit=${limit}`);
+        return __awaiter(this, arguments, void 0, function* (params = {}, page = 1, limit = 20) {
+            const query = new URLSearchParams(params).toString();
+            let url = `/api/external/transactions/?limit=${limit}&page=${page}`;
+            if (query) {
+                url += `&${query}`;
+            }
+            const transactionsResponse = yield this.get(url);
+            return transactionsResponse.results;
         });
     }
     getTransactionById(transactionId) {
@@ -35,9 +41,9 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 amount,
                 asset,
                 blockChain: chain,
-                category: 'TRANSFER'
+                category: "TRANSFER",
             };
-            return yield this.post('/api/external/transactions/estimate_fee/', data);
+            return yield this.post("/api/external/transactions/estimate_fee/", data);
         });
     }
     createTransferTransaction(sourceId_1, destinationId_1, amount_1, asset_1, chain_1) {
@@ -48,13 +54,13 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 amount: String(amount),
                 asset,
                 blockChain: chain,
-                category: 'TRANSFER',
+                category: "TRANSFER",
                 gasParams,
                 externalId,
                 isAutomation,
-                executeAt
+                executeAt,
             };
-            return yield this.post('/api/external/transactions/', data);
+            return yield this.post("/api/external/transactions/", data);
         });
     }
     getTradeQuote(vaultId, fromAsset, toAsset, fromAmount, fromChain, toChain, slippage) {
@@ -66,9 +72,9 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 fromAmount,
                 blockChain: fromChain,
                 toBlockchain: toChain,
-                slippage
+                slippage,
             };
-            return yield this.get('/api/external/transactions/trade_quote/', params);
+            return yield this.get("/api/external/transactions/trade_quote/", params);
         });
     }
     createTradeTransaction(vaultId, tradeRequestData, tradeResponseData, externalId) {
@@ -77,16 +83,22 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 vaultId,
                 tradeRequestData,
                 tradeResponseData,
-                category: 'SWAP',
-                blockChain: tradeRequestData['blockChain'],
-                externalId
+                category: "SWAP",
+                blockChain: tradeRequestData["blockChain"],
+                externalId,
             };
-            return yield this.post('/api/external/transactions/', data);
+            return yield this.post("/api/external/transactions/", data);
         });
     }
     getVaults() {
-        return __awaiter(this, arguments, void 0, function* (page = 1, limit = 20, reverse = false) {
-            return yield this.get(`/api/external/vaults/?limit=${limit}&page=${page}&reverse=${reverse}`);
+        return __awaiter(this, arguments, void 0, function* (params = {}, page = 1, limit = 20, reverse = false) {
+            const query = new URLSearchParams(params).toString();
+            let url = `/api/external/vaults/?limit=${limit}&page=${page}&reverse=${reverse}`;
+            if (query) {
+                url += `&${query}`;
+            }
+            const vaultsResponse = yield this.get(url);
+            return vaultsResponse.results;
         });
     }
     getVaultById(vaultId) {
@@ -96,7 +108,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
     }
     createVault(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.post('/api/external/vaults/', data);
+            return yield this.post("/api/external/vaults/", data);
         });
     }
     getBalances(vaultId) {
@@ -119,14 +131,20 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             const data = {
                 isApproved,
                 signatureHex,
-                operationId
+                operationId,
             };
             return yield this.post(`/api/external/operations/${operationId}/update_user_action/`, data);
         });
     }
     getContacts() {
-        return __awaiter(this, arguments, void 0, function* (page = 1, limit = 20) {
-            return yield this.get(`/api/external/contacts/?limit=${limit}&page=${page}`);
+        return __awaiter(this, arguments, void 0, function* (params = {}, page = 1, limit = 20) {
+            const query = new URLSearchParams(params).toString();
+            let url = `/api/external/contacts/?limit=${limit}&page=${page}`;
+            if (query) {
+                url += `&${query}`;
+            }
+            const contactsResponse = yield this.get(url);
+            return contactsResponse.results;
         });
     }
     getContactById(contactId) {
@@ -141,9 +159,9 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 address,
                 blockChain: chain,
                 tags,
-                externalId
+                externalId,
             };
-            return yield this.post('/api/external/contacts/', data);
+            return yield this.post("/api/external/contacts/", data);
         });
     }
 }

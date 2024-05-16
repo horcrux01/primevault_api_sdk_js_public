@@ -13,16 +13,16 @@ class Config {
         Config._config = {};
     }
     static getSignatureService() {
-        return Config.get('SIGNATURE_SERVICE') || constants_1.SignatureServiceEnum.PRIVATE_KEY;
+        return Config.get("SIGNATURE_SERVICE") || constants_1.SignatureServiceEnum.PRIVATE_KEY;
     }
     static getExpiresIn() {
-        return Config.get('EXPIRES_IN') || 300;
+        return Config.get("EXPIRES_IN") || 300;
     }
     static getAwsRegion() {
-        return Config.get('AWS_REGION') || 'eu-north-1';
+        return Config.get("AWS_REGION") || "eu-north-1";
     }
     static getKmsSigningAlgorithm() {
-        return Config.get('KMS_SIGNING_ALGORITHM') || 'ECDSA_SHA_256';
+        return Config.get("KMS_SIGNING_ALGORITHM") || "ECDSA_SHA_256";
     }
 }
 exports.Config = Config;

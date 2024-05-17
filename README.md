@@ -47,25 +47,37 @@ const assets = await apiClient.getAssetsData();
 const ethereumAsset = assets.find(
   (asset: Asset) =>
     asset.blockChain === "ETHEREUM" && asset.symbol === "ETH",
-)!;
+);
 
 const sourceVaults = await apiClient.getVaults({
   vaultName: "core-vault-1",
 }); // source
+
 const destinationContacts = await apiClient.getContacts({
   name: "Lynn Bell",
 }); // destination
 
 const sourceId = sourceVaults[0].id;
 const destinationId = destinationContacts[0].id;
+
+// Optional fee estimate API which returns the expected fee for different tiers, HIGH, MEDIUM, LOW.
+// Default is HIGH
+const feeEstimates = await apiClient.estimateFee(
+    sourceId,  // source id
+    destinationId,  // destination id
+    "0.0001",
+    ethereumAsset.symbol,
+    ethereumAsset.blockChain
+)
+
 let txnResponse = await apiClient.createTransferTransaction(
     sourceId,
     destinationId,
     "0.0001",
     ethereumAsset.symbol,
-    ethereumAsset?.blockChain,
-    {},
-    "externalId-1",
+    ethereumAsset.blockChain,
+    {},                                        // optional gasParams. Example: {'feeTier': 'MEDIUM'} for medium fee tier. Default is HIGH
+    "externalId-1",                            // external id to track txns. Should be unique.
 );
 
 while (true) {
@@ -82,7 +94,7 @@ while (true) {
 const data = {
     "vaultName": "Ethereum Vault",                      // Vault name, should be unique
     "defaultTransferSpendLimit": {                      // Default spend policy for transfer operations
-        "action": {
+        "action": {                                     // action when the txn exceeds the current spend limit. Options are to ask for more approvals or block txn.
            "actionType": "NEEDS_MORE_APPROVALS",
            "additionalApprovalCount": 1
         },

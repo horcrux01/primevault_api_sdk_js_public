@@ -87,6 +87,7 @@ while (true) {
     }
     await new Promise(resolve => setTimeout(resolve, 1000))
 }
+console.log(txnResponse)
 ```
 
 ### Creating a new vault
@@ -116,5 +117,5 @@ while (true) {
     }
     await new Promise(resolve => setTimeout(resolve, 1000))
 }
-
+// vaultResponse.wallets has the wallet addresses.
 ```

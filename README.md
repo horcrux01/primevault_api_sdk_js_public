@@ -82,7 +82,7 @@ let txnResponse = await apiClient.createTransferTransaction(
 
 while (true) {
     txnResponse = apiClient.getTransactionById(txnResponse.id)
-    if (txnResponse.status === "COMPLETED" || txnResponse.status === "FAILED") {
+    if (txnResponse.status === TransactionStatus.COMPLETED || txnResponse.status === TransactionStatus.FAILED) {
         break
     }
     await new Promise(resolve => setTimeout(resolve, 1000))

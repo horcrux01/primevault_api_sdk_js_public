@@ -90,6 +90,33 @@ while (true) {
 console.log(txnResponse)
 ```
 
+### Creating a contract call transaction
+
+```
+const vaults = await apiClient.getVaults({
+    vaultName: "core-vault-1",
+});
+
+const vaultId = vaults[0].id;
+
+let txn = await apiClient.createContractCallTransaction(
+    vaultId,
+    "POLYGON",
+    "0x095ea7b3000000000000000000000000c",               // Final message/data in hex
+    "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",        // Address of smart contract
+    "externalId-1",                                      // Optional externalId
+);
+
+while (true) {
+    txn = await apiClient.getTransactionStatus(txn.id);
+    if (txn.status === TransactionStatus.COMPLETED) {
+        break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+}
+
+```
+
 ### Creating a new vault
 ```
 const data = {

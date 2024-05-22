@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const apiClient_1 = require("./apiClient");
 const types_1 = require("./types");
+const constants_1 = require("./constants");
 describe("APIClient", () => {
     const apiKey = process.env.API_KEY;
     const apiUrl = process.env.API_URL;
@@ -132,13 +133,26 @@ describe("APIClient", () => {
         }
     }));
     test("getTransactionsById", () => __awaiter(void 0, void 0, void 0, function* () {
-        const transaction = yield apiClient.getTransactionById('f1cb568d-215e-426f-998a-4ba5be8288d4');
+        const transaction = yield apiClient.getTransactionById("f1cb568d-215e-426f-998a-4ba5be8288d4");
         expect(transaction).toBeDefined();
         expect(transaction).toBeInstanceOf(Object);
-        expect(transaction.id).toBe('f1cb568d-215e-426f-998a-4ba5be8288d4');
-        expect(transaction.status).toBe('PENDING');
-        expect(transaction.blockChain).toBe('ETHEREUM');
+        expect(transaction.id).toBe("f1cb568d-215e-426f-998a-4ba5be8288d4");
+        expect(transaction.status).toBe("PENDING");
+        expect(transaction.blockChain).toBe("ETHEREUM");
         expect(transaction.externalId).toBeNull();
-        expect(transaction.toAddressName).toBe('Compound');
+        expect(transaction.toAddressName).toBe("Compound");
+    }));
+    test("createContractCallTransaction", () => __awaiter(void 0, void 0, void 0, function* () {
+        const vaults = yield apiClient.getVaults({
+            vaultName: "core-vault-1",
+        });
+        const vaultId = vaults[0].id;
+        try {
+            yield apiClient.createContractCallTransaction(vaultId, constants_1.Chain.ETHEREUM, "0x", "0x", "externalId-1");
+        }
+        catch (e) {
+            expect(e).toBeDefined();
+            expect(e.message).toBe("400 Bad Request: Bad Request");
+        }
     }));
 });

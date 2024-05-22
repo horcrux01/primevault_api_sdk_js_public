@@ -6,7 +6,7 @@ export declare class APIClient extends BaseAPIClient {
     getTransactionById(transactionId: string): Promise<Transaction>;
     estimateFee(sourceId: string, destinationId: string, amount: string, asset: string, chain: string): Promise<any>;
     createTransferTransaction(sourceId: string, destinationId: string, amount: string, asset: string, chain: string, gasParams?: Record<string, any>, externalId?: string, isAutomation?: boolean, executeAt?: string): Promise<Transaction>;
-    createContractCallTransaction(vaultId: string, blockChain: string, messageHex: string, toAddress?: string, externalId?: string): Promise<Transaction>;
+    createContractCallTransaction(vaultId: string, blockChain: string, messageHex: string, toAddress?: string, amount?: string, externalId?: string): Promise<Transaction>;
     getTradeQuote(vaultId: string, fromAsset: string, toAsset: string, fromAmount: string, fromChain: string, toChain: string, slippage: string): Promise<any>;
     createTradeTransaction(vaultId: string, tradeRequestData: Record<string, any>, tradeResponseData: Record<string, any>, externalId?: string): Promise<any>;
     getVaults(params?: Record<string, string>, page?: number, limit?: number, reverse?: boolean): Promise<Vault[]>;

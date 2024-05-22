@@ -63,6 +63,19 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.post("/api/external/transactions/", data);
         });
     }
+    createContractCallTransaction(vaultId, blockChain, messageHex, toAddress, externalId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = {
+                vaultId,
+                blockChain,
+                messageHex,
+                toAddress,
+                externalId,
+                category: "CONTRACT_CALL",
+            };
+            return yield this.post("/api/external/transactions/", data);
+        });
+    }
     getTradeQuote(vaultId, fromAsset, toAsset, fromAmount, fromChain, toChain, slippage) {
         return __awaiter(this, void 0, void 0, function* () {
             const params = {

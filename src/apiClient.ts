@@ -14,7 +14,7 @@ export class APIClient extends BaseAPIClient {
     const query = new URLSearchParams(params).toString();
     let url = `/api/external/transactions/?limit=${limit}&page=${page}`;
     if (query) {
-        url += `&${query}`;
+      url += `&${query}`;
     }
     const transactionsResponse = await this.get(url);
     return transactionsResponse.results;
@@ -64,6 +64,24 @@ export class APIClient extends BaseAPIClient {
       externalId,
       isAutomation,
       executeAt,
+    };
+    return await this.post("/api/external/transactions/", data);
+  }
+
+  async createContractCallTransaction(
+    vaultId: string,
+    blockChain: string,
+    messageHex: string,
+    toAddress?: string,
+    externalId?: string,
+  ): Promise<Transaction> {
+    const data = {
+      vaultId,
+      blockChain,
+      messageHex,
+      toAddress,
+      externalId,
+      category: "CONTRACT_CALL",
     };
     return await this.post("/api/external/transactions/", data);
   }

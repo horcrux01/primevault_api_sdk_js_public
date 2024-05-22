@@ -23,7 +23,7 @@ class BaseAPIClient {
         this.apiUrl = apiUrl;
         this.headers = {
             "Content-Type": "application/json",
-            "Accept": "application/json",
+            Accept: "application/json",
             "Api-Key": this.apiKey,
         };
         this.authTokenService = new authTokenService_1.AuthTokenService(apiKey, privateKeyHex, keyId);

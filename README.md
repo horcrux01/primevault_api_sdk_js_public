@@ -1,5 +1,7 @@
 # PrimeVault's API SDK
 
+NPM Package: [Here](https://www.npmjs.com/package/@primevault/js-api-sdk)
+
 ### Generating API user's access public-private key pair
 This should be executed in some secure environment and access private key should be stored securely.
 The access public key is required when creating a new API user in PrimeVault.

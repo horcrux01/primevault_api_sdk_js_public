@@ -73,6 +73,7 @@ export class APIClient extends BaseAPIClient {
     blockChain: string,
     messageHex: string,
     toAddress?: string,
+    amount?: string,
     externalId?: string,
   ): Promise<Transaction> {
     const data = {
@@ -80,6 +81,7 @@ export class APIClient extends BaseAPIClient {
       blockChain,
       messageHex,
       toAddress,
+      amount,
       externalId,
       category: "CONTRACT_CALL",
     };

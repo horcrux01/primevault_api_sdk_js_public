@@ -12,7 +12,7 @@ describe("APIClient", () => {
     const assetsData = await apiClient.getAssetsData();
     expect(assetsData).toBeDefined();
     expect(assetsData).toBeInstanceOf(Array);
-    expect(assetsData.length).toBe(64);
+    expect(assetsData.length).toBe(65);
   });
 
   test("getVaults", async () => {
@@ -171,7 +171,8 @@ describe("APIClient", () => {
         vaultId,
         Chain.ETHEREUM,
         "0x",
-        "0x",
+        "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        undefined,
         "externalId-1",
       );
     } catch (e: any) {

@@ -51,7 +51,11 @@ export class BaseAPIClient {
       urlPath || "",
       data,
     );
-    this.headers["Authorization"] = `Bearer ${api_token}`;
+
+    const requestHeaders = {
+      ...this.headers,
+      Authorization: `Bearer ${api_token}`,
+    };
 
     if (data) {
       const dataSignature = await this.signatureService.sign(
@@ -61,7 +65,7 @@ export class BaseAPIClient {
     }
 
     const axiosConfig: AxiosRequestConfig = {
-      headers: this.headers,
+      headers: requestHeaders,
     };
     if (data && Object.keys(data).length > 0) {
       axiosConfig.data = data;

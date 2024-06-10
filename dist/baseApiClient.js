@@ -44,13 +44,13 @@ class BaseAPIClient {
             const { urlPath, params, data } = options;
             const full_url = `${this.apiUrl}${urlPath || ""}`;
             const api_token = yield this.authTokenService.generateAuthToken(urlPath || "", data);
-            this.headers["Authorization"] = `Bearer ${api_token}`;
+            const requestHeaders = Object.assign(Object.assign({}, this.headers), { Authorization: `Bearer ${api_token}` });
             if (data) {
                 const dataSignature = yield this.signatureService.sign(JSON.stringify((0, utils_1.sortObjectKeys)(data)));
                 data["dataSignatureHex"] = dataSignature.toString("hex");
             }
             const axiosConfig = {
-                headers: this.headers,
+                headers: requestHeaders,
             };
             if (data && Object.keys(data).length > 0) {
                 axiosConfig.data = data;

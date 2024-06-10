@@ -12,7 +12,7 @@ describe("APIClient", () => {
     const assetsData = await apiClient.getAssetsData();
     expect(assetsData).toBeDefined();
     expect(assetsData).toBeInstanceOf(Array);
-    expect(assetsData.length).toBe(65);
+    expect(assetsData.length).toBe(67);
   });
 
   test("getVaults", async () => {
@@ -64,16 +64,20 @@ describe("APIClient", () => {
     const balances2 = await apiClient.getBalances(vaults[0].id);
     expect(balances2).toBeDefined();
     expect(balances2).toBeInstanceOf(Object);
-    expect(Object.keys(balances2).length).toBe(3);
+    expect(Object.keys(balances2).length).toBe(5);
     expect(balances2["ETH"]).toBeDefined();
     expect(balances2["ETH"]).toBeInstanceOf(Object);
-    expect(Object.keys(balances2["ETH"]).length).toBe(2);
-    expect(balances2["ETH"]).toStrictEqual({ ETHEREUM: 1, OPTIMISM: 2 });
+    expect(Object.keys(balances2["ETH"]).length).toBe(3);
+    expect(balances2["ETH"]).toStrictEqual({
+      ETHEREUM: 0.00950008,
+      OPTIMISM: 0,
+      ARBITRUM: 0,
+    });
 
     expect(balances2["MATIC"]).toBeDefined();
     expect(balances2["MATIC"]).toBeInstanceOf(Object);
     expect(Object.keys(balances2["MATIC"]).length).toBe(1);
-    expect(balances2["MATIC"]).toStrictEqual({ POLYGON: 30.2322 });
+    expect(balances2["MATIC"]).toStrictEqual({ POLYGON: 0.00767327 });
   });
 
   test("getContacts", async () => {

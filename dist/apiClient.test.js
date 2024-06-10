@@ -21,7 +21,7 @@ describe("APIClient", () => {
         const assetsData = yield apiClient.getAssetsData();
         expect(assetsData).toBeDefined();
         expect(assetsData).toBeInstanceOf(Array);
-        expect(assetsData.length).toBe(64);
+        expect(assetsData.length).toBe(67);
     }));
     test("getVaults", () => __awaiter(void 0, void 0, void 0, function* () {
         const vaults = yield apiClient.getVaults({ vaultName: "core-vault-1" });
@@ -66,15 +66,19 @@ describe("APIClient", () => {
         const balances2 = yield apiClient.getBalances(vaults[0].id);
         expect(balances2).toBeDefined();
         expect(balances2).toBeInstanceOf(Object);
-        expect(Object.keys(balances2).length).toBe(3);
+        expect(Object.keys(balances2).length).toBe(5);
         expect(balances2["ETH"]).toBeDefined();
         expect(balances2["ETH"]).toBeInstanceOf(Object);
-        expect(Object.keys(balances2["ETH"]).length).toBe(2);
-        expect(balances2["ETH"]).toStrictEqual({ ETHEREUM: 1, OPTIMISM: 2 });
+        expect(Object.keys(balances2["ETH"]).length).toBe(3);
+        expect(balances2["ETH"]).toStrictEqual({
+            ETHEREUM: 0.00950008,
+            OPTIMISM: 0,
+            ARBITRUM: 0,
+        });
         expect(balances2["MATIC"]).toBeDefined();
         expect(balances2["MATIC"]).toBeInstanceOf(Object);
         expect(Object.keys(balances2["MATIC"]).length).toBe(1);
-        expect(balances2["MATIC"]).toStrictEqual({ POLYGON: 30.2322 });
+        expect(balances2["MATIC"]).toStrictEqual({ POLYGON: 0.00767327 });
     }));
     test("getContacts", () => __awaiter(void 0, void 0, void 0, function* () {
         const contacts = yield apiClient.getContacts({ name: "Lynn Bell" });
@@ -148,7 +152,7 @@ describe("APIClient", () => {
         });
         const vaultId = vaults[0].id;
         try {
-            yield apiClient.createContractCallTransaction(vaultId, constants_1.Chain.ETHEREUM, "0x", "0x", "externalId-1");
+            yield apiClient.createContractCallTransaction(vaultId, constants_1.Chain.ETHEREUM, "0x", "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", undefined, "externalId-1");
         }
         catch (e) {
             expect(e).toBeDefined();

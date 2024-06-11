@@ -29,6 +29,21 @@ console.log(response)
 
 ### Setting up API Client
 
+
+#### Typescript 
+```
+import {APIClient} from "@primevault/js-api-sdk";
+
+const apiClient = new APIClient("API_KEY", "API_URL");
+```
+
+#### Javascript
+```
+const { APIClient } = require("@primevault/js-api-sdk");
+
+const apiClient = new APIClient("API_KEY", "API_URL");
+```
+
 #### Option 1: PRIVATE_KEY
 
 ```
@@ -39,6 +54,19 @@ const privateKey = "..."
 Config.set("SIGNATURE_SERVICE", "PRIVATE_KEY")
 
 const apiClient = new APIClient(apiKey, apiUrl, privateKey)
+```
+
+#### Option 2: AWS_KMS
+
+```
+const apiKey = "509bc039-65b5-4200-ac56-4827acc5a1ee" // replace this with the API user's key
+const apiUrl = "https://app.primevault.com"
+const keyId = '..'  // AWS KMS key id
+
+const privateKey = "..."
+Config.set("SIGNATURE_SERVICE", "AWS_KMS")
+
+const apiClient = new APIClient(apiKey, apiUrl, keyId)
 ```
 
 

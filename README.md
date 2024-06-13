@@ -59,7 +59,7 @@ const keyId = '..'  // AWS KMS key Id from Key's detail page
 Config.set("SIGNATURE_SERVICE", "AWS_KMS")
 Config.set("AWS_REGION", "us-east-1")  // replace this with your region
 
-const apiClient = new APIClient(apiKey, apiUrl, keyId)
+const apiClient = new APIClient(apiKey, apiUrl, undefined, keyId)
 ```
 
 ### Creating transfer transaction

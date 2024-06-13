@@ -18,13 +18,6 @@ The flow is as follows:
 const response = await generatePublicPrivateKeyPair()
 console.log(response)
 
-#### Option 2: AWS_KMS
-"""
-Here the private key is managed by AWS KMS.
-Set up AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in your environment before executing this.
-"""
-const response = generate_aws_kms_key_pair()
-console.log(response)
 ```
 
 ### Setting up API Client
@@ -61,14 +54,13 @@ const apiClient = new APIClient(apiKey, apiUrl, privateKey)
 ```
 const apiKey = "509bc039-65b5-4200-ac56-4827acc5a1ee" // replace this with the API user's key
 const apiUrl = "https://app.primevault.com"
-const keyId = '..'  // AWS KMS key id
+const keyId = '..'  // AWS KMS key Id from Key's detail page
 
-const privateKey = "..."
 Config.set("SIGNATURE_SERVICE", "AWS_KMS")
+Config.set("AWS_REGION", "us-east-1")  // replace this with your region
 
-const apiClient = new APIClient(apiKey, apiUrl, keyId)
+const apiClient = new APIClient(apiKey, apiUrl, undefined, keyId)
 ```
-
 
 ### Creating transfer transaction
 ```

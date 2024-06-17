@@ -3,7 +3,7 @@ import {
   Asset,
   Contact,
   CreateContractCallTransactionRequest,
-  CreateTransactionRequest,
+  CreateTransferTransactionRequest,
   CreateVaultRequest,
   EstimateFeeRequest,
   Transaction,
@@ -46,7 +46,7 @@ export class APIClient extends BaseAPIClient {
   }
 
   async createTransferTransaction(
-    request: CreateTransactionRequest,
+    request: CreateTransferTransactionRequest,
   ): Promise<Transaction> {
     const data = {
       sourceId: request.sourceId,

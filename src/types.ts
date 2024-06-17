@@ -117,7 +117,7 @@ export interface Transaction {
   createdById: string;
 }
 
-export interface CreateTransactionRequest {
+export interface CreateTransferTransactionRequest {
   sourceId: string;
   destinationId: string;
   amount: string;

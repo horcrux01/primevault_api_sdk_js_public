@@ -182,5 +182,4 @@ describe("APIClient", () => {
       expect(e.message).toBe("400 Bad Request: Bad Request");
     }
   });
-
 });

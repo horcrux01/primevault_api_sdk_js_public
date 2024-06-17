@@ -137,15 +137,14 @@ describe("APIClient", () => {
     const sourceId = sourceVaults[0].id;
     const destinationId = destinationContacts[0].id;
     try {
-      await apiClient.createTransferTransaction(
-        sourceId,
-        destinationId,
-        "0.0001",
-        ethereumAsset.symbol,
-        ethereumAsset?.blockChain,
-        {},
-        "externalId-1",
-      );
+      await apiClient.createTransferTransaction({
+        sourceId: sourceId,
+        destinationId: destinationId,
+        amount: "0.0001",
+        asset: ethereumAsset.symbol,
+        chain: ethereumAsset.blockChain,
+        externalId: "externalId-1",
+      });
     } catch (e: any) {
       expect(e).toBeDefined();
       expect(e.message).toBe("400 Bad Request: Bad Request");
@@ -171,14 +170,13 @@ describe("APIClient", () => {
     });
     const vaultId = vaults[0].id;
     try {
-      await apiClient.createContractCallTransaction(
-        vaultId,
-        Chain.ETHEREUM,
-        "0x",
-        "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-        undefined,
-        "externalId-1",
-      );
+      await apiClient.createContractCallTransaction({
+        vaultId: vaultId,
+        chain: Chain.ETHEREUM,
+        messageHex: "0x",
+        toAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        externalId: "externalId-1",
+      });
     } catch (e: any) {
       expect(e).toBeDefined();
       expect(e.message).toBe("400 Bad Request: Bad Request");

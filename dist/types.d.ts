@@ -107,4 +107,35 @@ export interface Transaction {
     isDeleted: boolean;
     createdById: string;
 }
+export interface CreateTransferTransactionRequest {
+    sourceId: string;
+    destinationId: string;
+    amount: string;
+    asset: string;
+    chain: string;
+    gasParams?: Record<string, any>;
+    externalId?: string;
+    isAutomation?: boolean;
+    executeAt?: string;
+}
+export interface CreateContractCallTransactionRequest {
+    vaultId: string;
+    chain: string;
+    messageHex: string;
+    toAddress?: string;
+    amount?: string;
+    externalId?: string;
+}
+export interface EstimateFeeRequest {
+    sourceId: string;
+    destinationId: string;
+    amount: string;
+    asset: string;
+    chain: string;
+}
+export interface CreateVaultRequest {
+    vaultName: string;
+    defaultTransferSpendLimit: Record<string, any>;
+    defaultTradeSpendLimit: Record<string, any>;
+}
 //# sourceMappingURL=types.d.ts.map

@@ -129,7 +129,14 @@ describe("APIClient", () => {
         const sourceId = sourceVaults[0].id;
         const destinationId = destinationContacts[0].id;
         try {
-            yield apiClient.createTransferTransaction(sourceId, destinationId, "0.0001", ethereumAsset.symbol, ethereumAsset === null || ethereumAsset === void 0 ? void 0 : ethereumAsset.blockChain, {}, "externalId-1");
+            yield apiClient.createTransferTransaction({
+                sourceId: sourceId,
+                destinationId: destinationId,
+                amount: "0.0001",
+                asset: ethereumAsset.symbol,
+                chain: ethereumAsset.blockChain,
+                externalId: "externalId-1",
+            });
         }
         catch (e) {
             expect(e).toBeDefined();
@@ -152,7 +159,13 @@ describe("APIClient", () => {
         });
         const vaultId = vaults[0].id;
         try {
-            yield apiClient.createContractCallTransaction(vaultId, constants_1.Chain.ETHEREUM, "0x", "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", undefined, "externalId-1");
+            yield apiClient.createContractCallTransaction({
+                vaultId: vaultId,
+                chain: constants_1.Chain.ETHEREUM,
+                messageHex: "0x",
+                toAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                externalId: "externalId-1",
+            });
         }
         catch (e) {
             expect(e).toBeDefined();

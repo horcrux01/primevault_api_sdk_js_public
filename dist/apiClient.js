@@ -33,45 +33,45 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.get(`/api/external/transactions/${transactionId}/`);
         });
     }
-    estimateFee(sourceId, destinationId, amount, asset, chain) {
+    estimateFee(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
-                sourceId,
-                destinationId,
-                amount,
-                asset,
-                blockChain: chain,
+                sourceId: request.sourceId,
+                destinationId: request.destinationId,
+                amount: request.amount,
+                asset: request.asset,
+                blockChain: request.chain,
                 category: "TRANSFER",
             };
             return yield this.post("/api/external/transactions/estimate_fee/", data);
         });
     }
-    createTransferTransaction(sourceId_1, destinationId_1, amount_1, asset_1, chain_1) {
-        return __awaiter(this, arguments, void 0, function* (sourceId, destinationId, amount, asset, chain, gasParams = {}, externalId, isAutomation = false, executeAt) {
+    createTransferTransaction(request) {
+        return __awaiter(this, void 0, void 0, function* () {
             const data = {
-                sourceId,
-                destinationId,
-                amount: String(amount),
-                asset,
-                blockChain: chain,
+                sourceId: request.sourceId,
+                destinationId: request.destinationId,
+                amount: request.amount,
+                asset: request.asset,
+                blockChain: request.chain,
                 category: "TRANSFER",
-                gasParams,
-                externalId,
-                isAutomation,
-                executeAt,
+                gasParams: request.gasParams,
+                externalId: request.externalId,
+                isAutomation: request.isAutomation,
+                executeAt: request.executeAt,
             };
             return yield this.post("/api/external/transactions/", data);
         });
     }
-    createContractCallTransaction(vaultId, blockChain, messageHex, toAddress, amount, externalId) {
+    createContractCallTransaction(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
-                vaultId,
-                blockChain,
-                messageHex,
-                toAddress,
-                amount,
-                externalId,
+                vaultId: request.vaultId,
+                blockChain: request.chain,
+                messageHex: request.messageHex,
+                toAddress: request.toAddress,
+                amount: request.amount,
+                externalId: request.externalId,
                 category: "CONTRACT_CALL",
             };
             return yield this.post("/api/external/transactions/", data);

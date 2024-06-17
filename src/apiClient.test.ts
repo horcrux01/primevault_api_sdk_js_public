@@ -142,7 +142,7 @@ describe("APIClient", () => {
         destinationId: destinationId,
         amount: "0.0001",
         asset: ethereumAsset.symbol,
-        chain: ethereumAsset?.blockChain,
+        chain: ethereumAsset.blockChain,
         externalId: "externalId-1",
       });
     } catch (e: any) {

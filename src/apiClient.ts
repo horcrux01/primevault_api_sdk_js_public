@@ -51,7 +51,7 @@ export class APIClient extends BaseAPIClient {
     const data = {
       sourceId: request.sourceId,
       destinationId: request.destinationId,
-      amount: String(request.amount),
+      amount: request.amount,
       asset: request.asset,
       blockChain: request.chain,
       category: "TRANSFER",

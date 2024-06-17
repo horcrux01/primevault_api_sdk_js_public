@@ -162,7 +162,7 @@ const data = {
 
 let vaultResponse = await apiClient.createVault(data);
 while (true) {
-    vaultResponse = apiClient.getVaultById(vaultResponse.id);
+    vaultResponse = await apiClient.getVaultById(vaultResponse.id);
     if (vaultResponse.walletsGenerated) {
       break
     }

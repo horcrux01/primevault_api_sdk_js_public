@@ -1,5 +1,14 @@
 import { BaseAPIClient } from "./baseApiClient";
-import { Asset, Contact, Transaction, Vault } from "./types";
+import {
+  Asset,
+  Contact,
+  CreateContractCallTransactionRequest,
+  CreateTransactionRequest,
+  CreateVaultRequest,
+  EstimateFeeRequest,
+  Transaction,
+  Vault,
+} from "./types";
 
 export class APIClient extends BaseAPIClient {
   async getAssetsData(): Promise<Asset[]> {
@@ -24,65 +33,46 @@ export class APIClient extends BaseAPIClient {
     return await this.get(`/api/external/transactions/${transactionId}/`);
   }
 
-  async estimateFee(
-    sourceId: string,
-    destinationId: string,
-    amount: string,
-    asset: string,
-    chain: string,
-  ) {
+  async estimateFee(request: EstimateFeeRequest) {
     const data = {
-      sourceId,
-      destinationId,
-      amount,
-      asset,
-      blockChain: chain,
+      sourceId: request.sourceId,
+      destinationId: request.destinationId,
+      amount: request.amount,
+      asset: request.asset,
+      blockChain: request.chain,
       category: "TRANSFER",
     };
     return await this.post("/api/external/transactions/estimate_fee/", data);
   }
 
   async createTransferTransaction(
-    sourceId: string,
-    destinationId: string,
-    amount: string,
-    asset: string,
-    chain: string,
-    gasParams: Record<string, any> = {},
-    externalId?: string,
-    isAutomation: boolean = false,
-    executeAt?: string,
+    request: CreateTransactionRequest,
   ): Promise<Transaction> {
     const data = {
-      sourceId,
-      destinationId,
-      amount: String(amount),
-      asset,
-      blockChain: chain,
+      sourceId: request.sourceId,
+      destinationId: request.destinationId,
+      amount: String(request.amount),
+      asset: request.asset,
+      blockChain: request.chain,
       category: "TRANSFER",
-      gasParams,
-      externalId,
-      isAutomation,
-      executeAt,
+      gasParams: request.gasParams,
+      externalId: request.externalId,
+      isAutomation: request.isAutomation,
+      executeAt: request.executeAt,
     };
     return await this.post("/api/external/transactions/", data);
   }
 
   async createContractCallTransaction(
-    vaultId: string,
-    blockChain: string,
-    messageHex: string,
-    toAddress?: string,
-    amount?: string,
-    externalId?: string,
+    request: CreateContractCallTransactionRequest,
   ): Promise<Transaction> {
     const data = {
-      vaultId,
-      blockChain,
-      messageHex,
-      toAddress,
-      amount,
-      externalId,
+      vaultId: request.vaultId,
+      blockChain: request.chain,
+      messageHex: request.messageHex,
+      toAddress: request.toAddress,
+      amount: request.amount,
+      externalId: request.externalId,
       category: "CONTRACT_CALL",
     };
     return await this.post("/api/external/transactions/", data);
@@ -145,7 +135,7 @@ export class APIClient extends BaseAPIClient {
     return await this.get(`/api/external/vaults/${vaultId}/`);
   }
 
-  async createVault(data: Record<string, any>): Promise<Vault> {
+  async createVault(data: CreateVaultRequest): Promise<Vault> {
     return await this.post("/api/external/vaults/", data);
   }
 

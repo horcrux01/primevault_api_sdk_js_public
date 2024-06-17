@@ -83,31 +83,32 @@ const sourceId = sourceVaults[0].id;
 const destinationId = destinationContacts[0].id;
 
 // Optional fee estimate API which returns the expected fee for different tiers, HIGH, MEDIUM, LOW.
-// Default is HIGH
-const feeEstimates = await apiClient.estimateFee(
-    sourceId,  // source id
-    destinationId,  // destination id
-    "0.0001",
-    ethereumAsset.symbol,
-    ethereumAsset.blockChain
-)
+// Default is HIGH. The feeTier is passed in gasParams argument while creating the tranfer transaction.
+const feeEstimates = await apiClient.estimateFee({
+  sourceId, // source id
+  destinationId, // destination id
+  amount: "0.0001",
+  asset: ethereumAsset.symbol,
+  chain: ethereumAsset.blockChain,
+});
 
-let txnResponse = await apiClient.createTransferTransaction(
-    sourceId,
-    destinationId,
-    "0.0001",
-    ethereumAsset.symbol,
-    ethereumAsset.blockChain,
-    {},                                        // optional gasParams. Example: {'feeTier': 'MEDIUM'} for medium fee tier. Default is HIGH
-    "externalId-1",                            // external id to track txns. Should be unique.
-);
+
+let txnResponse = await apiClient.createTransferTransaction({
+  sourceId,
+  destinationId,
+  amount: "0.0001",
+  asset: ethereumAsset.symbol,
+  chain: ethereumAsset.blockChain,
+  externalId: "externalId-1",               // Optional externalId to track transactions, should be unique
+  gasParams: {},                            // Optional gasParams. Example: {'feeTier': 'MEDIUM'} for medium fee tier. Default is HIGH
+});
 
 while (true) {
-    txnResponse = apiClient.getTransactionById(txnResponse.id)
+    txnResponse = await apiClient.getTransactionById(txnResponse.id)
     if (txnResponse.status === TransactionStatus.COMPLETED || txnResponse.status === TransactionStatus.FAILED) {
         break
     }
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 3000))
 }
 console.log(txnResponse)
 ```
@@ -121,21 +122,20 @@ const vaults = await apiClient.getVaults({
 
 const vaultId = vaults[0].id;
 
-let txnResponse = await apiClient.createContractCallTransaction(
-    vaultId,
-    "POLYGON",
-    "0x095ea7b3000000000000000000000000c",               // Final message/data in hex
-    "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",        // Address of smart contract
-    undefined,                                           // Optional amount     
-    "externalId-1",                                      // Optional externalId
-);
+let txnResponse = await apiClient.createContractCallTransaction({
+  vaultId,
+  chain: "POLYGON",
+  messageHex: "0x095ea7b3000000000000000000000000c",                 // Final message/data in hex
+  toAddress: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",           // Address of smart contract
+  externalId: "externalId-1",                                        // Optional externalId to track transactions, should be unique
+});
 
 while (true) {
-    txnResponse = apiClient.getTransactionById(txnResponse.id)
+    txnResponse = await apiClient.getTransactionById(txnResponse.id)
     if (txnResponse.status === TransactionStatus.COMPLETED || txnResponse.status === TransactionStatus.FAILED) {
         break
     }
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 3000))
 }
 console.log(txnResponse)
 

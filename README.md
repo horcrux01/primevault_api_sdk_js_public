@@ -169,4 +169,9 @@ while (true) {
     await new Promise(resolve => setTimeout(resolve, 1000))
 }
 // vaultResponse.wallets has the wallet addresses.
+
+// balance of a vault
+const balances = await apiClient.getBalances(vaultResponse.id);
+console.log(balances);
+
 ```

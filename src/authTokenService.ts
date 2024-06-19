@@ -2,6 +2,7 @@ import { Config } from "./config";
 import { getSignatureService } from "./signatureService";
 import { encodeBase64, sortObjectKeys } from "./utils";
 import { createHash } from "node:crypto";
+import { uuid } from "uuidv4";
 
 export class AuthTokenService {
   private apiKey: string;
@@ -29,6 +30,7 @@ export class AuthTokenService {
       urlPath: urlPath,
       userId: this.apiKey,
       body: bodyHash,
+      jti: uuid(),
     };
     const headers = {
       alg: "ES256",

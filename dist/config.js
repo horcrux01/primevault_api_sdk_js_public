@@ -16,7 +16,7 @@ class Config {
         return Config.get("SIGNATURE_SERVICE") || constants_1.SignatureServiceEnum.PRIVATE_KEY;
     }
     static getExpiresIn() {
-        return Config.get("EXPIRES_IN") || 300;
+        return Config.get("EXPIRES_IN") || 120;
     }
     static getAwsRegion() {
         return Config.get("AWS_REGION") || "eu-north-1";

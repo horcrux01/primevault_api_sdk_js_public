@@ -14,7 +14,7 @@ const config_1 = require("./config");
 const signatureService_1 = require("./signatureService");
 const utils_1 = require("./utils");
 const node_crypto_1 = require("node:crypto");
-const uuidv4_1 = require("uuidv4");
+const uuid_1 = require("uuid");
 class AuthTokenService {
     constructor(apiKey, privateKeyHex, keyId) {
         this.apiKey = apiKey;
@@ -35,7 +35,7 @@ class AuthTokenService {
                 urlPath: urlPath,
                 userId: this.apiKey,
                 body: bodyHash,
-                jti: (0, uuidv4_1.uuid)(),
+                jti: (0, uuid_1.v4)(),
             };
             const headers = {
                 alg: "ES256",

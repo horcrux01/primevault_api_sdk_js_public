@@ -172,4 +172,63 @@ describe("APIClient", () => {
             expect(e.message).toBe("400 Bad Request: Bad Request");
         }
     }));
+    test("getTradeQuote", () => __awaiter(void 0, void 0, void 0, function* () {
+        const sourceVaults = yield apiClient.getVaults({
+            vaultName: "core-vault-1",
+        });
+        const vaultId = sourceVaults[0].id;
+        const tradeQuoteResponse = yield apiClient.getTradeQuote({
+            vaultId,
+            fromAsset: "ETH",
+            fromAmount: "0.0001",
+            fromChain: "ETHEREUM",
+            toAsset: "USDC",
+            toChain: "ETHEREUM",
+            slippage: "0.05",
+        });
+        expect(tradeQuoteResponse).toBeDefined();
+        expect(tradeQuoteResponse).toBeInstanceOf(Object);
+        expect(tradeQuoteResponse.tradeRequestData).toBeDefined();
+        expect(tradeQuoteResponse.tradeRequestData).toBeInstanceOf(Object);
+        expect(tradeQuoteResponse.tradeRequestData.fromAsset).toBe("ETH");
+        expect(tradeQuoteResponse.tradeRequestData.fromAmount).toBe("0.0001");
+        expect(tradeQuoteResponse.tradeRequestData.blockChain).toBe("ETHEREUM");
+        expect(tradeQuoteResponse.tradeRequestData.toAsset).toBe("USDC");
+        expect(tradeQuoteResponse.tradeRequestData.toBlockchain).toBe("ETHEREUM");
+        expect(tradeQuoteResponse.tradeResponseDataList).toBeDefined();
+        expect(tradeQuoteResponse.tradeResponseDataList).toBeInstanceOf(Array);
+        expect(tradeQuoteResponse.tradeResponseDataList.length).toBe(1);
+        expect(tradeQuoteResponse.tradeResponseDataList[0]).toBeDefined();
+        expect(tradeQuoteResponse.tradeResponseDataList[0]).toBeInstanceOf(Object);
+        expect(tradeQuoteResponse.tradeResponseDataList[0].finalToAmount).toBeDefined();
+        expect(tradeQuoteResponse.tradeResponseDataList[0].finalToAmountUSD).toBeDefined();
+        expect(tradeQuoteResponse.tradeResponseDataList[0].sourceName).toBeDefined();
+    }));
+    test("createTradeTransaction", () => __awaiter(void 0, void 0, void 0, function* () {
+        const sourceVaults = yield apiClient.getVaults({
+            vaultName: "core-vault-1",
+        });
+        const vaultId = sourceVaults[0].id;
+        const tradeQuoteResponse = yield apiClient.getTradeQuote({
+            vaultId,
+            fromAsset: "ETH",
+            fromAmount: "0.0001",
+            fromChain: "ETHEREUM",
+            toAsset: "USDC",
+            toChain: "ETHEREUM",
+            slippage: "0.05",
+        });
+        try {
+            yield apiClient.createTradeTransaction({
+                vaultId,
+                tradeRequestData: tradeQuoteResponse.tradeRequestData,
+                tradeResponseData: tradeQuoteResponse.tradeResponseDataList[0],
+                externalId: "externalId-1",
+            });
+        }
+        catch (e) {
+            expect(e).toBeDefined();
+            expect(e.message).toBe("400 Bad Request: Bad Request");
+        }
+    }));
 });

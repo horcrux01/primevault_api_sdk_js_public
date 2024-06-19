@@ -138,4 +138,67 @@ export interface CreateVaultRequest {
     defaultTransferSpendLimit: Record<string, any>;
     defaultTradeSpendLimit: Record<string, any>;
 }
+export interface TradeQuoteRequest {
+    vaultId: string;
+    fromAsset: string;
+    fromAmount: string;
+    fromChain: string;
+    toAsset: string;
+    toChain: string;
+    slippage: string;
+}
+export interface CreateTradeTransactionRequest {
+    vaultId: string;
+    tradeRequestData: Record<string, any>;
+    tradeResponseData: Record<string, any>;
+    externalId?: string;
+}
+export interface CreateContactRequest {
+    name: string;
+    address: string;
+    chain: string;
+    tags?: string[];
+    externalId?: string;
+}
+export interface FeeData {
+    expectedFeeInAsset: string;
+    asset: string;
+    expectedFeeInUSD: string;
+    baseFee?: string;
+    priorityFee?: string;
+}
+export interface EstimatedFeeResponse {
+    high: FeeData;
+    medium: FeeData;
+    low: FeeData;
+}
+export interface TradeQuoteResponseData {
+    finalToAmount: string;
+    finalToAmountUSD: string;
+    sourceName: string;
+    feeInUSD: string;
+    autoSlippage: string;
+    unitToAssetAmount?: string;
+    quotesValidTill?: string;
+    estCompletionTimeInSec?: string;
+}
+export interface TradeQuoteRequestData {
+    fromAsset: string;
+    fromAmount: string;
+    blockChain: string;
+    toAsset: string;
+    toBlockchain: string;
+    slippage: string;
+    fromAmountUSD?: string;
+    destinationAddress?: string;
+}
+export interface GetTradeQuoteResponse {
+    tradeRequestData: TradeQuoteRequestData;
+    tradeResponseDataList: TradeQuoteResponseData[];
+}
+export interface BalanceResponse {
+    [key: string]: {
+        [key: string]: string;
+    };
+}
 //# sourceMappingURL=types.d.ts.map

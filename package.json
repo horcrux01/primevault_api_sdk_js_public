@@ -37,9 +37,10 @@
   },
   "dependencies": {
     "@aws-sdk/client-kms": "3.569.0",
+    "@types/uuid": "9.0.8",
     "axios": "1.6.8",
     "base64url": "3.0.1",
     "dotenv": "16.4.5",
-    "uuidv4": "6.2.13"
+    "uuid": "10.0.0"
   }
 }

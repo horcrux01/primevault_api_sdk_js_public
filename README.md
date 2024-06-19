@@ -73,11 +73,11 @@ const ethereumAsset = assets.find(
 
 const sourceVaults = await apiClient.getVaults({
   vaultName: "core-vault-1",
-}); // source
+}); // Source Vault
 
 const destinationContacts = await apiClient.getContacts({
   name: "Lynn Bell",
-}); // destination
+}); // Destination Contact. This could be Core or Exchange Vault id as well.
 
 const sourceId = sourceVaults[0].id;
 const destinationId = destinationContacts[0].id;
@@ -100,7 +100,7 @@ let txnResponse = await apiClient.createTransferTransaction({
   asset: ethereumAsset.symbol,
   chain: ethereumAsset.blockChain,
   externalId: "externalId-1",               // Optional externalId to track transactions, should be unique
-  gasParams: {},                            // Optional gasParams. Example: {'feeTier': 'MEDIUM'} for medium fee tier. Default is HIGH
+  gasParams: {},                            // Optional gasParams. Example: {'feeTier': 'MEDIUM'} for medium fee tier. Default is HIGH.
 });
 
 while (true) {
@@ -169,4 +169,9 @@ while (true) {
     await new Promise(resolve => setTimeout(resolve, 1000))
 }
 // vaultResponse.wallets has the wallet addresses.
+
+// balance of a vault
+const balances = await apiClient.getBalances(vaultResponse.id);
+console.log(balances);
+
 ```

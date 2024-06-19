@@ -1,11 +1,17 @@
 import { BaseAPIClient } from "./baseApiClient";
 import {
   Asset,
+  BalanceResponse,
   Contact,
+  CreateContactRequest,
   CreateContractCallTransactionRequest,
+  CreateTradeTransactionRequest,
   CreateTransferTransactionRequest,
   CreateVaultRequest,
+  EstimatedFeeResponse,
   EstimateFeeRequest,
+  GetTradeQuoteResponse,
+  TradeQuoteRequest,
   Transaction,
   Vault,
 } from "./types";
@@ -33,7 +39,9 @@ export class APIClient extends BaseAPIClient {
     return await this.get(`/api/external/transactions/${transactionId}/`);
   }
 
-  async estimateFee(request: EstimateFeeRequest) {
+  async estimateFee(
+    request: EstimateFeeRequest,
+  ): Promise<EstimatedFeeResponse> {
     const data = {
       sourceId: request.sourceId,
       destinationId: request.destinationId,
@@ -79,39 +87,30 @@ export class APIClient extends BaseAPIClient {
   }
 
   async getTradeQuote(
-    vaultId: string,
-    fromAsset: string,
-    toAsset: string,
-    fromAmount: string,
-    fromChain: string,
-    toChain: string,
-    slippage: string,
-  ) {
+    request: TradeQuoteRequest,
+  ): Promise<GetTradeQuoteResponse> {
     const params = {
-      vaultId,
-      fromAsset,
-      toAsset,
-      fromAmount,
-      blockChain: fromChain,
-      toBlockchain: toChain,
-      slippage,
+      vaultId: request.vaultId,
+      fromAsset: request.fromAsset,
+      toAsset: request.toAsset,
+      fromAmount: request.fromAmount,
+      blockChain: request.fromChain,
+      toBlockchain: request.toChain,
+      slippage: request.slippage,
     };
     return await this.get("/api/external/transactions/trade_quote/", params);
   }
 
   async createTradeTransaction(
-    vaultId: string,
-    tradeRequestData: Record<string, any>,
-    tradeResponseData: Record<string, any>,
-    externalId?: string,
-  ) {
+    request: CreateTradeTransactionRequest,
+  ): Promise<Transaction> {
     const data = {
-      vaultId,
-      tradeRequestData,
-      tradeResponseData,
+      vaultId: request.vaultId,
+      tradeRequestData: request.tradeRequestData,
+      tradeResponseData: request.tradeResponseData,
       category: "SWAP",
-      blockChain: tradeRequestData["blockChain"],
-      externalId,
+      blockChain: request.tradeRequestData.blockChain,
+      externalId: request.externalId,
     };
     return await this.post("/api/external/transactions/", data);
   }
@@ -139,11 +138,11 @@ export class APIClient extends BaseAPIClient {
     return await this.post("/api/external/vaults/", data);
   }
 
-  async getBalances(vaultId: string) {
+  async getBalances(vaultId: string): Promise<BalanceResponse> {
     return await this.get(`/api/external/vaults/${vaultId}/balances/`);
   }
 
-  async updateBalances(vaultId: string) {
+  async updateBalances(vaultId: string): Promise<BalanceResponse> {
     return await this.post(`/api/external/vaults/${vaultId}/update_balances/`);
   }
 
@@ -187,19 +186,13 @@ export class APIClient extends BaseAPIClient {
     return await this.get(`/api/external/contacts/${contactId}/`);
   }
 
-  async createContact(
-    name: string,
-    address: string,
-    chain: string,
-    tags?: string[],
-    externalId?: string,
-  ) {
+  async createContact(request: CreateContactRequest): Promise<Contact> {
     const data = {
-      name,
-      address,
-      blockChain: chain,
-      tags,
-      externalId,
+      name: request.name,
+      address: request.address,
+      blockChain: request.chain,
+      tags: request.tags,
+      externalId: request.externalId,
     };
     return await this.post("/api/external/contacts/", data);
   }

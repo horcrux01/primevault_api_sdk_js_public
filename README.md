@@ -1,4 +1,4 @@
-# PrimeVault's API SDK
+# PrimeVault TypeScript/JavaScript SDK
 
 NPM Package: [Here](https://www.npmjs.com/package/@primevault/js-api-sdk)
 
@@ -15,8 +15,13 @@ The flow is as follows:
 
 ```
 #### Option 1: PRIVATE_KEY
+import {generatePublicPrivateKeyPair} from "@primevault/js-api-sdk";
+
 const response = await generatePublicPrivateKeyPair()
 console.log(response)
+
+#### Option 2: AWS_KMS
+In the API documentation
 
 ```
 

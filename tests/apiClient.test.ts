@@ -1,6 +1,6 @@
-import { APIClient } from "./apiClient";
-import { Asset, ContactStatus, TransferPartyType, VaultType } from "./types";
-import { Chain } from "./constants";
+import { APIClient } from "../src/apiClient";
+import { Asset, ContactStatus, TransferPartyType, VaultType } from "../src/types";
+import { Chain } from "../src/constants";
 
 describe("APIClient", () => {
   const apiKey = process.env.API_KEY!;
@@ -12,7 +12,7 @@ describe("APIClient", () => {
     const assetsData = await apiClient.getAssetsData();
     expect(assetsData).toBeDefined();
     expect(assetsData).toBeInstanceOf(Array);
-    expect(assetsData.length).toBe(67);
+    expect(assetsData.length).toBe(68);
   });
 
   test("getVaults", async () => {

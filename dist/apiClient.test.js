@@ -126,12 +126,15 @@ describe("APIClient", () => {
         const destinationContacts = yield apiClient.getContacts({
             name: "Lynn Bell",
         }); // destination
-        const sourceId = sourceVaults[0].id;
-        const destinationId = destinationContacts[0].id;
+        const source = { type: types_1.TransferPartyType.VAULT, id: sourceVaults[0].id };
+        const destination = {
+            type: types_1.TransferPartyType.CONTACT,
+            id: destinationContacts[0].id,
+        };
         try {
             yield apiClient.createTransferTransaction({
-                sourceId: sourceId,
-                destinationId: destinationId,
+                source,
+                destination,
                 amount: "0.0001",
                 asset: ethereumAsset.symbol,
                 chain: ethereumAsset.blockChain,

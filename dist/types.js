@@ -1,6 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.VaultType = void 0;
+exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.VaultType = exports.TransferPartyType = void 0;
+var TransferPartyType;
+(function (TransferPartyType) {
+    TransferPartyType["CONTACT"] = "CONTACT";
+    TransferPartyType["VAULT"] = "VAULT";
+    TransferPartyType["EXTERNAL_ADDRESS"] = "WALLET";
+})(TransferPartyType || (exports.TransferPartyType = TransferPartyType = {}));
 var VaultType;
 (function (VaultType) {
     VaultType["EXCHANGE"] = "EXCHANGE";

@@ -6,6 +6,16 @@ export interface Asset {
     logoURL: number;
     details: any;
 }
+export declare enum TransferPartyType {
+    CONTACT = "CONTACT",
+    VAULT = "VAULT",
+    EXTERNAL_ADDRESS = "WALLET"
+}
+export interface TransferPartyData {
+    type: TransferPartyType;
+    id?: string;
+    value?: string;
+}
 export declare enum VaultType {
     EXCHANGE = "EXCHANGE",
     DEFAULT = "DEFAULT",
@@ -108,8 +118,8 @@ export interface Transaction {
     createdById: string;
 }
 export interface CreateTransferTransactionRequest {
-    sourceId: string;
-    destinationId: string;
+    source: TransferPartyData;
+    destination: TransferPartyData;
     amount: string;
     asset: string;
     chain: string;
@@ -127,8 +137,8 @@ export interface CreateContractCallTransactionRequest {
     externalId?: string;
 }
 export interface EstimateFeeRequest {
-    sourceId: string;
-    destinationId: string;
+    source: TransferPartyData;
+    destination: TransferPartyData;
     amount: string;
     asset: string;
     chain: string;

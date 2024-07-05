@@ -1,5 +1,5 @@
 import { APIClient } from "./apiClient";
-import { Asset, ContactStatus, VaultType } from "./types";
+import { Asset, ContactStatus, TransferPartyType, VaultType } from "./types";
 import { Chain } from "./constants";
 
 describe("APIClient", () => {
@@ -134,12 +134,15 @@ describe("APIClient", () => {
       name: "Lynn Bell",
     }); // destination
 
-    const sourceId = sourceVaults[0].id;
-    const destinationId = destinationContacts[0].id;
+    const source = { type: TransferPartyType.VAULT, id: sourceVaults[0].id };
+    const destination = {
+      type: TransferPartyType.CONTACT,
+      id: destinationContacts[0].id,
+    };
     try {
       await apiClient.createTransferTransaction({
-        sourceId: sourceId,
-        destinationId: destinationId,
+        source,
+        destination,
         amount: "0.0001",
         asset: ethereumAsset.symbol,
         chain: ethereumAsset.blockChain,

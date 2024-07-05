@@ -43,8 +43,8 @@ export class APIClient extends BaseAPIClient {
     request: EstimateFeeRequest,
   ): Promise<EstimatedFeeResponse> {
     const data = {
-      sourceId: request.sourceId,
-      destinationId: request.destinationId,
+      source: request.source,
+      destination: request.destination,
       amount: request.amount,
       asset: request.asset,
       blockChain: request.chain,
@@ -57,8 +57,8 @@ export class APIClient extends BaseAPIClient {
     request: CreateTransferTransactionRequest,
   ): Promise<Transaction> {
     const data = {
-      sourceId: request.sourceId,
-      destinationId: request.destinationId,
+      source: request.source,
+      destinationId: request.destination,
       amount: request.amount,
       asset: request.asset,
       blockChain: request.chain,

@@ -1,5 +1,3 @@
-import exp from "node:constants";
-
 export interface Asset {
   asset: string;
   symbol: string;
@@ -7,6 +5,18 @@ export interface Asset {
   blockChain: string;
   logoURL: number;
   details: any;
+}
+
+export enum TransferPartyType {
+  CONTACT = "CONTACT",
+  VAULT = "VAULT",
+  EXTERNAL_ADDRESS = "WALLET",
+}
+
+export interface TransferPartyData {
+  type: TransferPartyType;
+  id?: string;
+  value?: string;
 }
 
 export enum VaultType {
@@ -120,8 +130,8 @@ export interface Transaction {
 }
 
 export interface CreateTransferTransactionRequest {
-  sourceId: string;
-  destinationId: string;
+  source: TransferPartyData;
+  destination: TransferPartyData;
   amount: string;
   asset: string;
   chain: string;
@@ -141,8 +151,8 @@ export interface CreateContractCallTransactionRequest {
 }
 
 export interface EstimateFeeRequest {
-  sourceId: string;
-  destinationId: string;
+  source: TransferPartyData;
+  destination: TransferPartyData;
   amount: string;
   asset: string;
   chain: string;

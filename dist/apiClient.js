@@ -36,8 +36,8 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
     estimateFee(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
-                sourceId: request.sourceId,
-                destinationId: request.destinationId,
+                source: request.source,
+                destination: request.destination,
                 amount: request.amount,
                 asset: request.asset,
                 blockChain: request.chain,
@@ -49,8 +49,8 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
     createTransferTransaction(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
-                sourceId: request.sourceId,
-                destinationId: request.destinationId,
+                source: request.source,
+                destinationId: request.destination,
                 amount: request.amount,
                 asset: request.asset,
                 blockChain: request.chain,

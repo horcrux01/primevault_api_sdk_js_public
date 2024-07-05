@@ -5,7 +5,7 @@ var TransferPartyType;
 (function (TransferPartyType) {
     TransferPartyType["CONTACT"] = "CONTACT";
     TransferPartyType["VAULT"] = "VAULT";
-    TransferPartyType["EXTERNAL_ADDRESS"] = "WALLET";
+    TransferPartyType["EXTERNAL_ADDRESS"] = "EXTERNAL_ADDRESS";
 })(TransferPartyType || (exports.TransferPartyType = TransferPartyType = {}));
 var VaultType;
 (function (VaultType) {

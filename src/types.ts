@@ -10,7 +10,7 @@ export interface Asset {
 export enum TransferPartyType {
   CONTACT = "CONTACT",
   VAULT = "VAULT",
-  EXTERNAL_ADDRESS = "WALLET",
+  EXTERNAL_ADDRESS = "EXTERNAL_ADDRESS",
 }
 
 export interface TransferPartyData {

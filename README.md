@@ -69,38 +69,45 @@ const apiClient = new APIClient(apiKey, apiUrl, undefined, keyId)
 
 ### Creating transfer transaction
 ```
-// find the asset and chain
-const assets = await apiClient.getAssetsData();
-const ethereumAsset = assets.find(
-  (asset: Asset) =>
-    asset.blockChain === "ETHEREUM" && asset.symbol === "ETH",
-);
+// find the asset. Here, we are looking for ETH on ETHEREUM
+const assets: Asset[] = await apiClient.getAssetsData();
+const ethereumAsset: Asset = assets.find(
+    (asset: Asset) =>
+        asset.blockChain === "ETHEREUM" && asset.symbol === "ETH",
+)!;
 
-const sourceVaults = await apiClient.getVaults({
+// Get source and destinations
+const sourceVaults: Vault[] = await apiClient.getVaults({
   vaultName: "core-vault-1",
 }); // Source Vault
 
-const destinationContacts = await apiClient.getContacts({
+const destinationContacts: Contact[] = await apiClient.getContacts({
   name: "Lynn Bell",
-}); // Destination Contact. This could be Core or Exchange Vault id as well.
+}); // Destination Contact. This could be Core or Exchange Vault or External address as.
 
-const sourceId = sourceVaults[0].id;
-const destinationId = destinationContacts[0].id;
+const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaults[0].id};
+const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContacts[0].id};
+/*
+ To send the transaction to an external whitelisted address, change the type and set the value
+ const destination: TransferPartyData = { type: TransferPartyType.EXTERNAL_ADDRESS, value: '0x123456789..'}; 
+*/
 
-// Optional fee estimate API which returns the expected fee for different tiers, HIGH, MEDIUM, LOW.
-// Default is HIGH. The feeTier is passed in gasParams argument while creating the tranfer transaction.
+/*
+  Optional fee estimate API which returns the expected fee for different tiers, HIGH, MEDIUM, LOW.
+  Default is HIGH. The feeTier is passed in gasParams argument while creating the tranfer transaction.
+*/
 const feeEstimates = await apiClient.estimateFee({
-  sourceId, // source id
-  destinationId, // destination id
+  source, // source id
+  destination, // destination id
   amount: "0.0001",
   asset: ethereumAsset.symbol,
   chain: ethereumAsset.blockChain,
 });
+console.log(feeEstimates);
 
-
-let txnResponse = await apiClient.createTransferTransaction({
-  sourceId,
-  destinationId,
+let txnResponse: Transaction = await apiClient.createTransferTransaction({
+  source,
+  destination,
   amount: "0.0001",
   asset: ethereumAsset.symbol,
   chain: ethereumAsset.blockChain,
@@ -109,11 +116,11 @@ let txnResponse = await apiClient.createTransferTransaction({
 });
 
 while (true) {
-    txnResponse = await apiClient.getTransactionById(txnResponse.id)
-    if (txnResponse.status === TransactionStatus.COMPLETED || txnResponse.status === TransactionStatus.FAILED) {
-        break
-    }
-    await new Promise(resolve => setTimeout(resolve, 3000))
+  txnResponse = await apiClient.getTransactionById(txnResponse.id)
+  if (txnResponse.status === TransactionStatus.COMPLETED || txnResponse.status === TransactionStatus.FAILED) {
+    break
+  }
+  await new Promise(resolve => setTimeout(resolve, 3000))
 }
 console.log(txnResponse)
 ```
@@ -165,7 +172,7 @@ const data = {
     },
 }
 
-let vaultResponse = await apiClient.createVault(data);
+let vaultResponse: Vault = await apiClient.createVault(data);
 while (true) {
     vaultResponse = await apiClient.getVaultById(vaultResponse.id);
     if (vaultResponse.walletsGenerated) {
@@ -176,7 +183,7 @@ while (true) {
 // vaultResponse.wallets has the wallet addresses.
 
 // balance of a vault
-const balances = await apiClient.getBalances(vaultResponse.id);
+const balances: BalanceResponse = await apiClient.getBalances(vaultResponse.id);
 console.log(balances);
 
 ```

@@ -6,12 +6,10 @@ module.exports = {
     '^@components/(.*)$': '<rootDir>/src/components/$1',
   },
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
-  },
-  globals: {
-    'ts-jest': {
-      tsconfig: 'tsconfig.json'
-    }
+    '^.+\\.tsx?$': ['ts-jest', {
+      tsconfig: 'tsconfig.json',
+      diagnostics: true,
+    }],
   },
   testMatch: [
     '**/__tests__/**/*.+(ts|tsx)',

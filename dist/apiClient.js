@@ -77,29 +77,29 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.post("/api/external/transactions/", data);
         });
     }
-    getTradeQuote(vaultId, fromAsset, toAsset, fromAmount, fromChain, toChain, slippage) {
+    getTradeQuote(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const params = {
-                vaultId,
-                fromAsset,
-                toAsset,
-                fromAmount,
-                blockChain: fromChain,
-                toBlockchain: toChain,
-                slippage,
+                vaultId: request.vaultId,
+                fromAsset: request.fromAsset,
+                toAsset: request.toAsset,
+                fromAmount: request.fromAmount,
+                blockChain: request.fromChain,
+                toBlockchain: request.toChain,
+                slippage: request.slippage,
             };
             return yield this.get("/api/external/transactions/trade_quote/", params);
         });
     }
-    createTradeTransaction(vaultId, tradeRequestData, tradeResponseData, externalId) {
+    createTradeTransaction(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
-                vaultId,
-                tradeRequestData,
-                tradeResponseData,
+                vaultId: request.vaultId,
+                tradeRequestData: request.tradeRequestData,
+                tradeResponseData: request.tradeResponseData,
                 category: "SWAP",
-                blockChain: tradeRequestData["blockChain"],
-                externalId,
+                blockChain: request.tradeRequestData.blockChain,
+                externalId: request.externalId,
             };
             return yield this.post("/api/external/transactions/", data);
         });
@@ -166,14 +166,14 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.get(`/api/external/contacts/${contactId}/`);
         });
     }
-    createContact(name, address, chain, tags, externalId) {
+    createContact(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
-                name,
-                address,
-                blockChain: chain,
-                tags,
-                externalId,
+                name: request.name,
+                address: request.address,
+                blockChain: request.chain,
+                tags: request.tags,
+                externalId: request.externalId,
             };
             return yield this.post("/api/external/contacts/", data);
         });

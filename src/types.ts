@@ -1,3 +1,5 @@
+import exp from "node:constants";
+
 export interface Asset {
   asset: string;
   symbol: string;
@@ -150,4 +152,87 @@ export interface CreateVaultRequest {
   vaultName: string;
   defaultTransferSpendLimit: Record<string, any>;
   defaultTradeSpendLimit: Record<string, any>;
+}
+
+export interface TradeQuoteRequest {
+  vaultId: string;
+  fromAsset: string;
+  fromAmount: string;
+  fromChain: string;
+  toAsset: string;
+  toChain: string;
+  slippage: string;
+}
+
+export interface CreateTradeTransactionRequest {
+  vaultId: string;
+  tradeRequestData: Record<string, any>;
+  tradeResponseData: Record<string, any>;
+  externalId?: string;
+}
+
+export interface CreateContactRequest {
+  name: string;
+  address: string;
+  chain: string;
+  tags?: string[];
+  externalId?: string;
+}
+
+export interface FeeData {
+  expectedFeeInAsset: string;
+  asset: string;
+  expectedFeeInUSD: string;
+  baseFee?: string;
+  priorityFee?: string;
+}
+
+export interface EstimatedFeeResponse {
+  high: FeeData;
+  medium: FeeData;
+  low: FeeData;
+}
+
+export interface TradeQuoteResponseData {
+  finalToAmount: string;
+  finalToAmountUSD: string;
+  sourceName: string;
+  feeInUSD: string;
+  autoSlippage: string;
+  unitToAssetAmount?: string;
+  quotesValidTill?: string;
+  estCompletionTimeInSec?: string;
+}
+
+export interface TradeQuoteRequestData {
+  fromAsset: string;
+  fromAmount: string;
+  blockChain: string; // fromChain
+  toAsset: string;
+  toBlockchain: string; // toChain
+  slippage: string;
+  fromAmountUSD?: string;
+  destinationAddress?: string;
+}
+
+export interface GetTradeQuoteResponse {
+  tradeRequestData: TradeQuoteRequestData;
+  tradeResponseDataList: TradeQuoteResponseData[];
+}
+
+/*
+ asset: {chain: balance}
+ Example:
+    {
+    "ETH": {
+        "ETHEREUM": "1.00000000"
+    },
+    "USDC": {
+        "POLYGON": "1.00000000"
+        "ETHEREUM": "1.00000000"
+        "ARBITRUM": "1.00000000"
+    }
+*/
+export interface BalanceResponse {
+  [key: string]: { [key: string]: string };
 }

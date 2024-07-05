@@ -2,6 +2,7 @@ import { Config } from "./config";
 import { getSignatureService } from "./signatureService";
 import { encodeBase64, sortObjectKeys } from "./utils";
 import { createHash } from "node:crypto";
+import { v4 } from "uuid";
 
 export class AuthTokenService {
   private apiKey: string;
@@ -18,24 +19,30 @@ export class AuthTokenService {
   ): Promise<string> {
     const timestamp = Math.floor(Date.now() / 1000);
     const expiresIn = Config.getExpiresIn();
+
     body = body || {};
     const bodyJson = JSON.stringify(sortObjectKeys(body));
     const hash = createHash("sha256");
     hash.update(bodyJson);
     const bodyHash = hash.digest("hex");
+
     const payload = {
       iat: timestamp,
       exp: timestamp + expiresIn,
       urlPath: urlPath,
       userId: this.apiKey,
       body: bodyHash,
+      jti: v4(),
     };
+
     const headers = {
       alg: "ES256",
       typ: "JWT",
     };
+
     const encodedRequest = this.encodeRequest(headers, payload);
     const signatureHexString = await this.signatureService.sign(encodedRequest);
+
     const encodedSignature = encodeBase64(
       Buffer.from(signatureHexString, "hex"),
     );

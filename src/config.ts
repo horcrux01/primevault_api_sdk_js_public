@@ -20,7 +20,7 @@ export class Config {
   }
 
   public static getExpiresIn(): number {
-    return Config.get<number>("EXPIRES_IN") || 300;
+    return Config.get<number>("EXPIRES_IN") || 120;
   }
 
   public static getAwsRegion(): string {

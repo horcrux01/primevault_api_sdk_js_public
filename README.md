@@ -1,4 +1,4 @@
-# PrimeVault's API SDK
+# PrimeVault TypeScript/JavaScript SDK
 
 NPM Package: [Here](https://www.npmjs.com/package/@primevault/js-api-sdk)
 
@@ -15,8 +15,13 @@ The flow is as follows:
 
 ```
 #### Option 1: PRIVATE_KEY
+import {generatePublicPrivateKeyPair} from "@primevault/js-api-sdk";
+
 const response = await generatePublicPrivateKeyPair()
 console.log(response)
+
+#### Option 2: AWS_KMS
+In the API documentation
 
 ```
 
@@ -73,11 +78,11 @@ const ethereumAsset = assets.find(
 
 const sourceVaults = await apiClient.getVaults({
   vaultName: "core-vault-1",
-}); // source
+}); // Source Vault
 
 const destinationContacts = await apiClient.getContacts({
   name: "Lynn Bell",
-}); // destination
+}); // Destination Contact. This could be Core or Exchange Vault id as well.
 
 const sourceId = sourceVaults[0].id;
 const destinationId = destinationContacts[0].id;
@@ -100,7 +105,7 @@ let txnResponse = await apiClient.createTransferTransaction({
   asset: ethereumAsset.symbol,
   chain: ethereumAsset.blockChain,
   externalId: "externalId-1",               // Optional externalId to track transactions, should be unique
-  gasParams: {},                            // Optional gasParams. Example: {'feeTier': 'MEDIUM'} for medium fee tier. Default is HIGH
+  gasParams: {},                            // Optional gasParams. Example: {'feeTier': 'MEDIUM'} for medium fee tier. Default is HIGH.
 });
 
 while (true) {
@@ -169,4 +174,9 @@ while (true) {
     await new Promise(resolve => setTimeout(resolve, 1000))
 }
 // vaultResponse.wallets has the wallet addresses.
+
+// balance of a vault
+const balances = await apiClient.getBalances(vaultResponse.id);
+console.log(balances);
+
 ```

@@ -58,7 +58,7 @@ export class APIClient extends BaseAPIClient {
   ): Promise<Transaction> {
     const data = {
       source: request.source,
-      destinationId: request.destination,
+      destination: request.destination,
       amount: request.amount,
       asset: request.asset,
       blockChain: request.chain,

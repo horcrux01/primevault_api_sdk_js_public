@@ -50,7 +50,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
                 source: request.source,
-                destinationId: request.destination,
+                destination: request.destination,
                 amount: request.amount,
                 asset: request.asset,
                 blockChain: request.chain,

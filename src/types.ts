@@ -129,6 +129,7 @@ export interface Transaction {
   createdById: string;
   gasParams: {
     finalGasFeeInUSD?: string;
+    finalGasFeeInToken?: string;
     gasFeeToken?: string;
     expectedGasFeeInToken?: string;
   }

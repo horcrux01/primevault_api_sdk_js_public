@@ -127,7 +127,7 @@ export interface Transaction {
   updatedAt: string;
   isDeleted: boolean;
   createdById: string;
-  gasParams: {
+  gasParams?: {
     finalGasFeeInUSD?: string;
     finalGasFeeInToken?: string;
     gasFeeToken?: string;

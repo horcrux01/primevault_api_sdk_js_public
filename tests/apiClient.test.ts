@@ -147,6 +147,7 @@ describe("APIClient", () => {
         asset: ethereumAsset.symbol,
         chain: ethereumAsset.blockChain,
         externalId: "externalId-1",
+        memo: "memo",
       });
     } catch (e: any) {
       expect(e).toBeDefined();

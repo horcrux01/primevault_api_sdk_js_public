@@ -67,6 +67,7 @@ export class APIClient extends BaseAPIClient {
       externalId: request.externalId,
       isAutomation: request.isAutomation,
       executeAt: request.executeAt,
+      memo: request.memo,
     };
     return await this.post("/api/external/transactions/", data);
   }
@@ -111,6 +112,7 @@ export class APIClient extends BaseAPIClient {
       category: "SWAP",
       blockChain: request.tradeRequestData.blockChain,
       externalId: request.externalId,
+      memo: request.memo,
     };
     return await this.post("/api/external/transactions/", data);
   }

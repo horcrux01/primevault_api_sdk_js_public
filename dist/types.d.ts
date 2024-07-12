@@ -122,6 +122,8 @@ export interface Transaction {
         gasFeeToken?: string;
         expectedGasFeeInToken?: string;
     };
+    memo?: string;
+    sourceAddress?: string;
 }
 export interface CreateTransferTransactionRequest {
     source: TransferPartyData;
@@ -133,6 +135,7 @@ export interface CreateTransferTransactionRequest {
     externalId?: string;
     isAutomation?: boolean;
     executeAt?: string;
+    memo?: string;
 }
 export interface CreateContractCallTransactionRequest {
     vaultId: string;
@@ -168,6 +171,7 @@ export interface CreateTradeTransactionRequest {
     tradeRequestData: Record<string, any>;
     tradeResponseData: Record<string, any>;
     externalId?: string;
+    memo?: string;
 }
 export interface CreateContactRequest {
     name: string;

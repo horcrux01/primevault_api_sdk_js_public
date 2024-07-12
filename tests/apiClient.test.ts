@@ -166,6 +166,12 @@ describe("APIClient", () => {
     expect(transaction.blockChain).toBe("ETHEREUM");
     expect(transaction.externalId).toBeNull();
     expect(transaction.toAddressName).toBe("Compound");
+    expect(transaction.sourceAddress).toBe("0x1feDDa0D98c5B4FDEbde9342d3db6Eff284B0d18");
+    expect(transaction.memo).toBeNull();
+    expect(transaction.gasParams).toBeDefined();
+    expect(transaction.gasParams).toBeInstanceOf(Object);
+    expect(transaction.gasParams?.expectedGasFeeInToken).toBe("0.00055509");
+    expect(transaction.gasParams?.gasFeeToken).toBe("ETH");
   });
 
   test("createContractCallTransaction", async () => {

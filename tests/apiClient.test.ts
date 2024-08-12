@@ -15,6 +15,24 @@ describe("APIClient", () => {
     expect(assetsData.length).toBe(68);
   });
 
+  test("getSupportedChains", async () => {
+    const supportedChains = await apiClient.getSupportedChains();
+    expect(supportedChains).toBeDefined();
+    expect(supportedChains).toBeInstanceOf(Array);
+    expect(supportedChains.length).toBe(9);
+    expect(supportedChains.map((chain) => chain.value)).toEqual([
+      "ETHEREUM",
+      "POLYGON",
+      "SOLANA",
+      "NEAR",
+      "APTOS",
+      "ARBITRUM",
+      "OPTIMISM",
+      "MOONBEAM",
+      "TON",
+    ]);
+  });
+
   test("getVaults", async () => {
     const vaults = await apiClient.getVaults({ vaultName: "core-vault-1" });
     expect(vaults).toBeDefined();

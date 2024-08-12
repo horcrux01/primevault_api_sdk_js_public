@@ -7,6 +7,12 @@ export interface Asset {
   details: any;
 }
 
+export interface ChainData {
+  value: string;
+  label: string;
+  logo: string;
+}
+
 export enum TransferPartyType {
   CONTACT = "CONTACT",
   VAULT = "VAULT",

@@ -1,7 +1,7 @@
 import { BaseAPIClient } from "./baseApiClient";
 import {
   Asset,
-  BalanceResponse,
+  BalanceResponse, ChainData,
   Contact,
   CreateContactRequest,
   CreateContractCallTransactionRequest,
@@ -19,6 +19,10 @@ import {
 export class APIClient extends BaseAPIClient {
   async getAssetsData(): Promise<Asset[]> {
     return await this.get("/api/external/assets/");
+  }
+
+  async getSupportedChains(): Promise<ChainData[]> {
+    return await this.get("/api/external/assets/supported_chains/");
   }
 
   async getTransactions(

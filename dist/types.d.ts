@@ -6,6 +6,11 @@ export interface Asset {
     logoURL: number;
     details: any;
 }
+export interface ChainData {
+    value: string;
+    label: string;
+    logo: string;
+}
 export declare enum TransferPartyType {
     CONTACT = "CONTACT",
     VAULT = "VAULT",

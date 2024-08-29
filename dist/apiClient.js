@@ -17,6 +17,11 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.get("/api/external/assets/");
         });
     }
+    getSupportedChains() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.get("/api/external/assets/supported_chains/");
+        });
+    }
     getTransactions() {
         return __awaiter(this, arguments, void 0, function* (params = {}, page = 1, limit = 20) {
             const query = new URLSearchParams(params).toString();

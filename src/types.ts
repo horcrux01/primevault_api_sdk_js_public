@@ -80,6 +80,7 @@ export interface Contact {
   createdAt: string;
   updatedAt: string;
   isDeleted: boolean;
+  operationId?: string;
 }
 
 export enum TransactionType {

@@ -1,6 +1,15 @@
 import { APIClient } from "../src/apiClient";
 import { Asset, ContactStatus, TransferPartyType, VaultType } from "../src/types";
-import { Chain } from "../src/constants";
+
+enum Chain {
+    "ETHEREUM" = "ETHEREUM",
+    "POLYGON" = "POLYGON",
+    "SOLANA" = "SOLANA",
+    "NEAR" = "NEAR",
+    "APTOS" = "APTOS",
+    "ARBITRUM" = "ARBITRUM",
+    "OPTIMISM" = "OPTIMISM",
+}
 
 describe("APIClient", () => {
   const apiKey = process.env.API_KEY!;
@@ -12,14 +21,14 @@ describe("APIClient", () => {
     const assetsData = await apiClient.getAssetsData();
     expect(assetsData).toBeDefined();
     expect(assetsData).toBeInstanceOf(Array);
-    expect(assetsData.length).toBe(68);
+    expect(assetsData.length).toBe(80);
   });
 
   test("getSupportedChains", async () => {
     const supportedChains = await apiClient.getSupportedChains();
     expect(supportedChains).toBeDefined();
     expect(supportedChains).toBeInstanceOf(Array);
-    expect(supportedChains.length).toBe(9);
+    expect(supportedChains.length).toBe(10);
     expect(supportedChains.map((chain) => chain.value)).toEqual([
       "ETHEREUM",
       "POLYGON",
@@ -29,7 +38,8 @@ describe("APIClient", () => {
       "ARBITRUM",
       "OPTIMISM",
       "MOONBEAM",
-      "TON",
+      "RADIX",
+      "RADIX"
     ]);
   });
 

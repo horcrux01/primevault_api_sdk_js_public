@@ -142,6 +142,7 @@ export interface Transaction {
   };
   memo?: string;
   sourceAddress?: string;
+  txnSignature?: string; // Hex encoded signature of the transaction
 }
 
 export interface CreateTransferTransactionRequest {

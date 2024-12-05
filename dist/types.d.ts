@@ -73,6 +73,7 @@ export interface Contact {
     createdAt: string;
     updatedAt: string;
     isDeleted: boolean;
+    operationId?: string;
 }
 export declare enum TransactionType {
     INCOMING = "INCOMING",
@@ -129,6 +130,7 @@ export interface Transaction {
     };
     memo?: string;
     sourceAddress?: string;
+    txnSignature?: string;
 }
 export interface CreateTransferTransactionRequest {
     source: TransferPartyData;

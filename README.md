@@ -162,6 +162,7 @@ const vaults = await apiClient.getVaults({
 
 const vaultId = vaults[0].id;
 
+// Signing a raw message on ICP Chain
 let txnResponse = await apiClient.createContractCallTransaction({
   vaultId,
   chain: "ICP",

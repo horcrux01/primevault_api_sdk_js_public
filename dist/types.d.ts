@@ -145,7 +145,7 @@ export interface CreateTransferTransactionRequest {
     memo?: string;
 }
 export interface EVMContractCallData {
-    callDataHex: string;
+    callData: string;
     toAddress?: string;
 }
 export interface ICPCanisterCallData {

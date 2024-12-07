@@ -159,7 +159,7 @@ export interface CreateTransferTransactionRequest {
 }
 
 export interface EVMContractCallData {
-  callDataHex: string;
+  callData: string;
   toAddress?: string;
 }
 

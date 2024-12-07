@@ -74,11 +74,12 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             const data = {
                 vaultId: request.vaultId,
                 blockChain: request.chain,
+                amount: request.amount,
                 messageHex: request.messageHex,
                 toAddress: request.toAddress,
-                amount: request.amount,
-                externalId: request.externalId,
                 category: "CONTRACT_CALL",
+                data: request.data,
+                externalId: request.externalId,
             };
             return yield this.post("/api/external/transactions/", data);
         });

@@ -144,12 +144,23 @@ export interface CreateTransferTransactionRequest {
     executeAt?: string;
     memo?: string;
 }
+export interface EVMContractCallData {
+    callData: string;
+    toAddress?: string;
+}
+export interface ICPCanisterCallData {
+    canisterId: string;
+    method: string;
+    arg: string;
+}
+export type ContractCallData = EVMContractCallData | ICPCanisterCallData;
 export interface CreateContractCallTransactionRequest {
     vaultId: string;
     chain: string;
-    messageHex: string;
-    toAddress?: string;
     amount?: string;
+    messageHex?: string;
+    toAddress?: string;
+    data?: ContractCallData;
     externalId?: string;
 }
 export interface EstimateFeeRequest {

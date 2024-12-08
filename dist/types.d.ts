@@ -101,6 +101,14 @@ export declare enum TransactionStatus {
     SUBMITTED = "SUBMITTED",
     WAITING_CONFIRMATION = "WAITING_CONFIRMATION"
 }
+export interface EVMOutput {
+    returnData?: string;
+}
+export interface ICPOutput {
+    certificate?: string;
+    contentMap?: string;
+}
+export type TransactionOutput = EVMOutput | ICPOutput;
 export interface Transaction {
     id: string;
     orgId: string;
@@ -131,6 +139,7 @@ export interface Transaction {
     memo?: string;
     sourceAddress?: string;
     txnSignature?: string;
+    output?: TransactionOutput;
 }
 export interface CreateTransferTransactionRequest {
     source: TransferPartyData;

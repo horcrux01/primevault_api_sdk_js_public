@@ -46,7 +46,7 @@ const apiClient = new APIClient("API_KEY", "API_URL");
 
 ```
 const apiKey = "509bc039-65b5-4200-ac56-4827acc5a1ee" // replace this with the API user's key
-const apiUrl = "https://app.primevault.com"
+const apiUrl = "https://api.primevault.com"
 
 const privateKey = "..."
 Config.set("SIGNATURE_SERVICE", "PRIVATE_KEY")
@@ -58,7 +58,7 @@ const apiClient = new APIClient(apiKey, apiUrl, privateKey)
 
 ```
 const apiKey = "509bc039-65b5-4200-ac56-4827acc5a1ee" // replace this with the API user's key
-const apiUrl = "https://app.primevault.com"
+const apiUrl = "https://api.primevault.com"
 const keyId = '..'  // AWS KMS key Id from Key's detail page
 
 Config.set("SIGNATURE_SERVICE", "AWS_KMS")

@@ -10,9 +10,11 @@ const createContractCall = async (apiClient: APIClient) => {
     let txnResponse = await apiClient.createContractCallTransaction({
         vaultId,
         chain: "POLYGON",
-        messageHex: "0x095ea7b3000000000000000000000000c",                 // Final message/data in hex
-        toAddress: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",           // Address of smart contract
         externalId: "externalId-1",                                        // Optional externalId to track transactions, should be unique
+        "data": {
+           "callData": "0x095ea7b3000000000000000000000000c36442b4a4522e871399cd717abdd847ab11fe88ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+           "toAddress": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",         // Address of smart contract
+        },
     });
 
     while (true) {

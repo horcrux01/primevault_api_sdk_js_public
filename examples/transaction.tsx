@@ -24,7 +24,7 @@ const createTransfer = async (apiClient: APIClient) => {
 
     const destinationContacts: Contact[] = await apiClient.getContacts({
         name: "Lynn Bell",
-    }); // Destination Contact. This could be Core or Exchange Vault or External address as.
+    });  // Destination Contact. This could be Core or Exchange Vault or External address as.
 
     const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaults[0].id};
     const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContacts[0].id};

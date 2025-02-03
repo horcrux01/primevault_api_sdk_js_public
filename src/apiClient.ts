@@ -88,6 +88,7 @@ export class APIClient extends BaseAPIClient {
       category: "CONTRACT_CALL",
       data: request.data,
       externalId: request.externalId,
+      gasParams: request.gasParams,
     };
     return await this.post("/api/external/transactions/", data);
   }

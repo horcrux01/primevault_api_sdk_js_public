@@ -1,3 +1,4 @@
+
 export interface Asset {
   asset: string;
   symbol: string;
@@ -105,12 +106,20 @@ export enum TransactionSubCategory {
 export enum TransactionStatus {
   DRAFT = "DRAFT",
   PENDING = "PENDING",
-  "APPROVED" = "APPROVED",
+  APPROVED = "APPROVED",
   COMPLETED = "COMPLETED",
   FAILED = "FAILED",
   DECLINED = "DECLINED",
   SUBMITTED = "SUBMITTED",
+  SIGNED = "SIGNED",
   WAITING_CONFIRMATION = "WAITING_CONFIRMATION",
+}
+
+export enum TransactionFeeTier {
+  INSTANT = "INSTANT",
+  HIGH = "HIGH",
+  MEDIUM = "MEDIUM",
+  LOW = "LOW",
 }
 
 export interface EVMOutput {
@@ -157,13 +166,17 @@ export interface Transaction {
   output?: TransactionOutput;
 }
 
+export interface TransactionCreationGasParams {
+  feeTier?: TransactionFeeTier;
+}
+
 export interface CreateTransferTransactionRequest {
   source: TransferPartyData;
   destination: TransferPartyData;
   amount: string;
   asset: string;
   chain: string;
-  gasParams?: Record<string, any>;
+  gasParams?: TransactionCreationGasParams;
   externalId?: string;
   isAutomation?: boolean;
   executeAt?: string;
@@ -191,6 +204,7 @@ export interface CreateContractCallTransactionRequest {
   toAddress?: string;
   data?: ContractCallData
   externalId?: string;
+  gasParams?: TransactionCreationGasParams;
 }
 
 export interface EstimateFeeRequest {

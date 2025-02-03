@@ -1,5 +1,5 @@
-import { APIClient } from "../src/apiClient";
-import { Asset, ContactStatus, TransferPartyType, VaultType } from "../src/types";
+import {APIClient} from "../src/apiClient";
+import {Asset, ContactStatus, TransactionFeeTier, TransferPartyType, VaultType} from "../src/types";
 
 enum Chain {
     "ETHEREUM" = "ETHEREUM",
@@ -21,7 +21,7 @@ describe("APIClient", () => {
     const assetsData = await apiClient.getAssetsData();
     expect(assetsData).toBeDefined();
     expect(assetsData).toBeInstanceOf(Array);
-    expect(assetsData.length).toBe(80);
+    expect(assetsData.length).toBe(86);
   });
 
   test("getSupportedChains", async () => {
@@ -176,6 +176,7 @@ describe("APIClient", () => {
         chain: ethereumAsset.blockChain,
         externalId: "externalId-1",
         memo: "memo",
+        gasParams: { feeTier: TransactionFeeTier.HIGH },
       });
     } catch (e: any) {
       expect(e).toBeDefined();
@@ -247,7 +248,7 @@ describe("APIClient", () => {
 
     expect(tradeQuoteResponse.tradeResponseDataList).toBeDefined();
     expect(tradeQuoteResponse.tradeResponseDataList).toBeInstanceOf(Array);
-    expect(tradeQuoteResponse.tradeResponseDataList.length).toBe(1);
+    expect(tradeQuoteResponse.tradeResponseDataList.length).toBe(2);
     expect(tradeQuoteResponse.tradeResponseDataList[0]).toBeDefined();
     expect(tradeQuoteResponse.tradeResponseDataList[0]).toBeInstanceOf(Object);
     expect(

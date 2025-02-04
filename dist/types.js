@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.VaultType = exports.TransferPartyType = void 0;
+exports.TransactionFeeTier = exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.VaultType = exports.TransferPartyType = void 0;
 var TransferPartyType;
 (function (TransferPartyType) {
     TransferPartyType["CONTACT"] = "CONTACT";
@@ -47,5 +47,12 @@ var TransactionStatus;
     TransactionStatus["FAILED"] = "FAILED";
     TransactionStatus["DECLINED"] = "DECLINED";
     TransactionStatus["SUBMITTED"] = "SUBMITTED";
+    TransactionStatus["SIGNED"] = "SIGNED";
     TransactionStatus["WAITING_CONFIRMATION"] = "WAITING_CONFIRMATION";
 })(TransactionStatus || (exports.TransactionStatus = TransactionStatus = {}));
+var TransactionFeeTier;
+(function (TransactionFeeTier) {
+    TransactionFeeTier["HIGH"] = "HIGH";
+    TransactionFeeTier["MEDIUM"] = "MEDIUM";
+    TransactionFeeTier["LOW"] = "LOW";
+})(TransactionFeeTier || (exports.TransactionFeeTier = TransactionFeeTier = {}));

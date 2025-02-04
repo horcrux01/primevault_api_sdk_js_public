@@ -1,10 +1,9 @@
 export interface Asset {
-    asset: string;
+    name: string;
     symbol: string;
-    assetType: string;
     blockChain: string;
-    logoURL: number;
-    details: any;
+    logoURL?: number;
+    details?: any;
 }
 export interface ChainData {
     value: string;
@@ -34,7 +33,7 @@ export interface Vault {
     wallets: {
         id: string;
         blockchain: string;
-        address: string;
+        address?: string;
     }[];
     signers: {
         id: string;
@@ -44,9 +43,9 @@ export interface Vault {
     }[];
     viewers: {
         id: string;
-        firstName: string;
-        lastName: string;
-        email: string;
+        firstName?: string;
+        lastName?: string;
+        email?: string;
     }[];
     walletsGenerated: boolean;
     createdAt: string;
@@ -94,12 +93,18 @@ export declare enum TransactionSubCategory {
 export declare enum TransactionStatus {
     DRAFT = "DRAFT",
     PENDING = "PENDING",
-    "APPROVED" = "APPROVED",
+    APPROVED = "APPROVED",
     COMPLETED = "COMPLETED",
     FAILED = "FAILED",
     DECLINED = "DECLINED",
     SUBMITTED = "SUBMITTED",
+    SIGNED = "SIGNED",
     WAITING_CONFIRMATION = "WAITING_CONFIRMATION"
+}
+export declare enum TransactionFeeTier {
+    HIGH = "HIGH",
+    MEDIUM = "MEDIUM",
+    LOW = "LOW"
 }
 export interface EVMOutput {
     returnData?: string;
@@ -141,13 +146,16 @@ export interface Transaction {
     txnSignature?: string;
     output?: TransactionOutput;
 }
+export interface TransactionCreationGasParams {
+    feeTier?: TransactionFeeTier;
+}
 export interface CreateTransferTransactionRequest {
     source: TransferPartyData;
     destination: TransferPartyData;
     amount: string;
     asset: string;
     chain: string;
-    gasParams?: Record<string, any>;
+    gasParams?: TransactionCreationGasParams;
     externalId?: string;
     isAutomation?: boolean;
     executeAt?: string;
@@ -171,6 +179,7 @@ export interface CreateContractCallTransactionRequest {
     toAddress?: string;
     data?: ContractCallData;
     externalId?: string;
+    gasParams?: TransactionCreationGasParams;
 }
 export interface EstimateFeeRequest {
     source: TransferPartyData;

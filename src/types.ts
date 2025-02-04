@@ -1,11 +1,10 @@
 
 export interface Asset {
-  asset: string;
+  name: string;
   symbol: string;
-  assetType: string;
   blockChain: string;
-  logoURL: number;
-  details: any;
+  logoURL?: number;
+  details?: any;
 }
 
 export interface ChainData {
@@ -40,7 +39,7 @@ export interface Vault {
   wallets: {
     id: string;
     blockchain: string;
-    address: string;
+    address?: string;
   }[];
   signers: {
     id: string;
@@ -50,9 +49,9 @@ export interface Vault {
   }[];
   viewers: {
     id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
   }[];
   walletsGenerated: boolean;
   createdAt: string;
@@ -116,7 +115,6 @@ export enum TransactionStatus {
 }
 
 export enum TransactionFeeTier {
-  INSTANT = "INSTANT",
   HIGH = "HIGH",
   MEDIUM = "MEDIUM",
   LOW = "LOW",
@@ -145,8 +143,8 @@ export interface Transaction {
   toAddressName: string;
   txHash: string;
   error: string;
-  toVaultId?: string; // if the transaction is a transfer from one vault to another
-  externalId?: string; // set by the external system
+  toVaultId?: string;                // if the transaction is a transfer from one vault to another
+  externalId?: string;               // set by the external system
   transactionType: TransactionType;
   category: TransactionCategory;
   subCategory: TransactionSubCategory;
@@ -162,7 +160,7 @@ export interface Transaction {
   };
   memo?: string;
   sourceAddress?: string;
-  txnSignature?: string; // Hex encoded signature of the transaction
+  txnSignature?: string;             // Hex encoded signature of the transaction
   output?: TransactionOutput;
 }
 
@@ -275,9 +273,9 @@ export interface TradeQuoteResponseData {
 export interface TradeQuoteRequestData {
   fromAsset: string;
   fromAmount: string;
-  blockChain: string; // fromChain
+  blockChain: string;       // fromChain
   toAsset: string;
-  toBlockchain: string; // toChain
+  toBlockchain: string;     // toChain
   slippage: string;
   fromAmountUSD?: string;
   destinationAddress?: string;

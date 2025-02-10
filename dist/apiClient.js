@@ -75,8 +75,6 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 vaultId: request.vaultId,
                 blockChain: request.chain,
                 amount: request.amount,
-                messageHex: request.messageHex,
-                toAddress: request.toAddress,
                 category: "CONTRACT_CALL",
                 data: request.data,
                 externalId: request.externalId,

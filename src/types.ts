@@ -192,14 +192,16 @@ export interface ICPCanisterCallData {
   arg: string;
 }
 
-export type ContractCallData = EVMContractCallData | ICPCanisterCallData;
+export interface RawSigningData {
+  messageHex: string;
+}
+
+export type ContractCallData = EVMContractCallData | ICPCanisterCallData | RawSigningData;
 
 export interface CreateContractCallTransactionRequest {
   vaultId: string;
   chain: string;
   amount?: string;
-  messageHex?: string;
-  toAddress?: string;
   data?: ContractCallData
   externalId?: string;
   gasParams?: TransactionCreationGasParams;

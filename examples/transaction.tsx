@@ -23,8 +23,8 @@ const createTransfer = async (apiClient: APIClient) => {
     }); // Source Vault
 
     const destinationContacts: Contact[] = await apiClient.getContacts({
-        name: "Lynn Bell",
-    });  // Destination Contact. This could be Core or Exchange Vault or External address as.
+        name: "Brandi Taylor",
+    });  // Destination Contact. This could be Core or Exchange Vault or External address.
 
     const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaults[0].id};
     const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContacts[0].id};
@@ -35,7 +35,7 @@ const createTransfer = async (apiClient: APIClient) => {
 
     /*
       Optional fee estimate API which returns the expected fee for different tiers, HIGH, MEDIUM, LOW.
-      Default is HIGH. The feeTier is passed in gasParams argument while creating the tranfer transaction.
+      Default is HIGH. The feeTier is passed in gasParams argument while creating the transfer transaction.
     */
     const feeEstimates = await apiClient.estimateFee({
         source, // source id

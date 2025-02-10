@@ -39,7 +39,7 @@ describe("APIClient", () => {
       "OPTIMISM",
       "MOONBEAM",
       "RADIX",
-      "RADIX"
+      "ICP"
     ]);
   });
 
@@ -212,10 +212,12 @@ describe("APIClient", () => {
       await apiClient.createContractCallTransaction({
         vaultId: vaultId,
         chain: Chain.ETHEREUM,
-        messageHex: "0x",
-        toAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         externalId: "externalId-1",
         gasParams: { feeTier: TransactionFeeTier.MEDIUM },
+        data : {
+          callData: "0x",
+          toAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        }
       });
     } catch (e: any) {
       expect(e).toBeDefined();

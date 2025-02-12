@@ -29,28 +29,3 @@ const icpCanisterCallTransaction = async (apiClient: APIClient) => {
     }
     console.log(txnResponse.output)
 }
-
-const rawMessageSignature = async (apiClient: APIClient) => {
-    const vaults = await apiClient.getVaults({
-        vaultName: "DeFi vault",
-    });
-    const vaultId = vaults[0].id;
-
-    // Signing a raw message on ICP Chain
-    let txnResponse = await apiClient.createContractCallTransaction({
-        vaultId,
-        chain: "ICP",
-        messageHex: "65",                 // Final message/data in hex
-        externalId: "externalId-12",     // Optional externalId to track transactions, should be unique
-    });
-
-    // wait for transaction to complete
-    while (true) {
-        txnResponse = await apiClient.getTransactionById(txnResponse.id)
-        if (txnResponse.status === TransactionStatus.COMPLETED || txnResponse.status === TransactionStatus.FAILED) {
-            break
-        }
-        await new Promise(resolve => setTimeout(resolve, 3000))
-    }
-    console.log(txnResponse.txnSignature)
-}

@@ -28,31 +28,4 @@ const createContractCall = async (apiClient: APIClient) => {
         await new Promise(resolve => setTimeout(resolve, 3000))
     }
     console.log(txnResponse)
-
-}
-
-const rawMessageSignature = async (apiClient: APIClient) => {
-    const vaults = await apiClient.getVaults({
-        vaultName: "core-vault-1",
-    });
-
-    const vaultId = vaults[0].id;
-
-    // Signing a raw message on ETHEREUM
-    let txnResponse = await apiClient.createContractCallTransaction({
-        vaultId,
-        chain: "ETHEREUM",
-        messageHex: "0x095ea7b3000000000000000000000000c",                 // Final message/data in hex
-        externalId: "externalId-1",                                        // Optional externalId to track transactions, should be unique
-    });
-
-    while (true) {
-        txnResponse = await apiClient.getTransactionById(txnResponse.id)
-        if (txnResponse.status === TransactionStatus.COMPLETED || txnResponse.status === TransactionStatus.FAILED) {
-            break
-        }
-        await new Promise(resolve => setTimeout(resolve, 3000))
-    }
-    console.log(txnResponse.txnSignature)
-
 }

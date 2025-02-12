@@ -11,8 +11,10 @@ const rawMessageSignatureForEVM = async (apiClient: APIClient) => {
     let txnResponse = await apiClient.createContractCallTransaction({
         vaultId,
         chain: "ETHEREUM",
-        messageHex: "0x095ea7b3000000000000000000000000c",                 // Final message/data in hex
         externalId: "externalId-1",                                        // Optional externalId to track transactions, should be unique
+        data: {
+            messageHex: "0x095ea7b3000000000000000000000000c"
+        }
     });
 
     while (true) {
@@ -54,9 +56,11 @@ const rawMessageSignatureForNear = async (apiClient: APIClient) => {
     // Signing a raw message on ETHEREUM
     let txnResponse = await apiClient.createContractCallTransaction({
         vaultId,
-        chain: "ETHEREUM",
-        messageHex: "0x095ea7b3000000000000000000000000c",                 // Final message/data in hex
+        chain: "NEAR",
         externalId: "externalId-1",                                        // Optional externalId to track transactions, should be unique
+        data: {
+            messageHex: "0x095ea7b3000000000000000000000000c"
+        }
     });
 
     while (true) {

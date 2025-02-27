@@ -87,6 +87,7 @@ export class APIClient extends BaseAPIClient {
       data: request.data,
       externalId: request.externalId,
       gasParams: request.gasParams,
+      creationOptions: request.creationOptions,
     };
     return await this.post("/api/external/transactions/", data);
   }

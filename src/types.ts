@@ -162,10 +162,15 @@ export interface Transaction {
   sourceAddress?: string;
   txnSignature?: string;             // Hex encoded signature of the transaction
   output?: TransactionOutput;
+  amountInUSD?: string;
 }
 
 export interface TransactionCreationGasParams {
   feeTier?: TransactionFeeTier;
+}
+
+export interface TransactionCreationOptions {
+  skipPreprocessSimulation?: boolean;
 }
 
 export interface CreateTransferTransactionRequest {
@@ -205,6 +210,7 @@ export interface CreateContractCallTransactionRequest {
   data?: ContractCallData
   externalId?: string;
   gasParams?: TransactionCreationGasParams;
+  creationOptions?: TransactionCreationOptions;
 }
 
 export interface EstimateFeeRequest {

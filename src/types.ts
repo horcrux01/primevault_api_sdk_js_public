@@ -160,7 +160,8 @@ export interface Transaction {
   };
   memo?: string;
   sourceAddress?: string;
-  txnSignature?: string;             // Hex encoded signature of the transaction
+  txnSignature?: string;                  // Hex encoded signature of the transaction
+  txnSignatureData?: Record<string, any>; // Signature data
   output?: TransactionOutput;
   amountInUSD?: string;
 }

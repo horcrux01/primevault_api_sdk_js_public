@@ -144,6 +144,7 @@ export interface Transaction {
     memo?: string;
     sourceAddress?: string;
     txnSignature?: string;
+    txnSignatureData?: Record<string, any>;
     output?: TransactionOutput;
     amountInUSD?: string;
 }

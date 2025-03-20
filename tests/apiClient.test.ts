@@ -124,7 +124,7 @@ describe("APIClient", () => {
   test("createVault", async () => {
     const data = {
       vaultName: "Ethereum Vault 11",
-      templateId: "e3372142-c319-42a6-9cc1-1ac0c02dedd5",
+      templateId: "2c693b68-c0da-49a4-a924-fbbfa36f2b24",
     };
     try {
       await apiClient.createVault(data);

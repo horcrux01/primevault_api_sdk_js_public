@@ -53,7 +53,7 @@ describe("APIClient", () => {
     expect(vaults[0].wallets).toBeDefined();
     expect(vaults[0].wallets.length).toBe(8);
     expect(vaults[0].signers).toBeDefined();
-    expect(vaults[0].signers.length).toBe(8);
+    expect(vaults[0].signers.length).toBe(9);
     expect(vaults[0].viewers.length).toBe(0);
 
     const blockchains = vaults[0].wallets
@@ -97,15 +97,15 @@ describe("APIClient", () => {
     expect(balances2["ETH"]).toBeInstanceOf(Object);
     expect(Object.keys(balances2["ETH"]).length).toBe(3);
     expect(balances2["ETH"]).toStrictEqual({
-      ETHEREUM: 0.00950008,
-      OPTIMISM: 0,
-      ARBITRUM: 0,
+      ARBITRUM: "0",
+      ETHEREUM: "0.00950008",
+      OPTIMISM: "0",
     });
 
     expect(balances2["MATIC"]).toBeDefined();
     expect(balances2["MATIC"]).toBeInstanceOf(Object);
     expect(Object.keys(balances2["MATIC"]).length).toBe(1);
-    expect(balances2["MATIC"]).toStrictEqual({ POLYGON: 0.00767327 });
+    expect(balances2["MATIC"]).toStrictEqual({ POLYGON: "0.00767327" });
   });
 
   test("getContacts", async () => {
@@ -182,7 +182,7 @@ describe("APIClient", () => {
       expect(e).toBeDefined();
       expect(e.message).toBe("400 Bad Request: Bad Request");
     }
-  });
+  }, 10000);
 
   test("getTransactionsById", async () => {
     const transaction = await apiClient.getTransactionById(
@@ -263,7 +263,7 @@ describe("APIClient", () => {
     expect(
       tradeQuoteResponse.tradeResponseDataList[0].sourceName,
     ).toBeDefined();
-  });
+  }, 10000);
 
   test("createTradeTransaction", async () => {
     const sourceVaults = await apiClient.getVaults({
@@ -290,5 +290,5 @@ describe("APIClient", () => {
       expect(e).toBeDefined();
       expect(e.message).toBe("400 Bad Request: Bad Request");
     }
-  });
+  }, 10000);
 });

@@ -20,13 +20,33 @@ export class PrivateKeySignatureService extends BaseSignatureService {
 
   constructor(privateKeyHex: string) {
     super();
-    const privateKeyDer = Buffer.from(privateKeyHex, "hex");
-    // Create a private key object from DER format
-    this.privateKey = crypto.createPrivateKey({
-      key: privateKeyDer,
-      format: "der",
-      type: "pkcs8",
-    });
+    const trimmedKey = privateKeyHex.trim();
+    if (trimmedKey.startsWith("-----BEGIN")) {
+      // The key is in PEM format.
+      // Determine if it is in SEC1 (EC PRIVATE KEY) or PKCS#8 (PRIVATE KEY) format.
+      if (trimmedKey.includes("EC PRIVATE KEY")) {
+        this.privateKey = crypto.createPrivateKey({
+          key: trimmedKey,
+          format: "pem",
+          type: "sec1", // SEC1 for EC keys
+        });
+      } else {
+        // Assume PKCS#8 format
+        this.privateKey = crypto.createPrivateKey({
+          key: trimmedKey,
+          format: "pem",
+          type: "pkcs8",
+        });
+      }
+    } else {
+      // Otherwise, assume it's a hex-encoded DER key in PKCS#8 format.
+      const privateKeyDer = Buffer.from(trimmedKey, "hex");
+      this.privateKey = crypto.createPrivateKey({
+        key: privateKeyDer,
+        format: "der",
+        type: "pkcs8",
+      });
+    }
   }
 
   async sign(data: string): Promise<string | undefined> {

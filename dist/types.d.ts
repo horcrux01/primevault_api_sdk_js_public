@@ -197,8 +197,11 @@ export interface EstimateFeeRequest {
 }
 export interface CreateVaultRequest {
     vaultName: string;
-    defaultTransferSpendLimit: Record<string, any>;
-    defaultTradeSpendLimit: Record<string, any>;
+    defaultTransferSpendLimit?: Record<string, any>;
+    defaultTradeSpendLimit?: Record<string, any>;
+    templateId?: string;
+    signers?: string[];
+    viewers?: string[];
 }
 export interface TradeQuoteRequest {
     vaultId: string;

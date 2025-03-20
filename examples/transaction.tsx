@@ -17,7 +17,7 @@ const createTransfer = async (apiClient: APIClient) => {
             asset.blockChain === "ETHEREUM" && asset.symbol === "ETH",
     )!;
 
-// Get source and destinations
+    // Get source and destinations
     const sourceVaults: Vault[] = await apiClient.getVaults({
         vaultName: "core-vault-1",
     }); // Source Vault
@@ -29,12 +29,12 @@ const createTransfer = async (apiClient: APIClient) => {
     const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaults[0].id};
     const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContacts[0].id};
     /*
-     To send the transaction to an external whitelisted address, change the type and set the value
+     To send the transaction to an external non-whitelisted address, change the type and set the value
      const destination: TransferPartyData = { type: TransferPartyType.EXTERNAL_ADDRESS, value: '0x123456789..'};
     */
 
     /*
-      Optional fee estimate API which returns the expected fee for different tiers, HIGH, MEDIUM, LOW.
+      [Optional Step]: fee estimate API which returns the expected fee for different tiers, HIGH, MEDIUM, LOW.
       Default is HIGH. The feeTier is passed in gasParams argument while creating the transfer transaction.
     */
     const feeEstimates = await apiClient.estimateFee({

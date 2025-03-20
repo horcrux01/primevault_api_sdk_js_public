@@ -123,20 +123,8 @@ describe("APIClient", () => {
 
   test("createVault", async () => {
     const data = {
-      vaultName: "Ethereum Vault",
-      defaultTransferSpendLimit: {
-        action: {
-          actionType: "NEEDS_MORE_APPROVALS",
-          additionalApprovalCount: 1,
-        },
-        spendLimit: "100",
-        resetFrequency: "86400",
-      },
-      defaultTradeSpendLimit: {
-        action: { actionType: "BLOCK_OPERATION" },
-        spendLimit: "100",
-        resetFrequency: "86400",
-      },
+      vaultName: "Ethereum Vault 11",
+      templateId: "e3372142-c319-42a6-9cc1-1ac0c02dedd5",
     };
     try {
       await apiClient.createVault(data);

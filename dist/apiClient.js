@@ -84,6 +84,11 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.post("/api/external/transactions/", data);
         });
     }
+    replaceTransaction(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.post("/api/external/transactions/replace_transaction", request);
+        });
+    }
     getTradeQuote(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const params = {

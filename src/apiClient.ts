@@ -10,7 +10,7 @@ import {
   CreateVaultRequest,
   EstimatedFeeResponse,
   EstimateFeeRequest,
-  GetTradeQuoteResponse,
+  GetTradeQuoteResponse, ReplaceTransactionRequest,
   TradeQuoteRequest,
   Transaction,
   Vault,
@@ -90,6 +90,10 @@ export class APIClient extends BaseAPIClient {
       creationOptions: request.creationOptions,
     };
     return await this.post("/api/external/transactions/", data);
+  }
+
+  async replaceTransaction(request: ReplaceTransactionRequest) {
+    return await this.post("/api/external/transactions/replace_transaction", request);
   }
 
   async getTradeQuote(

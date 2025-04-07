@@ -93,7 +93,7 @@ export class APIClient extends BaseAPIClient {
   }
 
   async replaceTransaction(request: ReplaceTransactionRequest) {
-    return await this.post("/api/external/transactions/replace_transaction", request);
+    return await this.post("/api/external/transactions/replace_transaction/", request);
   }
 
   async getTradeQuote(

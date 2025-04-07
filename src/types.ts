@@ -164,6 +164,7 @@ export interface Transaction {
   txnSignatureData?: Record<string, any>; // Signature data
   output?: TransactionOutput;
   amountInUSD?: string;
+  nonce?: number;
 }
 
 export interface TransactionCreationGasParams {
@@ -214,6 +215,10 @@ export interface CreateContractCallTransactionRequest {
   creationOptions?: TransactionCreationOptions;
 }
 
+export interface ReplaceTransactionRequest {
+  transactionId: string;
+}
+
 export interface EstimateFeeRequest {
   source: TransferPartyData;
   destination: TransferPartyData;
@@ -225,10 +230,7 @@ export interface EstimateFeeRequest {
 export interface CreateVaultRequest {
   vaultName: string;
   templateId: string;
-  defaultTransferSpendLimit?: Record<string, any>;
-  defaultTradeSpendLimit?: Record<string, any>;
-  vaultSigners?: string[];
-  vaultViewers?: string[];
+  chains?: string[];
 }
 
 export interface TradeQuoteRequest {

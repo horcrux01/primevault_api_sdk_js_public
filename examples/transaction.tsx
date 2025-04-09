@@ -8,6 +8,7 @@ import {
     TransferPartyType,
     Vault
 } from "../src"; // Import the APIClient and types from the SDK @primevault/js-api-sdk
+import {BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError, TooManyRequestsError, InternalServerError} from "../src/baseApiClient";
 
 const createTransfer = async (apiClient: APIClient) => {
     // find the asset. Here, we are looking for ETH on ETHEREUM
@@ -35,7 +36,8 @@ const createTransfer = async (apiClient: APIClient) => {
 
     /*
       [Optional Step]: fee estimate API which returns the expected fee for different tiers, HIGH, MEDIUM, LOW.
-      Default is HIGH. The feeTier is passed in gasParams argument while creating the transfer transaction.
+      The feeTier is passed in gasParams argument while creating the transfer transaction.
+      Default is HIGH and PV will pick the optimal fee.
     */
     const feeEstimates = await apiClient.estimateFee({
         source, // source id
@@ -46,15 +48,42 @@ const createTransfer = async (apiClient: APIClient) => {
     });
     console.log(feeEstimates);
 
-    let txnResponse: Transaction = await apiClient.createTransferTransaction({
-        source,
-        destination,
-        amount: "0.0001",
-        asset: ethereumAsset.symbol,
-        chain: ethereumAsset.blockChain,
-        externalId: "externalId-1",               // Optional externalId to track transactions, should be unique
-        gasParams: {},                            // Optional gasParams. Example: {'feeTier': 'MEDIUM'} for medium fee tier. Default is HIGH.
-    });
+    let txnResponse: Transaction | null = null;
+    try {
+        txnResponse = await apiClient.createTransferTransaction({
+            source,
+            destination,
+            amount: "0.0001",
+            asset: ethereumAsset.symbol,
+            chain: ethereumAsset.blockChain,
+            externalId: "externalId-1",               // Optional externalId to track transactions, should be unique
+            gasParams: {},                            // Optional gasParams. Example: {'feeTier': 'MEDIUM'} for medium fee tier. Default is HIGH.
+        });
+    } catch (error: any) {
+        if (error instanceof BadRequestError) {
+            console.error("Invalid transfer transaction request:", error.message, error.responseText);
+        } else if (error instanceof UnauthorizedError) {
+            console.error("Authentication error when creating transfer:", error.message);
+        } else if (error instanceof ForbiddenError) {
+            console.error("Permission denied for transfer creation:", error.message);
+        } else if (error instanceof NotFoundError) {
+            console.error("Resource not found for transfer creation:", error.message);
+        } else if (error instanceof TooManyRequestsError) {
+            console.error("Rate limit exceeded for transfer creation:", error.message);
+            console.log("Please wait before retrying");
+        } else if (error instanceof InternalServerError) {
+            console.error("Server error during transfer creation:", error.message);
+        } else {
+            console.error("Error creating transfer transaction:", error);
+        }
+        return; // Exit if transaction creation fails
+    }
+
+    // Check if txnResponse exists before proceeding
+    if (!txnResponse) {
+        console.error("Transfer transaction creation failed, cannot proceed.");
+        return;
+    }
 
     while (true) {
         txnResponse = await apiClient.getTransactionById(txnResponse.id)
@@ -78,4 +107,14 @@ const expectedGasForTransfer = async (apiClient: APIClient) => {
         asset: "USDT"
     });
     console.log(response);
+}
+
+
+const replaceTransaction = async (apiClient: APIClient) => {
+    /*
+    If a transaction on EVM based chain is pending for a long time (ideally more than 5 minutes), you can replace it with a new transaction.
+    This will submit a new transaction with the same nonce and higher gas price to replace the old one in the mempool.
+    */
+    const txn = await apiClient.getTransactionById("1234567890");
+    console.log(txn);
 }

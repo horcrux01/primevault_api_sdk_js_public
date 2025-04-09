@@ -133,16 +133,16 @@ class BaseAPIException extends Error {
   }
 }
 
-class BadRequestError extends BaseAPIException {}
+export class BadRequestError extends BaseAPIException {}
 
-class UnauthorizedError extends BaseAPIException {}
+export class UnauthorizedError extends BaseAPIException {}
 
-class ForbiddenError extends BaseAPIException {}
+export class ForbiddenError extends BaseAPIException {}
 
-class NotFoundError extends BaseAPIException {}
+export class NotFoundError extends BaseAPIException {}
 
-class InternalServerError extends BaseAPIException {}
+export class InternalServerError extends BaseAPIException {}
 
-class ServiceUnavailableError extends BaseAPIException {}
+export class ServiceUnavailableError extends BaseAPIException {}
 
-class TooManyRequestsError extends BaseAPIException {}
+export class TooManyRequestsError extends BaseAPIException {}

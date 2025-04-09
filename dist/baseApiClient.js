@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BaseAPIClient = void 0;
+exports.TooManyRequestsError = exports.ServiceUnavailableError = exports.InternalServerError = exports.NotFoundError = exports.ForbiddenError = exports.UnauthorizedError = exports.BadRequestError = exports.BaseAPIClient = void 0;
 const axios_1 = __importDefault(require("axios"));
 const authTokenService_1 = require("./authTokenService");
 const signatureService_1 = require("./signatureService");
@@ -96,15 +96,22 @@ class BaseAPIException extends Error {
 }
 class BadRequestError extends BaseAPIException {
 }
+exports.BadRequestError = BadRequestError;
 class UnauthorizedError extends BaseAPIException {
 }
+exports.UnauthorizedError = UnauthorizedError;
 class ForbiddenError extends BaseAPIException {
 }
+exports.ForbiddenError = ForbiddenError;
 class NotFoundError extends BaseAPIException {
 }
+exports.NotFoundError = NotFoundError;
 class InternalServerError extends BaseAPIException {
 }
+exports.InternalServerError = InternalServerError;
 class ServiceUnavailableError extends BaseAPIException {
 }
+exports.ServiceUnavailableError = ServiceUnavailableError;
 class TooManyRequestsError extends BaseAPIException {
 }
+exports.TooManyRequestsError = TooManyRequestsError;

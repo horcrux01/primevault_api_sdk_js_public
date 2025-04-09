@@ -9,4 +9,23 @@ export declare class BaseAPIClient {
     post(path: string, data?: Record<string, any>): Promise<any>;
     private _makeRequest;
 }
+declare class BaseAPIException extends Error {
+    responseText?: any;
+    constructor(message: string, responseText?: any);
+}
+export declare class BadRequestError extends BaseAPIException {
+}
+export declare class UnauthorizedError extends BaseAPIException {
+}
+export declare class ForbiddenError extends BaseAPIException {
+}
+export declare class NotFoundError extends BaseAPIException {
+}
+export declare class InternalServerError extends BaseAPIException {
+}
+export declare class ServiceUnavailableError extends BaseAPIException {
+}
+export declare class TooManyRequestsError extends BaseAPIException {
+}
+export {};
 //# sourceMappingURL=baseApiClient.d.ts.map

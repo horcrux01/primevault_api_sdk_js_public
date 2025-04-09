@@ -4,7 +4,8 @@ import {APIClient, BalanceResponse, Vault} from "../src";
 const createVault = async (apiClient: APIClient) => {
     const data = {
         "vaultName": "Ethereum Vault",                      // Vault name, should be unique
-        "templateId": "b188813e-3137-4b91-8534-f494cb198b8a" // Template to use for this vault
+        "templateId": "b188813e-3137-4b91-8534-f494cb198b8a", // Template to use for this vault
+        "chains": ["ETHEREUM", "SOLANA"]
     }
 
     let vaultResponse: Vault = await apiClient.createVault(data);

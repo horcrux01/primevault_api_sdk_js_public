@@ -115,6 +115,6 @@ const replaceTransaction = async (apiClient: APIClient) => {
     If a transaction on EVM based chain is pending for a long time (ideally more than 5 minutes), you can replace it with a new transaction.
     This will submit a new transaction with the same nonce and higher gas price to replace the old one in the mempool.
     */
-    const txn = await apiClient.getTransactionById("1234567890");
+    const txn = await apiClient.replaceTransaction({"transactionId": "12345678910"});
     console.log(txn);
 }

@@ -143,6 +143,11 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.get(`/api/external/vaults/${vaultId}/balances/`);
         });
     }
+    getDetailedBalances(vaultId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.get(`/api/external/vaults/${vaultId}/detailed_balances/`);
+        });
+    }
     updateBalances(vaultId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.post(`/api/external/vaults/${vaultId}/update_balances/`);

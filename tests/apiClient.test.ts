@@ -108,6 +108,44 @@ describe("APIClient", () => {
     expect(balances2["MATIC"]).toStrictEqual({ POLYGON: "0.00767327" });
   });
 
+  test("getDetailedBalances", async () => {
+    // Test with vault having non-zero balances
+    const vaults = await apiClient.getVaults({ vaultName: "Ethereum Vault" });
+    const vaultId = vaults[0].id;
+    const detailedBalances = await apiClient.getDetailedBalances(vaultId);
+
+    // Verify the response type and overall structure
+    expect(detailedBalances).toBeDefined();
+    expect(detailedBalances).toBeInstanceOf(Array);
+    expect(detailedBalances.length).toBeGreaterThan(0);
+
+    // Create dictionary for easier lookup by chain and symbol
+    const balancesByKey: Record<string, any> = {};
+    for (const balance of detailedBalances) {
+      const key = `${balance.chain}:${balance.symbol}`;
+      balancesByKey[key] = balance;
+    }
+
+    // Check specific expected balances
+    // ETH on Ethereum
+    const ethKey = "ETHEREUM:ETH";
+    expect(balancesByKey).toHaveProperty(ethKey);
+    const ethBalance = balancesByKey[ethKey];
+    expect(ethBalance.chain).toBe("ETHEREUM");
+    expect(ethBalance.symbol).toBe("ETH");
+    expect(ethBalance.name).toBe("Ethereum");
+    expect(ethBalance.balance).toBe("0.00950008");
+
+    // MATIC on Polygon
+    const maticKey = "POLYGON:MATIC";
+    expect(balancesByKey).toHaveProperty(maticKey);
+    const maticBalance = balancesByKey[maticKey];
+    expect(maticBalance.chain).toBe("POLYGON");
+    expect(maticBalance.symbol).toBe("MATIC");
+    expect(maticBalance.name).toBe("Matic");
+    expect(maticBalance.balance).toBe("0.00767327");
+  });
+
   test("getContacts", async () => {
     const contacts = await apiClient.getContacts({ name: "Lynn Bell" });
     expect(contacts).toBeDefined();

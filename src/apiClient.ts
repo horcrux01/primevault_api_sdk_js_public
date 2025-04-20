@@ -14,6 +14,7 @@ import {
   TradeQuoteRequest,
   Transaction,
   Vault,
+  DetailedBalanceResponse,
 } from "./types";
 
 export class APIClient extends BaseAPIClient {
@@ -151,6 +152,10 @@ export class APIClient extends BaseAPIClient {
 
   async getBalances(vaultId: string): Promise<BalanceResponse> {
     return await this.get(`/api/external/vaults/${vaultId}/balances/`);
+  }
+
+  async getDetailedBalances(vaultId: string): Promise<DetailedBalanceResponse> {
+    return await this.get(`/api/external/vaults/${vaultId}/detailed_balances/`);
   }
 
   async updateBalances(vaultId: string): Promise<BalanceResponse> {

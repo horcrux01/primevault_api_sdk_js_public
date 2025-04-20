@@ -1,4 +1,3 @@
-
 export interface Asset {
   name: string;
   symbol: string;
@@ -316,3 +315,14 @@ export interface GetTradeQuoteResponse {
 export interface BalanceResponse {
   [key: string]: { [key: string]: string };
 }
+
+
+export interface DetailedBalance {
+  symbol: string;
+  balance: string;
+  name?: string;
+  chain?: string;
+  tokenAddress?: string;
+}
+
+export type DetailedBalanceResponse  = DetailedBalance[];

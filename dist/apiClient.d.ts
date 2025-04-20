@@ -1,5 +1,5 @@
 import { BaseAPIClient } from "./baseApiClient";
-import { Asset, BalanceResponse, ChainData, Contact, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, Vault } from "./types";
+import { Asset, BalanceResponse, ChainData, Contact, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, Vault, DetailedBalanceResponse } from "./types";
 export declare class APIClient extends BaseAPIClient {
     getAssetsData(): Promise<Asset[]>;
     getSupportedChains(): Promise<ChainData[]>;
@@ -15,6 +15,7 @@ export declare class APIClient extends BaseAPIClient {
     getVaultById(vaultId: string): Promise<Vault>;
     createVault(data: CreateVaultRequest): Promise<Vault>;
     getBalances(vaultId: string): Promise<BalanceResponse>;
+    getDetailedBalances(vaultId: string): Promise<DetailedBalanceResponse>;
     updateBalances(vaultId: string): Promise<BalanceResponse>;
     getOperationMessageToSign(operationId: string): Promise<any>;
     updateUserAction(operationId: string, isApproved: boolean, signatureHex: string): Promise<any>;

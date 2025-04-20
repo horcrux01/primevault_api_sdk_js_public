@@ -268,4 +268,12 @@ export interface BalanceResponse {
         [key: string]: string;
     };
 }
+export interface DetailedBalance {
+    symbol: string;
+    balance: string;
+    name?: string;
+    chain?: string;
+    tokenAddress?: string;
+}
+export type DetailedBalanceResponse = DetailedBalance[];
 //# sourceMappingURL=types.d.ts.map

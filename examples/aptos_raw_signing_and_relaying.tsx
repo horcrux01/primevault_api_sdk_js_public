@@ -21,11 +21,11 @@ async function aptosTransfer(apiClient: APIClient) {
   // Step 2: Build a simple token transfer transaction (can be replaced with any DeFi or contract interaction)
   const transaction = await aptos.transaction.build.simple({
     sender:
-      '0xc4c9366532c5e5ba59824ced6803cd2efd450f292a1d27399873c7b5c6a36b7b',
+      '0x96ff9958854473a127e2f97daad8ffc6eb198f70224e77406581ee6cba08d53a',
     data: {
       function: '0x1::aptos_account::transfer',
       functionArguments: [
-        '0xa39432a064608b1ec3855e28b19c6978239eb7d2639bb8de1c544cd2e8e73226',
+        '0x96ff9958854473a127e2f97daad8ffc6eb198f70224e77406581ee6cba08d53a',
         1,
       ],
     },
@@ -37,7 +37,7 @@ async function aptosTransfer(apiClient: APIClient) {
 
   // Step 3: Send transaction to PrimeVault for signing and poll until the signing process completes
   let txnResponse = await apiClient.createContractCallTransaction({
-    vaultId: '73e65d1e-4270-4ff3-8f1a-4dd03a2af8b0', // replace the vault ID
+    vaultId: '73e65d1e-4270-4ff3-8f1a-1111212121',   // replace the vault ID
     chain: 'APTOS_TESTNET',
     data: { messageHex: signingMessageHex },
   });

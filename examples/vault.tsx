@@ -55,3 +55,8 @@ const createVault = async (apiClient: APIClient) => {
     const balances: BalanceResponse = await apiClient.getBalances(vaultId);
     console.log("Vault balances:", balances);
 }
+
+const getDetailedBalance = async (apiClient: APIClient) => {
+    const response = await apiClient.getDetailedBalances('7ad54443-21d2-4075-abef-83758c9dceb7')
+    console.log('response', response);
+}

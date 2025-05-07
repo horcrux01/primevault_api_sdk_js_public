@@ -39,6 +39,7 @@ export interface Vault {
     id: string;
     blockchain: string;
     address?: string;
+    publicKey?: string;
   }[];
   signers: {
     id: string;

@@ -9,7 +9,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/horcrux01/primevault_api_sdk_js_public"
+    "url": "git+https://github.com/horcrux01/primevault_api_sdk_js_public.git"
   },
   "homepage": "https://github.com/horcrux01/primevault_api_sdk_js_public",
   "scripts": {

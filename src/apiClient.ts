@@ -73,6 +73,7 @@ export class APIClient extends BaseAPIClient {
       isAutomation: request.isAutomation,
       executeAt: request.executeAt,
       memo: request.memo,
+      feePayer: request.feePayer,
     };
     return await this.post("/api/external/transactions/", data);
   }

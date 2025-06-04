@@ -277,7 +277,7 @@ describe("APIClient", () => {
 
     expect(tradeQuoteResponse.tradeResponseDataList).toBeDefined();
     expect(tradeQuoteResponse.tradeResponseDataList).toBeInstanceOf(Array);
-    expect(tradeQuoteResponse.tradeResponseDataList.length).toBe(2);
+    expect(tradeQuoteResponse.tradeResponseDataList.length).toBe(3);
     expect(tradeQuoteResponse.tradeResponseDataList[0]).toBeDefined();
     expect(tradeQuoteResponse.tradeResponseDataList[0]).toBeInstanceOf(Object);
     expect(

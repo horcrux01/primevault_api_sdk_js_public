@@ -65,6 +65,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 isAutomation: request.isAutomation,
                 executeAt: request.executeAt,
                 memo: request.memo,
+                feePayer: request.feePayer,
             };
             return yield this.post("/api/external/transactions/", data);
         });

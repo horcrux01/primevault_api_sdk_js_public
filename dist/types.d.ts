@@ -156,6 +156,9 @@ export interface TransactionCreationGasParams {
 export interface TransactionCreationOptions {
     skipPreprocessSimulation?: boolean;
 }
+export interface FeePayer {
+    id: string;
+}
 export interface CreateTransferTransactionRequest {
     source: TransferPartyData;
     destination: TransferPartyData;
@@ -167,6 +170,7 @@ export interface CreateTransferTransactionRequest {
     isAutomation?: boolean;
     executeAt?: string;
     memo?: string;
+    feePayer?: FeePayer;
 }
 export interface EVMContractCallData {
     callData: string;

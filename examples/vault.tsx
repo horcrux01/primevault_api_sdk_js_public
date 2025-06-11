@@ -52,7 +52,7 @@ const createVault = async (apiClient: APIClient) => {
     console.log("Vault created successfully with wallets:", vaultResponse.wallets);
 
     // balance of a vault
-    const balances: BalanceResponse = await apiClient.getBalances(vaultId);
+    const balances: BalanceResponse = await apiClient.getDetailedBalances(vaultId);
     console.log("Vault balances:", balances);
 }
 

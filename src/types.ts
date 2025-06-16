@@ -208,7 +208,12 @@ export interface RawSigningData {
   messageHex: string;
 }
 
-export type ContractCallData = EVMContractCallData | ICPCanisterCallData | RawSigningData;
+export interface AlephiumContractCallData {
+  method: string;
+  params: Record<string, any>;
+}
+
+export type ContractCallData = EVMContractCallData | ICPCanisterCallData | RawSigningData | AlephiumContractCallData;
 
 export interface CreateContractCallTransactionRequest {
   vaultId: string;

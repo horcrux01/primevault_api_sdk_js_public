@@ -23,31 +23,19 @@ const createTransfer = async (apiClient: APIClient) => {
         vaultName: "core-vault-1",
     }); // Source Vault
 
-    const destinationContacts: Contact[] = await apiClient.getContacts({
+    let destinationContacts: Contact[];
+    destinationContacts = await apiClient.getContacts({
         name: "Brandi Taylor",
     });  // Destination Contact. This could be Core or Exchange Vault or External address.
 
-    const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaults[0].id};
-    const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContacts[0].id};
     /*
      To send the transaction to an external non-whitelisted address, change the type and set the value
      const destination: TransferPartyData = { type: TransferPartyType.EXTERNAL_ADDRESS, value: '0x123456789..'};
     */
+    const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaults[0].id};
+    const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContacts[0].id};
 
-    /*
-      [Optional Step]: fee estimate API which returns the expected fee for different tiers, HIGH, MEDIUM, LOW.
-      The feeTier is passed in gasParams argument while creating the transfer transaction.
-      Default is HIGH and PV will pick the optimal fee.
-    */
-    const feeEstimates = await apiClient.estimateFee({
-        source, // source id
-        destination, // destination id
-        amount: "0.0001",
-        asset: ethereumAsset.symbol,
-        chain: ethereumAsset.blockChain,
-    });
-    console.log(feeEstimates);
-
+    // create and submit transaction and wait for processing
     let txnResponse: Transaction | null = null;
     try {
         txnResponse = await apiClient.createTransferTransaction({
@@ -95,7 +83,7 @@ const createTransfer = async (apiClient: APIClient) => {
     console.log(txnResponse)
 }
 
-const expectedGasForTransfer = async (apiClient: APIClient) => {
+const feeEstimate = async (apiClient: APIClient) => {
     const source = {id: "7ad54443-21d2-4075-abef-83758c9dceb7", type: TransferPartyType.VAULT}
     const destination = {id: "ee177fd8-d00e-4c55-9966-36fcbfdce123", type: TransferPartyType.VAULT}
 

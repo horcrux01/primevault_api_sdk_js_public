@@ -212,6 +212,7 @@ export interface CreateVaultRequest {
     vaultName: string;
     templateId: string;
     chains?: string[];
+    testNetVault?: boolean;
 }
 export interface TradeQuoteRequest {
     vaultId: string;

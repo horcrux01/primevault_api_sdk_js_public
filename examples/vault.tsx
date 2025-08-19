@@ -7,6 +7,7 @@ const createVault = async (apiClient: APIClient) => {
         "templateId": "b188813e-3137-4b91-8534-f494cb198b8a", // Template to use for this vault
         "chains": ["ETHEREUM", "SOLANA"]
     }
+    // set "testNetVault": true for creating testnet vaults for testnet supported chains
 
     let vaultResponse: Vault | null = null;
     try {

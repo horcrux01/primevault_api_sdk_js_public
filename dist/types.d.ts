@@ -81,7 +81,12 @@ export declare enum TransactionType {
 }
 export declare enum TransactionCategory {
     TRANSFER = "TRANSFER",
-    SWAP = "SWAP"
+    SWAP = "SWAP",
+    TOKEN_TRANSFER = "TOKEN_TRANSFER",
+    TOKEN_APPROVAL = "TOKEN_APPROVAL",
+    CONTRACT_CALL = "CONTRACT_CALL",
+    STAKE = "STAKE",
+    REVOKE_TOKEN_ALLOWANCE = "REVOKE_TOKEN_ALLOWANCE"
 }
 export declare enum TransactionSubCategory {
     INCOMING_TRANSFER = "INCOMING_TRANSFER",
@@ -89,7 +94,12 @@ export declare enum TransactionSubCategory {
     INTERNAL_TRANSFER = "INTERNAL_TRANSFER",
     LIMIT_TRADE = "LIMIT_TRADE",
     MARKET_TRADE = "MARKET_TRADE",
-    APPROVE_TOKEN_ALLOWANCE = "APPROVE_TOKEN_ALLOWANCE"
+    APPROVE_TOKEN_ALLOWANCE = "APPROVE_TOKEN_ALLOWANCE",
+    CUSTOM_MESSAGE = "CUSTOM_MESSAGE",
+    CONTRACT_CALL = "CONTRACT_CALL",
+    STAKE = "STAKE",
+    UNSTAKE = "UNSTAKE",
+    CLAIM = "CLAIM"
 }
 export declare enum TransactionStatus {
     DRAFT = "DRAFT",

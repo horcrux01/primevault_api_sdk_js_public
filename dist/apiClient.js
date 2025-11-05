@@ -118,6 +118,34 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.post("/api/external/transactions/", data);
         });
     }
+    createOnRampTransaction(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = {
+                vaultId: request.vaultId,
+                tradeRequestData: request.onRampRequestData,
+                tradeResponseData: request.onRampResponseData,
+                category: "ON_RAMP",
+                blockChain: request.onRampRequestData.blockChain,
+                externalId: request.externalId,
+                memo: request.memo,
+            };
+            return yield this.post("/api/external/transactions/", data);
+        });
+    }
+    createOffRampTransaction(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = {
+                vaultId: request.vaultId,
+                tradeRequestData: request.offRampRequestData,
+                tradeResponseData: request.offRampResponseData,
+                category: "OFF_RAMP",
+                blockChain: request.offRampRequestData.blockChain,
+                externalId: request.externalId,
+                memo: request.memo,
+            };
+            return yield this.post("/api/external/transactions/", data);
+        });
+    }
     getVaults() {
         return __awaiter(this, arguments, void 0, function* (params = {}, page = 1, limit = 20, reverse = false) {
             const query = new URLSearchParams(params).toString();

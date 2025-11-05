@@ -1,5 +1,5 @@
 import { BaseAPIClient } from "./baseApiClient";
-import { Asset, BalanceResponse, ChainData, Contact, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, Vault, DetailedBalanceResponse } from "./types";
+import { Asset, BalanceResponse, ChainData, Contact, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, Vault, DetailedBalanceResponse, CreateOnRampTransactionRequest, CreateOffRampTransactionRequest } from "./types";
 export declare class APIClient extends BaseAPIClient {
     getAssetsData(): Promise<Asset[]>;
     getSupportedChains(): Promise<ChainData[]>;
@@ -11,6 +11,8 @@ export declare class APIClient extends BaseAPIClient {
     replaceTransaction(request: ReplaceTransactionRequest): Promise<any>;
     getTradeQuote(request: TradeQuoteRequest): Promise<GetTradeQuoteResponse>;
     createTradeTransaction(request: CreateTradeTransactionRequest): Promise<Transaction>;
+    createOnRampTransaction(request: CreateOnRampTransactionRequest): Promise<Transaction>;
+    createOffRampTransaction(request: CreateOffRampTransactionRequest): Promise<Transaction>;
     getVaults(params?: Record<string, string>, page?: number, limit?: number, reverse?: boolean): Promise<Vault[]>;
     getVaultById(vaultId: string): Promise<Vault>;
     createVault(data: CreateVaultRequest): Promise<Vault>;

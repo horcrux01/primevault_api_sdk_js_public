@@ -15,6 +15,8 @@ import {
   Transaction,
   Vault,
   DetailedBalanceResponse,
+  CreateOnRampTransactionRequest,
+  CreateOffRampTransactionRequest,
 } from "./types";
 
 export class APIClient extends BaseAPIClient {
@@ -122,6 +124,36 @@ export class APIClient extends BaseAPIClient {
       tradeResponseData: request.tradeResponseData,
       category: "SWAP",
       blockChain: request.tradeRequestData.blockChain,
+      externalId: request.externalId,
+      memo: request.memo,
+    };
+    return await this.post("/api/external/transactions/", data);
+  }
+
+  async createOnRampTransaction(
+    request: CreateOnRampTransactionRequest,
+  ): Promise<Transaction> {
+    const data = {
+      vaultId: request.vaultId,
+      tradeRequestData: request.onRampRequestData,
+      tradeResponseData: request.onRampResponseData,
+      category: "ON_RAMP",
+      blockChain: request.onRampRequestData.blockChain,
+      externalId: request.externalId,
+      memo: request.memo,
+    };
+    return await this.post("/api/external/transactions/", data);
+  }
+
+  async createOffRampTransaction(
+    request: CreateOffRampTransactionRequest,
+  ): Promise<Transaction> {
+    const data = {
+      vaultId: request.vaultId,
+      tradeRequestData: request.offRampRequestData,
+      tradeResponseData: request.offRampResponseData,
+      category: "OFF_RAMP",
+      blockChain: request.offRampRequestData.blockChain,
       externalId: request.externalId,
       memo: request.memo,
     };

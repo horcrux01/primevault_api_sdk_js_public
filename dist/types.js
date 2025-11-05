@@ -33,6 +33,8 @@ var TransactionCategory;
     TransactionCategory["CONTRACT_CALL"] = "CONTRACT_CALL";
     TransactionCategory["STAKE"] = "STAKE";
     TransactionCategory["REVOKE_TOKEN_ALLOWANCE"] = "REVOKE_TOKEN_ALLOWANCE";
+    TransactionCategory["ON_RAMP"] = "ON_RAMP";
+    TransactionCategory["OFF_RAMP"] = "OFF_RAMP";
 })(TransactionCategory || (exports.TransactionCategory = TransactionCategory = {}));
 var TransactionSubCategory;
 (function (TransactionSubCategory) {
@@ -47,6 +49,8 @@ var TransactionSubCategory;
     TransactionSubCategory["STAKE"] = "STAKE";
     TransactionSubCategory["UNSTAKE"] = "UNSTAKE";
     TransactionSubCategory["CLAIM"] = "CLAIM";
+    TransactionSubCategory["ON_RAMP"] = "ON_RAMP";
+    TransactionSubCategory["OFF_RAMP"] = "OFF_RAMP";
 })(TransactionSubCategory || (exports.TransactionSubCategory = TransactionSubCategory = {}));
 var TransactionStatus;
 (function (TransactionStatus) {

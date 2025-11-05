@@ -86,7 +86,9 @@ export declare enum TransactionCategory {
     TOKEN_APPROVAL = "TOKEN_APPROVAL",
     CONTRACT_CALL = "CONTRACT_CALL",
     STAKE = "STAKE",
-    REVOKE_TOKEN_ALLOWANCE = "REVOKE_TOKEN_ALLOWANCE"
+    REVOKE_TOKEN_ALLOWANCE = "REVOKE_TOKEN_ALLOWANCE",
+    ON_RAMP = "ON_RAMP",
+    OFF_RAMP = "OFF_RAMP"
 }
 export declare enum TransactionSubCategory {
     INCOMING_TRANSFER = "INCOMING_TRANSFER",
@@ -99,7 +101,9 @@ export declare enum TransactionSubCategory {
     CONTRACT_CALL = "CONTRACT_CALL",
     STAKE = "STAKE",
     UNSTAKE = "UNSTAKE",
-    CLAIM = "CLAIM"
+    CLAIM = "CLAIM",
+    ON_RAMP = "ON_RAMP",
+    OFF_RAMP = "OFF_RAMP"
 }
 export declare enum TransactionStatus {
     DRAFT = "DRAFT",

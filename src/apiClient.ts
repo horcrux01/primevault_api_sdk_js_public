@@ -15,6 +15,9 @@ import {
   Transaction,
   Vault,
   DetailedBalanceResponse,
+  CreateOnRampTransactionRequest,
+  CreateOffRampTransactionRequest,
+  TransactionCategory,
 } from "./types";
 
 export class APIClient extends BaseAPIClient {
@@ -67,7 +70,7 @@ export class APIClient extends BaseAPIClient {
       amount: request.amount,
       asset: request.asset,
       blockChain: request.chain,
-      category: "TRANSFER",
+      category: TransactionCategory.TRANSFER,
       gasParams: request.gasParams,
       externalId: request.externalId,
       isAutomation: request.isAutomation,
@@ -85,7 +88,7 @@ export class APIClient extends BaseAPIClient {
       vaultId: request.vaultId,
       blockChain: request.chain,
       amount: request.amount,
-      category: "CONTRACT_CALL",
+      category: TransactionCategory.CONTRACT_CALL,
       data: request.data,
       externalId: request.externalId,
       gasParams: request.gasParams,
@@ -120,8 +123,38 @@ export class APIClient extends BaseAPIClient {
       vaultId: request.vaultId,
       tradeRequestData: request.tradeRequestData,
       tradeResponseData: request.tradeResponseData,
-      category: "SWAP",
+      category: TransactionCategory.SWAP,
       blockChain: request.tradeRequestData.blockChain,
+      externalId: request.externalId,
+      memo: request.memo,
+    };
+    return await this.post("/api/external/transactions/", data);
+  }
+
+  async createOnRampTransaction(
+    request: CreateOnRampTransactionRequest,
+  ): Promise<Transaction> {
+    const data = {
+      vaultId: request.vaultId,
+      tradeRequestData: request.onRampRequestData,
+      tradeResponseData: request.onRampResponseData,
+      category: TransactionCategory.ON_RAMP,
+      blockChain: request.onRampRequestData.blockChain,
+      externalId: request.externalId,
+      memo: request.memo,
+    };
+    return await this.post("/api/external/transactions/", data);
+  }
+
+  async createOffRampTransaction(
+    request: CreateOffRampTransactionRequest,
+  ): Promise<Transaction> {
+    const data = {
+      vaultId: request.vaultId,
+      tradeRequestData: request.offRampRequestData,
+      tradeResponseData: request.offRampResponseData,
+      category: TransactionCategory.OFF_RAMP,
+      blockChain: request.offRampRequestData.blockChain,
       externalId: request.externalId,
       memo: request.memo,
     };

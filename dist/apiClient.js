@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.APIClient = void 0;
 const baseApiClient_1 = require("./baseApiClient");
+const types_1 = require("./types");
 class APIClient extends baseApiClient_1.BaseAPIClient {
     getAssetsData() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -59,7 +60,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 amount: request.amount,
                 asset: request.asset,
                 blockChain: request.chain,
-                category: "TRANSFER",
+                category: types_1.TransactionCategory.TRANSFER,
                 gasParams: request.gasParams,
                 externalId: request.externalId,
                 isAutomation: request.isAutomation,
@@ -76,7 +77,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 vaultId: request.vaultId,
                 blockChain: request.chain,
                 amount: request.amount,
-                category: "CONTRACT_CALL",
+                category: types_1.TransactionCategory.CONTRACT_CALL,
                 data: request.data,
                 externalId: request.externalId,
                 gasParams: request.gasParams,
@@ -110,8 +111,36 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 vaultId: request.vaultId,
                 tradeRequestData: request.tradeRequestData,
                 tradeResponseData: request.tradeResponseData,
-                category: "SWAP",
+                category: types_1.TransactionCategory.SWAP,
                 blockChain: request.tradeRequestData.blockChain,
+                externalId: request.externalId,
+                memo: request.memo,
+            };
+            return yield this.post("/api/external/transactions/", data);
+        });
+    }
+    createOnRampTransaction(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = {
+                vaultId: request.vaultId,
+                tradeRequestData: request.onRampRequestData,
+                tradeResponseData: request.onRampResponseData,
+                category: types_1.TransactionCategory.ON_RAMP,
+                blockChain: request.onRampRequestData.blockChain,
+                externalId: request.externalId,
+                memo: request.memo,
+            };
+            return yield this.post("/api/external/transactions/", data);
+        });
+    }
+    createOffRampTransaction(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = {
+                vaultId: request.vaultId,
+                tradeRequestData: request.offRampRequestData,
+                tradeResponseData: request.offRampResponseData,
+                category: types_1.TransactionCategory.OFF_RAMP,
+                blockChain: request.offRampRequestData.blockChain,
                 externalId: request.externalId,
                 memo: request.memo,
             };

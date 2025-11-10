@@ -10,7 +10,6 @@ const icpCanisterCallTransaction = async (apiClient: APIClient) => {
     let txnResponse = await apiClient.createContractCallTransaction({
         vaultId,
         chain: "ICP",
-        toAddress: "ryjl3-tyaaa-aaaaa-aaaba-cai",                         // Canister address
         externalId: "externalId-16",                                      // Optional externalId to track transactions, should be unique
         data: {
             canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",

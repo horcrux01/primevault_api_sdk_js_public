@@ -73,6 +73,7 @@ const createTransfer = async (apiClient: APIClient) => {
         return;
     }
 
+    // instead of polling, you can setup webhooks to get notified when the transaction is completed or failed.
     while (true) {
         txnResponse = await apiClient.getTransactionById(txnResponse.id)
         if (txnResponse.status === TransactionStatus.COMPLETED || txnResponse.status === TransactionStatus.FAILED) {
@@ -95,6 +96,60 @@ const feeEstimate = async (apiClient: APIClient) => {
         asset: "USDT"
     });
     console.log(response);
+}
+
+const createTransferWithFeePayer = async (apiClient: APIClient) => {
+    // find an asset, e.g., USDT on SOLANA (any supported asset/chain works)
+    const assets: Asset[] = await apiClient.getAssetsData();
+    const solUsdt: Asset = assets.find(
+        (asset: Asset) =>
+            asset.blockChain === "SOLANA" && asset.symbol === "USDT",
+    )!;
+
+    const sourceVaults: Vault[] = await apiClient.getVaults({
+        vaultName: "core-vault-1",
+    });
+    const destinationContacts: Contact[] = await apiClient.getContacts({
+        name: "Brandi Taylor",
+    });
+
+    // Vault to act as Fee Payer (network fee will be paid by this vault)
+    const feePayerVaults: Vault[] = await apiClient.getVaults({
+        vaultName: "fee-payer-1",
+    });
+
+    const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaults[0].id };
+    const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContacts[0].id };
+
+    try {
+        const txnResponse: Transaction = await apiClient.createTransferTransaction({
+            source,
+            destination,
+            amount: "0.5",
+            asset: solUsdt.symbol,
+            chain: solUsdt.blockChain,
+            gasParams: {},
+            feePayer: { id: feePayerVaults[0].id },   // Use GAS vault as fee payer
+            memo: "Transfer with FeePayer vault example",
+        });
+        console.log("Created transfer with fee payer:", txnResponse.id);
+    } catch (error: any) {
+        if (error instanceof BadRequestError) {
+            console.error("Invalid transfer request (fee payer):", error.message, error.responseText);
+        } else if (error instanceof UnauthorizedError) {
+            console.error("Authentication error (fee payer):", error.message);
+        } else if (error instanceof ForbiddenError) {
+            console.error("Permission denied (fee payer):", error.message);
+        } else if (error instanceof NotFoundError) {
+            console.error("Resource not found (fee payer):", error.message);
+        } else if (error instanceof TooManyRequestsError) {
+            console.error("Rate limit exceeded (fee payer):", error.message);
+        } else if (error instanceof InternalServerError) {
+            console.error("Server error (fee payer):", error.message);
+        } else {
+            console.error("Error creating transfer with fee payer:", error);
+        }
+    }
 }
 
 

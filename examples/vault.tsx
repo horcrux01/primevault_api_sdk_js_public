@@ -1,4 +1,4 @@
-import {APIClient, BalanceResponse, Vault} from "../src";
+import {APIClient, DetailedBalanceResponse, Vault} from "../src";
 import {BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError, TooManyRequestsError, InternalServerError} from "../src/baseApiClient";
 
 const createVault = async (apiClient: APIClient) => {
@@ -53,7 +53,7 @@ const createVault = async (apiClient: APIClient) => {
     console.log("Vault created successfully with wallets:", vaultResponse.wallets);
 
     // balance of a vault
-    const balances: BalanceResponse = await apiClient.getDetailedBalances(vaultId);
+    const balances: DetailedBalanceResponse = await apiClient.getDetailedBalances(vaultId);
     console.log("Vault balances:", balances);
 }
 

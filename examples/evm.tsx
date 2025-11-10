@@ -1,12 +1,16 @@
 import {APIClient, TransactionFeeTier, TransactionStatus} from "../src"; // Import the APIClient and types from the SDK @primevault/js-api-sdk
 
 const createContractCall = async (apiClient: APIClient) => {
+    /*
+    Example code to call a contract on POLYGON
+    */
     const vaults = await apiClient.getVaults({
         vaultName: "core-vault-1",
     });
 
     const vaultId = vaults[0].id;
 
+    // callData is `data` field in EVM transaction object
     let txnResponse = await apiClient.createContractCallTransaction({
         vaultId,
         chain: "POLYGON",
@@ -28,4 +32,34 @@ const createContractCall = async (apiClient: APIClient) => {
         await new Promise(resolve => setTimeout(resolve, 3000))
     }
     console.log(txnResponse)
+}
+
+const rawMessageSignatureForEVM = async (apiClient: APIClient) => {
+    /*
+     Example code to sign a raw message on ETHEREUM
+    */
+    const vaults = await apiClient.getVaults({
+        vaultName: "core-vault-1",
+    });
+
+    const vaultId = vaults[0].id;
+
+    // Signing a raw message on ETHEREUM
+    let txnResponse = await apiClient.createContractCallTransaction({
+        vaultId,
+        chain: "ETHEREUM",
+        externalId: "externalId-1",                                        // Optional externalId to track transactions, should be unique
+        data: {
+            messageHex: "0x095ea7b3000000000000000000000000c"
+        }
+    });
+
+    while (true) {
+        txnResponse = await apiClient.getTransactionById(txnResponse.id)
+        if (txnResponse.status === TransactionStatus.COMPLETED || txnResponse.status === TransactionStatus.FAILED) {
+            break
+        }
+        await new Promise(resolve => setTimeout(resolve, 3000))
+    }
+    console.log(txnResponse.txnSignature)
 }

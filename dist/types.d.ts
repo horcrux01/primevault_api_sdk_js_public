@@ -88,7 +88,8 @@ export declare enum TransactionCategory {
     STAKE = "STAKE",
     REVOKE_TOKEN_ALLOWANCE = "REVOKE_TOKEN_ALLOWANCE",
     ON_RAMP = "ON_RAMP",
-    OFF_RAMP = "OFF_RAMP"
+    OFF_RAMP = "OFF_RAMP",
+    DELEGATE_RESOURCE = "DELEGATE_RESOURCE"
 }
 export declare enum TransactionSubCategory {
     INCOMING_TRANSFER = "INCOMING_TRANSFER",
@@ -314,4 +315,27 @@ export interface DetailedBalance {
     tokenAddress?: string;
 }
 export type DetailedBalanceResponse = DetailedBalance[];
+export declare enum ResourceType {
+    TRON_ENERGY = "TRON_ENERGY",
+    TRON_BANDWIDTH = "TRON_BANDWIDTH"
+}
+export interface DelegateResourceRequest {
+    source: TransferPartyData;
+    destination: TransferPartyData;
+    asset: string;
+    chain: string;
+    amount: string;
+    resourceType: ResourceType;
+    externalId?: string;
+    memo?: string;
+}
+export interface StakeResourceRequest {
+    source: TransferPartyData;
+    asset: string;
+    chain: string;
+    amount: string;
+    resourceType?: ResourceType;
+    externalId?: string;
+    memo?: string;
+}
 //# sourceMappingURL=types.d.ts.map

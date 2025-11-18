@@ -1,5 +1,5 @@
 import { BaseAPIClient } from "./baseApiClient";
-import { Asset, BalanceResponse, ChainData, Contact, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, Vault, DetailedBalanceResponse, CreateOnRampTransactionRequest, CreateOffRampTransactionRequest } from "./types";
+import { Asset, BalanceResponse, ChainData, Contact, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, Vault, DetailedBalanceResponse, CreateOnRampTransactionRequest, CreateOffRampTransactionRequest, DelegateResourceRequest, StakeResourceRequest } from "./types";
 export declare class APIClient extends BaseAPIClient {
     getAssetsData(): Promise<Asset[]>;
     getSupportedChains(): Promise<ChainData[]>;
@@ -24,5 +24,7 @@ export declare class APIClient extends BaseAPIClient {
     getContacts(params?: Record<string, string>, page?: number, limit?: number): Promise<Contact[]>;
     getContactById(contactId: string): Promise<Contact>;
     createContact(request: CreateContactRequest): Promise<Contact>;
+    delegateResource(request: DelegateResourceRequest): Promise<Transaction>;
+    stakeResource(request: StakeResourceRequest): Promise<Transaction>;
 }
 //# sourceMappingURL=apiClient.d.ts.map

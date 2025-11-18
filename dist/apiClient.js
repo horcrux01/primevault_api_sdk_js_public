@@ -226,5 +226,36 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.post("/api/external/contacts/", data);
         });
     }
+    delegateResource(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = {
+                source: request.source,
+                destination: request.destination,
+                asset: request.asset,
+                blockChain: request.chain,
+                amount: request.amount,
+                resourceType: request.resourceType,
+                externalId: request.externalId,
+                memo: request.memo,
+                category: types_1.TransactionCategory.DELEGATE_RESOURCE,
+            };
+            return yield this.post("/api/external/transactions/", data);
+        });
+    }
+    stakeResource(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = {
+                source: request.source,
+                asset: request.asset,
+                blockChain: request.chain,
+                amount: request.amount,
+                resourceType: request.resourceType,
+                category: types_1.TransactionCategory.STAKE,
+                externalId: request.externalId,
+                memo: request.memo,
+            };
+            return yield this.post("/api/external/transactions/", data);
+        });
+    }
 }
 exports.APIClient = APIClient;

@@ -18,6 +18,8 @@ import {
   CreateOnRampTransactionRequest,
   CreateOffRampTransactionRequest,
   TransactionCategory,
+  DelegateResourceRequest,
+  StakeResourceRequest,
 } from "./types";
 
 export class APIClient extends BaseAPIClient {
@@ -245,5 +247,34 @@ export class APIClient extends BaseAPIClient {
       externalId: request.externalId,
     };
     return await this.post("/api/external/contacts/", data);
+  }
+
+  async delegateResource(request: DelegateResourceRequest): Promise<Transaction> {
+    const data = {
+      source: request.source,
+      destination: request.destination,
+      asset: request.asset,
+      blockChain: request.chain,
+      amount: request.amount,
+      resourceType: request.resourceType,
+      externalId: request.externalId,
+      memo: request.memo,
+      category: TransactionCategory.DELEGATE_RESOURCE,
+    };
+    return await this.post("/api/external/transactions/", data);
+  }
+
+  async stakeResource(request: StakeResourceRequest): Promise<Transaction> {
+    const data = {
+      source: request.source,
+      asset: request.asset,
+      blockChain: request.chain,
+      amount: request.amount,
+      resourceType: request.resourceType,
+      category: TransactionCategory.STAKE,
+      externalId: request.externalId,
+      memo: request.memo,
+    };
+    return await this.post("/api/external/transactions/", data);
   }
 }

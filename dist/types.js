@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TransactionFeeTier = exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.VaultType = exports.TransferPartyType = void 0;
+exports.ResourceType = exports.TransactionFeeTier = exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.VaultType = exports.TransferPartyType = void 0;
 var TransferPartyType;
 (function (TransferPartyType) {
     TransferPartyType["CONTACT"] = "CONTACT";
@@ -35,6 +35,7 @@ var TransactionCategory;
     TransactionCategory["REVOKE_TOKEN_ALLOWANCE"] = "REVOKE_TOKEN_ALLOWANCE";
     TransactionCategory["ON_RAMP"] = "ON_RAMP";
     TransactionCategory["OFF_RAMP"] = "OFF_RAMP";
+    TransactionCategory["DELEGATE_RESOURCE"] = "DELEGATE_RESOURCE";
 })(TransactionCategory || (exports.TransactionCategory = TransactionCategory = {}));
 var TransactionSubCategory;
 (function (TransactionSubCategory) {
@@ -70,3 +71,8 @@ var TransactionFeeTier;
     TransactionFeeTier["MEDIUM"] = "MEDIUM";
     TransactionFeeTier["LOW"] = "LOW";
 })(TransactionFeeTier || (exports.TransactionFeeTier = TransactionFeeTier = {}));
+var ResourceType;
+(function (ResourceType) {
+    ResourceType["TRON_ENERGY"] = "TRON_ENERGY";
+    ResourceType["TRON_BANDWIDTH"] = "TRON_BANDWIDTH";
+})(ResourceType || (exports.ResourceType = ResourceType = {}));

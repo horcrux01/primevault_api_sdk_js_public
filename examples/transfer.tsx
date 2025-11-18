@@ -2,6 +2,7 @@ import {
     APIClient,
     Asset,
     Contact,
+    ResourceType,
     Transaction,
     TransactionStatus,
     TransferPartyData,
@@ -9,6 +10,20 @@ import {
     Vault
 } from "../src"; // Import the APIClient and types from the SDK @primevault/js-api-sdk
 import {BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError, TooManyRequestsError, InternalServerError} from "../src/baseApiClient";
+
+const pollForTransaction = async (apiClient: APIClient, transactionId: string) => {
+    let txnResponse: Transaction | null = null;
+    // instead of polling, you can setup webhooks to get notified when the transaction is completed or failed.
+    while (true) {
+        txnResponse = await apiClient.getTransactionById(transactionId)
+        if (txnResponse.status === TransactionStatus.COMPLETED || txnResponse.status === TransactionStatus.FAILED) {
+            break
+        }
+        await new Promise(resolve => setTimeout(resolve, 3000))
+    }
+    console.log(txnResponse)
+    return txnResponse;
+}
 
 const createTransfer = async (apiClient: APIClient) => {
     // find the asset. Here, we are looking for ETH on ETHEREUM
@@ -72,15 +87,8 @@ const createTransfer = async (apiClient: APIClient) => {
         console.error("Transfer transaction creation failed, cannot proceed.");
         return;
     }
-
-    // instead of polling, you can setup webhooks to get notified when the transaction is completed or failed.
-    while (true) {
-        txnResponse = await apiClient.getTransactionById(txnResponse.id)
-        if (txnResponse.status === TransactionStatus.COMPLETED || txnResponse.status === TransactionStatus.FAILED) {
-            break
-        }
-        await new Promise(resolve => setTimeout(resolve, 3000))
-    }
+    
+    txnResponse = await pollForTransaction(apiClient, txnResponse.id);
     console.log(txnResponse)
 }
 
@@ -160,4 +168,40 @@ const replaceTransaction = async (apiClient: APIClient) => {
     */
     const txn = await apiClient.replaceTransaction({"transactionId": "12345678910"});
     console.log(txn);
+}
+
+
+const delegateResource = async (apiClient: APIClient) => {
+    const source = {id: "7ad54443-21d2-4075-abef-83758c9dceb7", type: TransferPartyType.VAULT}
+    const destination = {id: "ee177fd8-d00e-4c55-9966-36fcbfdce123", type: TransferPartyType.VAULT}
+
+    let txnResponse = await apiClient.delegateResource({
+        source,
+        destination,
+        asset: "TRX",
+        chain: "TRON",
+        amount: "100",
+        resourceType: ResourceType.TRON_ENERGY,
+    });
+    // similar error handling as createTransferTransaction
+    console.log(txnResponse);
+
+    txnResponse = await pollForTransaction(apiClient, txnResponse.id);
+    console.log(txnResponse);
+}
+
+const stakeResource = async (apiClient: APIClient) => {
+    const source = {id: "7ad54443-21d2-4075-abef-83758c9dceb7", type: TransferPartyType.VAULT}
+    let txnResponse = await apiClient.stakeResource({
+        source,
+        asset: "TRX",
+        chain: "TRON",
+        amount: "100",
+        resourceType: ResourceType.TRON_ENERGY,
+    });
+    // similar error handling as createTransferTransaction
+    console.log(txnResponse);
+
+    txnResponse = await pollForTransaction(apiClient, txnResponse.id);
+    console.log(txnResponse);
 }

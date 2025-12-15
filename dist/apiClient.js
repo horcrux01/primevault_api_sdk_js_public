@@ -115,7 +115,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 blockChain: request.blockChain,
                 vaultId: request.vaultId,
             };
-            return yield this.get("/api/investment/transactions/ramp_exchange_rates/", params);
+            return yield this.get("/api/external/transactions/ramp_exchange_rates/", params);
         });
     }
     createTradeTransaction(request) {

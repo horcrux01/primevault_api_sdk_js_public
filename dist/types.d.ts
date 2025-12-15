@@ -314,7 +314,7 @@ export interface RampExchangeRatesRequest {
 }
 export interface RampExchangeRateFees {
     amount: string;
-    [asset: string]: string;
+    asset: string;
 }
 export interface RampExchangeRateQuote {
     quoteId: string;

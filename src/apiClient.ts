@@ -11,6 +11,8 @@ import {
   EstimatedFeeResponse,
   EstimateFeeRequest,
   GetTradeQuoteResponse, ReplaceTransactionRequest,
+  RampExchangeRatesRequest,
+  RampExchangeRatesResponse,
   TradeQuoteRequest,
   Transaction,
   Vault,
@@ -118,6 +120,24 @@ export class APIClient extends BaseAPIClient {
     return await this.get("/api/external/transactions/trade_quote/", params);
   }
 
+  async getRampExchangeRates(
+    request: RampExchangeRatesRequest,
+  ): Promise<RampExchangeRatesResponse> {
+    const params = {
+      amount: request.amount,
+      currency: request.currency,
+      asset: request.asset,
+      orgId: request.orgId,
+      category: request.category,
+      blockChain: request.blockChain,
+      vaultId: request.vaultId,
+    };
+    return await this.get(
+      "/api/investment/transactions/ramp_exchange_rates/",
+      params,
+    );
+  }
+
   async createTradeTransaction(
     request: CreateTradeTransactionRequest,
   ): Promise<Transaction> {
@@ -138,7 +158,7 @@ export class APIClient extends BaseAPIClient {
   ): Promise<Transaction> {
     const data = {
       vaultId: request.vaultId,
-      tradeRequestData: request.onRampRequestData,
+      onRampRequestData: request.onRampRequestData,
       tradeResponseData: request.onRampResponseData,
       category: TransactionCategory.ON_RAMP,
       blockChain: request.onRampRequestData.blockChain,

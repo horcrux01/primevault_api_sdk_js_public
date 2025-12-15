@@ -350,7 +350,6 @@ export interface RampExchangeRatesRequest {
   amount: string;
   currency: string;
   asset: string;
-  orgId: string;
   category: string;
   blockChain: string;
   vaultId: string;

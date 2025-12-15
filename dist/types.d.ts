@@ -117,6 +117,7 @@ export declare enum TransactionStatus {
     SIGNED = "SIGNED",
     WAITING_CONFIRMATION = "WAITING_CONFIRMATION"
 }
+export type UUID = string;
 export declare enum TransactionFeeTier {
     HIGH = "HIGH",
     MEDIUM = "MEDIUM",
@@ -247,6 +248,7 @@ export interface CreateTradeTransactionRequest {
 }
 export interface CreateOnRampTransactionRequest {
     vaultId: string;
+    quoteId: string;
     onRampRequestData: Record<string, any>;
     onRampResponseData: Record<string, any>;
     externalId?: string;
@@ -254,6 +256,7 @@ export interface CreateOnRampTransactionRequest {
 }
 export interface CreateOffRampTransactionRequest {
     vaultId: string;
+    quoteId: string;
     offRampRequestData: Record<string, any>;
     offRampResponseData: Record<string, any>;
     externalId?: string;
@@ -302,6 +305,26 @@ export interface GetTradeQuoteResponse {
     tradeRequestData: TradeQuoteRequestData;
     tradeResponseDataList: TradeQuoteResponseData[];
 }
+export interface RampExchangeRatesRequest {
+    amount: string;
+    currency: string;
+    asset: string;
+    category: string;
+    blockChain: string;
+    vaultId: string;
+}
+export interface RampExchangeRateFees {
+    fee: string;
+    [asset: string]: string;
+}
+export interface RampExchangeRateQuote {
+    quoteId: UUID;
+    amount: string;
+    convertedAmount: string;
+    fees: RampExchangeRateFees;
+    source: string;
+}
+export type RampExchangeRatesResponse = RampExchangeRateQuote[];
 export interface BalanceResponse {
     [key: string]: {
         [key: string]: string;

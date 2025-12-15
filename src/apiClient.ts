@@ -127,7 +127,6 @@ export class APIClient extends BaseAPIClient {
       amount: request.amount,
       currency: request.currency,
       asset: request.asset,
-      orgId: request.orgId,
       category: request.category,
       blockChain: request.blockChain,
       vaultId: request.vaultId,
@@ -159,7 +158,7 @@ export class APIClient extends BaseAPIClient {
     const data = {
       vaultId: request.vaultId,
       onRampRequestData: request.onRampRequestData,
-      tradeResponseData: request.onRampResponseData,
+        onRampResponseData: request.onRampResponseData,
       category: TransactionCategory.ON_RAMP,
       blockChain: request.onRampRequestData.blockChain,
       externalId: request.externalId,
@@ -174,7 +173,7 @@ export class APIClient extends BaseAPIClient {
     const data = {
       vaultId: request.vaultId,
       tradeRequestData: request.offRampRequestData,
-      tradeResponseData: request.offRampResponseData,
+        offRampResponseData: request.offRampResponseData,
       category: TransactionCategory.OFF_RAMP,
       blockChain: request.offRampRequestData.blockChain,
       externalId: request.externalId,

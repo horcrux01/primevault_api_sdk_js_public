@@ -132,7 +132,7 @@ export class APIClient extends BaseAPIClient {
       vaultId: request.vaultId,
     };
     return await this.get(
-      "/api/investment/transactions/ramp_exchange_rates/",
+      "/api/external/transactions/ramp_exchange_rates/",
       params,
     );
   }

@@ -178,6 +178,7 @@ export class APIClient extends BaseAPIClient {
       blockChain: request.offRampRequestData.blockChain,
       externalId: request.externalId,
       memo: request.memo,
+      quoteId: request.quoteId,
     };
     return await this.post("/api/external/transactions/", data);
   }

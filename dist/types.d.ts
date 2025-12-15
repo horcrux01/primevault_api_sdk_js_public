@@ -117,7 +117,6 @@ export declare enum TransactionStatus {
     SIGNED = "SIGNED",
     WAITING_CONFIRMATION = "WAITING_CONFIRMATION"
 }
-export type UUID = string;
 export declare enum TransactionFeeTier {
     HIGH = "HIGH",
     MEDIUM = "MEDIUM",
@@ -314,12 +313,11 @@ export interface RampExchangeRatesRequest {
     vaultId: string;
 }
 export interface RampExchangeRateFees {
-    fee: string;
+    amount: string;
     [asset: string]: string;
 }
 export interface RampExchangeRateQuote {
-    quoteId: UUID;
-    amount: string;
+    quoteId: string;
     convertedAmount: string;
     fees: RampExchangeRateFees;
     source: string;

@@ -355,13 +355,12 @@ export interface RampExchangeRatesRequest {
 }
 
 export interface RampExchangeRateFees {
-  fee: string;
+  amount: string;
   [asset: string]: string;
 }
 
 export interface RampExchangeRateQuote {
   quoteId: string;
-  amount: string;
   convertedAmount: string;
   fees: RampExchangeRateFees;
   source: string;

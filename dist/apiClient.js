@@ -156,6 +156,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 blockChain: request.offRampRequestData.blockChain,
                 externalId: request.externalId,
                 memo: request.memo,
+                quoteId: request.quoteId,
             };
             return yield this.post("/api/external/transactions/", data);
         });

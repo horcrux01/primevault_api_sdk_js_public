@@ -105,6 +105,19 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.get("/api/external/transactions/trade_quote/", params);
         });
     }
+    getRampExchangeRates(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const params = {
+                amount: request.amount,
+                currency: request.currency,
+                asset: request.asset,
+                category: request.category,
+                blockChain: request.blockChain,
+                vaultId: request.vaultId,
+            };
+            return yield this.get("/api/external/transactions/ramp_exchange_rates/", params);
+        });
+    }
     createTradeTransaction(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
@@ -123,8 +136,8 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
                 vaultId: request.vaultId,
-                tradeRequestData: request.onRampRequestData,
-                tradeResponseData: request.onRampResponseData,
+                onRampRequestData: request.onRampRequestData,
+                onRampResponseData: request.onRampResponseData,
                 category: types_1.TransactionCategory.ON_RAMP,
                 blockChain: request.onRampRequestData.blockChain,
                 externalId: request.externalId,
@@ -138,11 +151,12 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             const data = {
                 vaultId: request.vaultId,
                 tradeRequestData: request.offRampRequestData,
-                tradeResponseData: request.offRampResponseData,
+                offRampResponseData: request.offRampResponseData,
                 category: types_1.TransactionCategory.OFF_RAMP,
                 blockChain: request.offRampRequestData.blockChain,
                 externalId: request.externalId,
                 memo: request.memo,
+                quoteId: request.quoteId,
             };
             return yield this.post("/api/external/transactions/", data);
         });

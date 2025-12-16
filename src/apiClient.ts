@@ -11,6 +11,8 @@ import {
   EstimatedFeeResponse,
   EstimateFeeRequest,
   GetTradeQuoteResponse, ReplaceTransactionRequest,
+  RampExchangeRatesRequest,
+  RampExchangeRatesResponse,
   TradeQuoteRequest,
   Transaction,
   Vault,
@@ -118,6 +120,23 @@ export class APIClient extends BaseAPIClient {
     return await this.get("/api/external/transactions/trade_quote/", params);
   }
 
+  async getRampExchangeRates(
+    request: RampExchangeRatesRequest,
+  ): Promise<RampExchangeRatesResponse> {
+    const params = {
+      amount: request.amount,
+      currency: request.currency,
+      asset: request.asset,
+      category: request.category,
+      blockChain: request.blockChain,
+      vaultId: request.vaultId,
+    };
+    return await this.get(
+      "/api/external/transactions/ramp_exchange_rates/",
+      params,
+    );
+  }
+
   async createTradeTransaction(
     request: CreateTradeTransactionRequest,
   ): Promise<Transaction> {
@@ -138,8 +157,8 @@ export class APIClient extends BaseAPIClient {
   ): Promise<Transaction> {
     const data = {
       vaultId: request.vaultId,
-      tradeRequestData: request.onRampRequestData,
-      tradeResponseData: request.onRampResponseData,
+      onRampRequestData: request.onRampRequestData,
+        onRampResponseData: request.onRampResponseData,
       category: TransactionCategory.ON_RAMP,
       blockChain: request.onRampRequestData.blockChain,
       externalId: request.externalId,
@@ -154,11 +173,12 @@ export class APIClient extends BaseAPIClient {
     const data = {
       vaultId: request.vaultId,
       tradeRequestData: request.offRampRequestData,
-      tradeResponseData: request.offRampResponseData,
+        offRampResponseData: request.offRampResponseData,
       category: TransactionCategory.OFF_RAMP,
       blockChain: request.offRampRequestData.blockChain,
       externalId: request.externalId,
       memo: request.memo,
+      quoteId: request.quoteId,
     };
     return await this.post("/api/external/transactions/", data);
   }

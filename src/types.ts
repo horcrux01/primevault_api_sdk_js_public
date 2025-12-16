@@ -129,6 +129,7 @@ export enum TransactionStatus {
   WAITING_CONFIRMATION = "WAITING_CONFIRMATION",
 }
 
+
 export enum TransactionFeeTier {
   HIGH = "HIGH",
   MEDIUM = "MEDIUM",
@@ -279,6 +280,7 @@ export interface CreateTradeTransactionRequest {
 
 export interface CreateOnRampTransactionRequest {
   vaultId: string;
+  quoteId: string;
   onRampRequestData: Record<string, any>;
   onRampResponseData: Record<string, any>;
   externalId?: string;
@@ -287,6 +289,7 @@ export interface CreateOnRampTransactionRequest {
 
 export interface CreateOffRampTransactionRequest {
   vaultId: string;
+  quoteId: string;
   offRampRequestData: Record<string, any>;
   offRampResponseData: Record<string, any>;
   externalId?: string;
@@ -341,6 +344,29 @@ export interface GetTradeQuoteResponse {
   tradeRequestData: TradeQuoteRequestData;
   tradeResponseDataList: TradeQuoteResponseData[];
 }
+
+export interface RampExchangeRatesRequest {
+  amount: string;
+  currency: string;
+  asset: string;
+  category: string;
+  blockChain: string;
+  vaultId: string;
+}
+
+export interface RampExchangeRateFees {
+  amount: string;
+  asset: string;
+}
+
+export interface RampExchangeRateQuote {
+  quoteId: string;
+  convertedAmount: string;
+  fees: RampExchangeRateFees;
+  source: string;
+}
+
+export type RampExchangeRatesResponse = RampExchangeRateQuote[];
 
 /*
  asset: {chain: balance}

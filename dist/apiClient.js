@@ -150,7 +150,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
                 vaultId: request.vaultId,
-                tradeRequestData: request.offRampRequestData,
+                offRampRequestData: request.offRampRequestData,
                 offRampResponseData: request.offRampResponseData,
                 category: types_1.TransactionCategory.OFF_RAMP,
                 blockChain: request.offRampRequestData.blockChain,

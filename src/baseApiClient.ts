@@ -84,39 +84,22 @@ export class BaseAPIClient {
     } catch (error: any) {
       const response = error.response || {};
       const { status, data: responseText } = response;
+      const errorMessage = response.statusText || "Unknown error";
       switch (status) {
         case 400:
-          throw new BadRequestError(
-            `400 Bad Request: ${response.statusText}`,
-            responseText,
-          );
+          throw new BadRequestError(errorMessage, responseText);
         case 401:
-          throw new UnauthorizedError(
-            `401 Unauthorized: ${response.statusText}`,
-            responseText,
-          );
+          throw new UnauthorizedError(errorMessage, responseText);
         case 403:
-          throw new ForbiddenError(
-            `403 Forbidden: ${response.statusText}`,
-            responseText,
-          );
+          throw new ForbiddenError(errorMessage, responseText);
         case 404:
-          throw new NotFoundError(
-            `404 Not Found: ${response.statusText}`,
-            responseText,
-          );
+          throw new NotFoundError(errorMessage, responseText);
         case 429:
-          throw new TooManyRequestsError(
-            `429 Too Many Requests: ${response.statusText}`,
-            responseText,
-          );
+          throw new TooManyRequestsError(errorMessage, responseText);
         case 500:
-          throw new InternalServerError(
-            `500 Internal Server Error: ${response.statusText}`,
-            responseText,
-          );
+          throw new InternalServerError(errorMessage, responseText);
         default:
-          throw new Error(`HTTP Error: ${response.statusText}`);
+          throw new Error(errorMessage);
       }
     }
   }

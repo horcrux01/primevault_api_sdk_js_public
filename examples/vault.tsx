@@ -14,18 +14,18 @@ const createVault = async (apiClient: APIClient) => {
         vaultResponse = await apiClient.createVault(data);
     } catch (error: any) {
         if (error instanceof BadRequestError) {
-            console.error("Invalid vault creation request:", error.message, error.responseText);
+            console.error("Invalid vault creation request:", error.message, error.errorCode, error.status);
         } else if (error instanceof UnauthorizedError) {
-            console.error("Authentication error when creating vault:", error.message);
+            console.error("Authentication error:", error.message, error.errorCode, error.status);
         } else if (error instanceof ForbiddenError) {
-            console.error("Permission denied for vault creation:", error.message);
+            console.error("Permission denied:", error.message, error.errorCode, error.status);
         } else if (error instanceof NotFoundError) {
-            console.error("Resource not found for vault creation:", error.message);
+            console.error("Resource not found:", error.message, error.errorCode, error.status);
         } else if (error instanceof TooManyRequestsError) {
-            console.error("Rate limit exceeded for vault creation:", error.message);
+            console.error("Rate limit exceeded:", error.message, error.errorCode, error.status);
             console.log("Please wait before retrying");
         } else if (error instanceof InternalServerError) {
-            console.error("Server error during vault creation:", error.message);
+            console.error("Server error:", error.message, error.errorCode, error.status);
         } else {
             console.error("Error creating vault:", error);
         }

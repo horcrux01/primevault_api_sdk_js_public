@@ -64,18 +64,18 @@ const createTransfer = async (apiClient: APIClient) => {
         });
     } catch (error: any) {
         if (error instanceof BadRequestError) {
-            console.error("Invalid transfer transaction request:", error.message, error.responseText);
+            console.error("Invalid request:", error.message, error.errorCode, error.status);
         } else if (error instanceof UnauthorizedError) {
-            console.error("Authentication error when creating transfer:", error.message);
+            console.error("Authentication error:", error.message, error.errorCode, error.status);
         } else if (error instanceof ForbiddenError) {
-            console.error("Permission denied for transfer creation:", error.message);
+            console.error("Permission denied:", error.message, error.errorCode, error.status);
         } else if (error instanceof NotFoundError) {
-            console.error("Resource not found for transfer creation:", error.message);
+            console.error("Resource not found:", error.message, error.errorCode, error.status);
         } else if (error instanceof TooManyRequestsError) {
-            console.error("Rate limit exceeded for transfer creation:", error.message);
+            console.error("Rate limit exceeded:", error.message, error.errorCode, error.status);
             console.log("Please wait before retrying");
         } else if (error instanceof InternalServerError) {
-            console.error("Server error during transfer creation:", error.message);
+            console.error("Server error:", error.message, error.errorCode, error.status);
         } else {
             console.error("Error creating transfer transaction:", error);
         }
@@ -143,17 +143,17 @@ const createTransferWithFeePayer = async (apiClient: APIClient) => {
         console.log("Created transfer with fee payer:", txnResponse.id);
     } catch (error: any) {
         if (error instanceof BadRequestError) {
-            console.error("Invalid transfer request (fee payer):", error.message, error.responseText);
+            console.error("Invalid request (fee payer):", error.message, error.errorCode, error.status);
         } else if (error instanceof UnauthorizedError) {
-            console.error("Authentication error (fee payer):", error.message);
+            console.error("Authentication error (fee payer):", error.message, error.errorCode, error.status);
         } else if (error instanceof ForbiddenError) {
-            console.error("Permission denied (fee payer):", error.message);
+            console.error("Permission denied (fee payer):", error.message, error.errorCode, error.status);
         } else if (error instanceof NotFoundError) {
-            console.error("Resource not found (fee payer):", error.message);
+            console.error("Resource not found (fee payer):", error.message, error.errorCode, error.status);
         } else if (error instanceof TooManyRequestsError) {
-            console.error("Rate limit exceeded (fee payer):", error.message);
+            console.error("Rate limit exceeded (fee payer):", error.message, error.errorCode, error.status);
         } else if (error instanceof InternalServerError) {
-            console.error("Server error (fee payer):", error.message);
+            console.error("Server error (fee payer):", error.message, error.errorCode, error.status);
         } else {
             console.error("Error creating transfer with fee payer:", error);
         }

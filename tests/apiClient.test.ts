@@ -1,4 +1,5 @@
 import {APIClient} from "../src/apiClient";
+import {BadRequestError} from "../src/baseApiClient";
 import {Asset, ContactStatus, TransactionFeeTier, TransferPartyType, VaultType} from "../src/types";
 
 enum Chain {
@@ -29,17 +30,17 @@ describe("APIClient", () => {
     expect(supportedChains).toBeDefined();
     expect(supportedChains).toBeInstanceOf(Array);
     expect(supportedChains.length).toBe(10);
-    expect(supportedChains.map((chain) => chain.value)).toEqual([
-      "ETHEREUM",
-      "POLYGON",
-      "SOLANA",
-      "NEAR",
+    expect(supportedChains.map((chain: any) => chain.value).sort()).toEqual([
       "APTOS",
       "ARBITRUM",
-      "OPTIMISM",
+      "ETHEREUM",
+      "ICP",
       "MOONBEAM",
+      "NEAR",
+      "OPTIMISM",
+      "POLYGON",
       "RADIX",
-      "ICP"
+      "SOLANA",
     ]);
   });
 
@@ -168,8 +169,8 @@ describe("APIClient", () => {
       await apiClient.createVault(data);
     } catch (e: any) {
       // vault already exists
-      expect(e).toBeDefined();
-      expect(e.message).toBe("400 Bad Request: Bad Request");
+      expect(e).toBeInstanceOf(BadRequestError);
+      expect(e.status).toBe(400);
     }
   });
 
@@ -205,8 +206,8 @@ describe("APIClient", () => {
         gasParams: { feeTier: TransactionFeeTier.HIGH },
       });
     } catch (e: any) {
-      expect(e).toBeDefined();
-      expect(e.message).toBe("400 Bad Request: Bad Request");
+      expect(e).toBeInstanceOf(BadRequestError);
+      expect(e.status).toBe(400);
     }
   }, 10000);
 
@@ -246,8 +247,8 @@ describe("APIClient", () => {
         }
       });
     } catch (e: any) {
-      expect(e).toBeDefined();
-      expect(e.message).toBe("400 Bad Request: Bad Request");
+      expect(e).toBeInstanceOf(BadRequestError);
+      expect(e.status).toBe(400);
     }
   });
 
@@ -313,8 +314,8 @@ describe("APIClient", () => {
         externalId: "externalId-1",
       });
     } catch (e: any) {
-      expect(e).toBeDefined();
-      expect(e.message).toBe("400 Bad Request: Bad Request");
+      expect(e).toBeInstanceOf(BadRequestError);
+      expect(e.status).toBe(400);
     }
   }, 10000);
 });

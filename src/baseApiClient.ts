@@ -57,18 +57,20 @@ export class BaseAPIClient {
       Authorization: `Bearer ${api_token}`,
     };
 
+    let requestData = data;
     if (data) {
+      requestData = { ...data };
       const dataSignature = await this.signatureService.sign(
         JSON.stringify(sortObjectKeys(data)),
       );
-      data["dataSignatureHex"] = dataSignature.toString("hex");
+      requestData["dataSignatureHex"] = dataSignature.toString("hex");
     }
 
     const axiosConfig: AxiosRequestConfig = {
       headers: requestHeaders,
     };
-    if (data && Object.keys(data).length > 0) {
-      axiosConfig.data = data;
+    if (requestData && Object.keys(requestData).length > 0) {
+      axiosConfig.data = requestData;
     }
     if (params && Object.keys(params).length > 0) {
       axiosConfig.params = params;
@@ -82,56 +84,73 @@ export class BaseAPIClient {
       });
       return response.data;
     } catch (error: any) {
-      const response = error.response || {};
-      const { status, data: responseText } = response;
+      if (!error.response) {
+        throw new NetworkError(error.message || "Network request failed");
+      }
+
+      const { status, data: responseData } = error.response;
+      const errorMessage =
+        (typeof responseData === "object" && responseData?.message) ||
+        (typeof responseData === "string" && responseData) ||
+        "Unknown error";
+      const errorCode =
+        typeof responseData === "object" ? responseData?.code : undefined;
+
       switch (status) {
         case 400:
-          throw new BadRequestError(
-            `400 Bad Request: ${response.statusText}`,
-            responseText,
-          );
+          throw new BadRequestError(errorMessage, errorCode, status, responseData);
         case 401:
-          throw new UnauthorizedError(
-            `401 Unauthorized: ${response.statusText}`,
-            responseText,
-          );
+          throw new UnauthorizedError(errorMessage, errorCode, status, responseData);
         case 403:
-          throw new ForbiddenError(
-            `403 Forbidden: ${response.statusText}`,
-            responseText,
-          );
+          throw new ForbiddenError(errorMessage, errorCode, status, responseData);
         case 404:
-          throw new NotFoundError(
-            `404 Not Found: ${response.statusText}`,
-            responseText,
-          );
+          throw new NotFoundError(errorMessage, errorCode, status, responseData);
+        case 408:
+          throw new RequestTimeoutError(errorMessage, errorCode, status, responseData);
+        case 409:
+          throw new ConflictError(errorMessage, errorCode, status, responseData);
+        case 422:
+          throw new ValidationError(errorMessage, errorCode, status, responseData);
         case 429:
-          throw new TooManyRequestsError(
-            `429 Too Many Requests: ${response.statusText}`,
-            responseText,
-          );
+          throw new TooManyRequestsError(errorMessage, errorCode, status, responseData);
         case 500:
-          throw new InternalServerError(
-            `500 Internal Server Error: ${response.statusText}`,
-            responseText,
-          );
+          throw new InternalServerError(errorMessage, errorCode, status, responseData);
+        case 502:
+          throw new BadGatewayError(errorMessage, errorCode, status, responseData);
+        case 503:
+          throw new ServiceUnavailableError(errorMessage, errorCode, status, responseData);
+        case 504:
+          throw new GatewayTimeoutError(errorMessage, errorCode, status, responseData);
         default:
-          throw new Error(`HTTP Error: ${response.statusText}`);
+          throw new UnknownError(errorMessage, errorCode, status, responseData);
       }
     }
   }
 }
 
-class BaseAPIException extends Error {
+export class BaseAPIException extends Error {
+  message: string;
+  errorCode?: string;
+  status?: number;
+  responseText?: any;
+
   constructor(
     message: string,
-    public responseText?: any,
+    code?: string,
+    status?: number,
+    responseText?: any,
   ) {
     super(message);
     this.name = this.constructor.name;
+    this.errorCode = code;
+    this.message = message;
+    this.status = status;
+    this.responseText = responseText;
     Error.captureStackTrace(this, this.constructor);
   }
 }
+
+export class NetworkError extends BaseAPIException {}
 
 export class BadRequestError extends BaseAPIException {}
 
@@ -141,8 +160,20 @@ export class ForbiddenError extends BaseAPIException {}
 
 export class NotFoundError extends BaseAPIException {}
 
+export class RequestTimeoutError extends BaseAPIException {}
+
+export class ConflictError extends BaseAPIException {}
+
+export class ValidationError extends BaseAPIException {}
+
+export class TooManyRequestsError extends BaseAPIException {}
+
 export class InternalServerError extends BaseAPIException {}
+
+export class BadGatewayError extends BaseAPIException {}
 
 export class ServiceUnavailableError extends BaseAPIException {}
 
-export class TooManyRequestsError extends BaseAPIException {}
+export class GatewayTimeoutError extends BaseAPIException {}
+
+export class UnknownError extends BaseAPIException {}

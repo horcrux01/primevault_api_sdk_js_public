@@ -131,20 +131,20 @@ export class BaseAPIClient {
 export class BaseAPIException extends Error {
   message: string;
   errorCode?: string;
-  statusCode?: number;
+  status?: number;
   responseText?: any;
 
   constructor(
     message: string,
     code?: string,
-    statusCode?: number,
+    status?: number,
     responseText?: any,
   ) {
     super(message);
     this.name = this.constructor.name;
     this.errorCode = code;
     this.message = message;
-    this.statusCode = statusCode;
+    this.status = status;
     this.responseText = responseText;
     Error.captureStackTrace(this, this.constructor);
   }

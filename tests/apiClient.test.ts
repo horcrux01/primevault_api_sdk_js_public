@@ -82,11 +82,13 @@ describe("APIClient", () => {
 
   test("getBalances", async () => {
     let vaults = await apiClient.getVaults({ vaultName: "core-vault-1" });
-    // all balances are 0
     const balances = await apiClient.getBalances(vaults[0].id);
     expect(balances).toBeDefined();
     expect(balances).toBeInstanceOf(Object);
-    expect(balances).toStrictEqual({});
+    expect(balances).toStrictEqual({
+      ETH: { ETHEREUM: "1" },
+      USDC: { ETHEREUM: "1342" },
+    });
 
     // non-zero balances
     vaults = await apiClient.getVaults({ vaultName: "Ethereum Vault" });

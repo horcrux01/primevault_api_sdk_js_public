@@ -12,9 +12,9 @@ export declare class BaseAPIClient {
 export declare class BaseAPIException extends Error {
     message: string;
     errorCode?: string;
-    statusCode?: number;
+    status?: number;
     responseText?: any;
-    constructor(message: string, code?: string, statusCode?: number, responseText?: any);
+    constructor(message: string, code?: string, status?: number, responseText?: any);
 }
 export declare class NetworkError extends BaseAPIException {
 }

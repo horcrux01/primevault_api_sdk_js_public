@@ -116,8 +116,6 @@ export class APIClient extends BaseAPIClient {
       blockChain: request.fromChain,
       toBlockchain: request.toChain,
       slippage: request.slippage,
-      category: request.category,
-      paymentMethod: request.paymentMethod,
     };
     return await this.get("/api/external/transactions/trade_quote/", params);
   }
@@ -132,6 +130,7 @@ export class APIClient extends BaseAPIClient {
       category: request.category,
       blockChain: request.blockChain,
       vaultId: request.vaultId,
+      paymentMethod: request.paymentMethod,
     };
     return await this.get(
       "/api/external/transactions/ramp_exchange_rates/",
@@ -157,16 +156,13 @@ export class APIClient extends BaseAPIClient {
   async createOnRampTransaction(
     request: CreateOnRampTransactionRequest,
   ): Promise<Transaction> {
-    const blockChain =
-      request.onRampRequestData.blockChain ||
-      request.onRampRequestData.toBlockchain;
     const data = {
       vaultId: request.vaultId,
       quoteId: request.quoteId,
       onRampRequestData: request.onRampRequestData,
       onRampResponseData: request.onRampResponseData,
       category: TransactionCategory.ON_RAMP,
-      blockChain,
+      blockChain: request.onRampRequestData.blockChain,
       externalId: request.externalId,
       memo: request.memo,
     };

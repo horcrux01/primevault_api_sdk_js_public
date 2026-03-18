@@ -1,32 +1,30 @@
 import { APIClient, Transaction, TransactionCategory } from "../src";
 
 const createOnRampTransfer = async (apiClient: APIClient): Promise<Transaction> => {
-  const createTradeQuoteRequest = {
-    vaultId: "393f359c-6e66-4490-bf1f-5a4ec44f49d6",
-    fromAsset: "USD",
-    toAsset: "USDC",
-    fromAmount: "100",
+  const vaultId = "393f359c-6e66-4490-bf1f-5a4ec44f49d6";
+
+  const onRampRequestData = {
+    vaultId,
+    amount: "100",
+    currency: "USD",
+    asset: "USDC",
     category: TransactionCategory.ON_RAMP,
+    blockChain: "POLYGON",
     paymentMethod: "US_ACH",
-    toChain: "POLYGON",
   };
 
-  const tradeResponse = await apiClient.getTradeQuote(createTradeQuoteRequest);
-  const tradeRequestData = tradeResponse.tradeRequestData;
-  const tradeRoutes = tradeResponse.tradeResponseDataList || [];
-  const tradeResponseData = tradeRoutes[0];
-  if (!tradeResponseData) {
-    throw new Error("No on-ramp trade routes returned for the requested conversion.");
-  }
-  if (!tradeResponseData.quoteId) {
-    throw new Error("Missing quoteId in on-ramp trade response.");
+  const rampQuotes = await apiClient.getRampExchangeRates(onRampRequestData);
+  if (!rampQuotes.length) {
+    throw new Error("No on-ramp quotes returned for the requested conversion.");
   }
 
+  const selectedQuote = rampQuotes[0];
+
   const onRampTransactionResponse = await apiClient.createOnRampTransaction({
-    vaultId: createTradeQuoteRequest.vaultId,
-    quoteId: tradeResponseData.quoteId,
-    onRampRequestData: tradeRequestData,
-    onRampResponseData: tradeResponseData,
+    vaultId,
+    quoteId: selectedQuote.quoteId,
+    onRampRequestData,
+    onRampResponseData: selectedQuote,
     externalId: "on-ramp-ext-8",
     memo: "on ramp test",
   });

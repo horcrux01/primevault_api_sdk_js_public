@@ -107,12 +107,12 @@ class BaseAPIClient {
 }
 exports.BaseAPIClient = BaseAPIClient;
 class BaseAPIException extends Error {
-    constructor(message, code, statusCode, responseText) {
+    constructor(message, code, status, responseText) {
         super(message);
         this.name = this.constructor.name;
         this.errorCode = code;
         this.message = message;
-        this.statusCode = statusCode;
+        this.status = status;
         this.responseText = responseText;
         Error.captureStackTrace(this, this.constructor);
     }

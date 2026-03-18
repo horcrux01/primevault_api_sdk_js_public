@@ -264,12 +264,10 @@ export interface TradeQuoteRequest {
   vaultId: string;
   fromAsset: string;
   fromAmount: string;
+  fromChain: string;
   toAsset: string;
-  category?: string;
-  paymentMethod?: string;
-  fromChain?: string;
   toChain: string;
-  slippage?: string;
+  slippage: string;
 }
 
 export interface CreateTradeTransactionRequest {
@@ -329,7 +327,6 @@ export interface TradeQuoteResponseData {
   unitToAssetAmount?: string;
   quotesValidTill?: string;
   estCompletionTimeInSec?: string;
-  quoteId?: string;
 }
 
 export interface TradeQuoteRequestData {
@@ -355,6 +352,7 @@ export interface RampExchangeRatesRequest {
   category: string;
   blockChain: string;
   vaultId: string;
+  paymentMethod?: string;
 }
 
 export interface RampExchangeRateFees {

@@ -9,9 +9,14 @@ export declare class BaseAPIClient {
     post(path: string, data?: Record<string, any>): Promise<any>;
     private _makeRequest;
 }
-declare class BaseAPIException extends Error {
+export declare class BaseAPIException extends Error {
+    message: string;
+    errorCode?: string;
+    statusCode?: number;
     responseText?: any;
-    constructor(message: string, responseText?: any);
+    constructor(message: string, code?: string, statusCode?: number, responseText?: any);
+}
+export declare class NetworkError extends BaseAPIException {
 }
 export declare class BadRequestError extends BaseAPIException {
 }
@@ -21,11 +26,22 @@ export declare class ForbiddenError extends BaseAPIException {
 }
 export declare class NotFoundError extends BaseAPIException {
 }
-export declare class InternalServerError extends BaseAPIException {
+export declare class RequestTimeoutError extends BaseAPIException {
 }
-export declare class ServiceUnavailableError extends BaseAPIException {
+export declare class ConflictError extends BaseAPIException {
+}
+export declare class ValidationError extends BaseAPIException {
 }
 export declare class TooManyRequestsError extends BaseAPIException {
 }
-export {};
+export declare class InternalServerError extends BaseAPIException {
+}
+export declare class BadGatewayError extends BaseAPIException {
+}
+export declare class ServiceUnavailableError extends BaseAPIException {
+}
+export declare class GatewayTimeoutError extends BaseAPIException {
+}
+export declare class UnknownError extends BaseAPIException {
+}
 //# sourceMappingURL=baseApiClient.d.ts.map

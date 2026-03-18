@@ -233,10 +233,14 @@ export interface TradeQuoteRequest {
     vaultId: string;
     fromAsset: string;
     fromAmount: string;
-    fromChain: string;
     toAsset: string;
-    toChain: string;
-    slippage: string;
+    category?: string;
+    paymentMethod?: string;
+    fromChain?: string;
+    toChain?: string;
+    slippage?: string;
+    expectedToAmount?: string;
+    expiryInMinutes?: number;
 }
 export interface CreateTradeTransactionRequest {
     vaultId: string;
@@ -244,6 +248,17 @@ export interface CreateTradeTransactionRequest {
     tradeResponseData: Record<string, any>;
     externalId?: string;
     memo?: string;
+}
+export interface CreateRampTransactionRequest {
+    vaultId: string;
+    tradeRequestData: TradeQuoteRequestData;
+    tradeResponseData: TradeQuoteResponseData;
+    category?: string;
+    externalId?: string;
+    operationMessage?: string;
+    memo?: string;
+    paymentMethod?: string;
+    toBlockChain?: string;
 }
 export interface CreateOnRampTransactionRequest {
     vaultId: string;
@@ -280,25 +295,45 @@ export interface EstimatedFeeResponse {
     medium: FeeData;
     low: FeeData;
 }
+export interface TradeQuoteFee {
+    amount?: string;
+    asset?: string;
+}
 export interface TradeQuoteResponseData {
     finalToAmount: string;
-    finalToAmountUSD: string;
-    sourceName: string;
-    feeInUSD: string;
-    autoSlippage: string;
+    quoteResponseDict?: string | Record<string, any>;
+    handler?: string;
+    sourceName?: string;
+    handlerCategory?: string;
     unitToAssetAmount?: string;
+    approvedFinalToAmount?: string;
     quotesValidTill?: string;
-    estCompletionTimeInSec?: string;
+    feeInUSD?: string;
+    finalToAmountUSD?: string;
+    stepsData?: any[];
+    sourceLogoURL?: string;
+    estCompletionTimeInSec?: number;
+    autoSlippage?: string;
+    minimumToAmount?: string;
+    fees?: TradeQuoteFee;
+    quoteId?: string;
+    fromAmount?: string;
+    paymentMethod?: string;
 }
 export interface TradeQuoteRequestData {
     fromAsset: string;
     fromAmount: string;
-    blockChain: string;
     toAsset: string;
-    toBlockchain: string;
-    slippage: string;
+    slippage?: string;
+    blockChain?: string;
+    toBlockchain?: string;
     fromAmountUSD?: string;
     destinationAddress?: string;
+    chainId?: string;
+    fromAssetLogoURL?: string;
+    toAssetLogoURL?: string;
+    expectedToAmountUSD?: string;
+    expiryInMinutes?: number;
 }
 export interface GetTradeQuoteResponse {
     tradeRequestData: TradeQuoteRequestData;
@@ -311,6 +346,7 @@ export interface RampExchangeRatesRequest {
     category: string;
     blockChain: string;
     vaultId: string;
+    paymentMethod?: string;
 }
 export interface RampExchangeRateFees {
     amount: string;

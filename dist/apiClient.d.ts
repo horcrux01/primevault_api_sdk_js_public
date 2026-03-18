@@ -1,5 +1,5 @@
 import { BaseAPIClient } from "./baseApiClient";
-import { Asset, BalanceResponse, ChainData, Contact, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, ReplaceTransactionRequest, RampExchangeRatesRequest, RampExchangeRatesResponse, TradeQuoteRequest, Transaction, Vault, DetailedBalanceResponse, CreateOnRampTransactionRequest, CreateOffRampTransactionRequest, DelegateResourceRequest, StakeResourceRequest } from "./types";
+import { Asset, BalanceResponse, ChainData, Contact, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, ReplaceTransactionRequest, RampExchangeRatesRequest, RampExchangeRatesResponse, TradeQuoteRequest, Transaction, Vault, DetailedBalanceResponse, CreateRampTransactionRequest, CreateOnRampTransactionRequest, CreateOffRampTransactionRequest, DelegateResourceRequest, StakeResourceRequest } from "./types";
 export declare class APIClient extends BaseAPIClient {
     getAssetsData(): Promise<Asset[]>;
     getSupportedChains(): Promise<ChainData[]>;
@@ -12,6 +12,7 @@ export declare class APIClient extends BaseAPIClient {
     getTradeQuote(request: TradeQuoteRequest): Promise<GetTradeQuoteResponse>;
     getRampExchangeRates(request: RampExchangeRatesRequest): Promise<RampExchangeRatesResponse>;
     createTradeTransaction(request: CreateTradeTransactionRequest): Promise<Transaction>;
+    createRampTransaction(request: CreateRampTransactionRequest): Promise<Transaction>;
     createOnRampTransaction(request: CreateOnRampTransactionRequest): Promise<Transaction>;
     createOffRampTransaction(request: CreateOffRampTransactionRequest): Promise<Transaction>;
     getVaults(params?: Record<string, string>, page?: number, limit?: number, reverse?: boolean): Promise<Vault[]>;

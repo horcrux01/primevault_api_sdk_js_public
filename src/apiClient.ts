@@ -17,6 +17,7 @@ import {
   Transaction,
   Vault,
   DetailedBalanceResponse,
+  CreateRampTransactionRequest,
   CreateOnRampTransactionRequest,
   CreateOffRampTransactionRequest,
   TransactionCategory,
@@ -116,6 +117,10 @@ export class APIClient extends BaseAPIClient {
       blockChain: request.fromChain,
       toBlockchain: request.toChain,
       slippage: request.slippage,
+      expectedToAmount: request.expectedToAmount,
+      expiryInMinutes: request.expiryInMinutes,
+      category: request.category,
+      paymentMethod: request.paymentMethod,
     };
     return await this.get("/api/external/transactions/trade_quote/", params);
   }
@@ -130,6 +135,7 @@ export class APIClient extends BaseAPIClient {
       category: request.category,
       blockChain: request.blockChain,
       vaultId: request.vaultId,
+      paymentMethod: request.paymentMethod,
     };
     return await this.get(
       "/api/external/transactions/ramp_exchange_rates/",
@@ -152,13 +158,31 @@ export class APIClient extends BaseAPIClient {
     return await this.post("/api/external/transactions/", data);
   }
 
+  async createRampTransaction(
+    request: CreateRampTransactionRequest,
+  ): Promise<Transaction> {
+    const data = {
+      vaultId: request.vaultId,
+      category: request.category,
+      tradeRequestData: request.tradeRequestData,
+      tradeResponseData: request.tradeResponseData,
+      externalId: request.externalId,
+      operationMessage: request.operationMessage,
+      memo: request.memo,
+      paymentMethod: request.paymentMethod,
+      toBlockChain: request.toBlockChain,
+    };
+    return await this.post("/api/external/transactions/", data);
+  }
+
   async createOnRampTransaction(
     request: CreateOnRampTransactionRequest,
   ): Promise<Transaction> {
     const data = {
       vaultId: request.vaultId,
+      quoteId: request.quoteId,
       onRampRequestData: request.onRampRequestData,
-        onRampResponseData: request.onRampResponseData,
+      onRampResponseData: request.onRampResponseData,
       category: TransactionCategory.ON_RAMP,
       blockChain: request.onRampRequestData.blockChain,
       externalId: request.externalId,

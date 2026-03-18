@@ -178,7 +178,7 @@ export class APIClient extends BaseAPIClient {
   ): Promise<Transaction> {
     const data = {
       vaultId: request.vaultId,
-        offRampRequestData: request.offRampRequestData,
+      tradeRequestData: request.offRampRequestData,
         offRampResponseData: request.offRampResponseData,
       category: TransactionCategory.OFF_RAMP,
       blockChain: request.offRampRequestData.blockChain,

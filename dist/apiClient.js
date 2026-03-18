@@ -101,6 +101,8 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 blockChain: request.fromChain,
                 toBlockchain: request.toChain,
                 slippage: request.slippage,
+                category: request.category,
+                paymentMethod: request.paymentMethod,
             };
             return yield this.get("/api/external/transactions/trade_quote/", params);
         });
@@ -134,12 +136,15 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
     }
     createOnRampTransaction(request) {
         return __awaiter(this, void 0, void 0, function* () {
+            const blockChain = request.onRampRequestData.blockChain ||
+                request.onRampRequestData.toBlockchain;
             const data = {
                 vaultId: request.vaultId,
+                quoteId: request.quoteId,
                 onRampRequestData: request.onRampRequestData,
                 onRampResponseData: request.onRampResponseData,
                 category: types_1.TransactionCategory.ON_RAMP,
-                blockChain: request.onRampRequestData.blockChain,
+                blockChain,
                 externalId: request.externalId,
                 memo: request.memo,
             };

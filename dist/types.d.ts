@@ -233,10 +233,12 @@ export interface TradeQuoteRequest {
     vaultId: string;
     fromAsset: string;
     fromAmount: string;
-    fromChain: string;
     toAsset: string;
+    category?: string;
+    paymentMethod?: string;
+    fromChain?: string;
     toChain: string;
-    slippage: string;
+    slippage?: string;
 }
 export interface CreateTradeTransactionRequest {
     vaultId: string;
@@ -289,6 +291,7 @@ export interface TradeQuoteResponseData {
     unitToAssetAmount?: string;
     quotesValidTill?: string;
     estCompletionTimeInSec?: string;
+    quoteId?: string;
 }
 export interface TradeQuoteRequestData {
     fromAsset: string;

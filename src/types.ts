@@ -16,6 +16,7 @@ export enum TransferPartyType {
   CONTACT = "CONTACT",
   VAULT = "VAULT",
   EXTERNAL_ADDRESS = "EXTERNAL_ADDRESS",
+  EXTERNAL_BANK_ACCOUNT = "EXTERNAL_BANK_ACCOUNT",
 }
 
 export interface TransferPartyData {
@@ -181,6 +182,10 @@ export interface Transaction {
   output?: TransactionOutput;
   amountInUSD?: string;
   nonce?: number;
+  source?: TransferPartyData;
+  destination?: TransferPartyData;
+  rampRequestData?: RampQuoteRequest;
+  rampResponseData?: RampQuoteResponse;
 }
 
 export interface TransactionCreationGasParams {

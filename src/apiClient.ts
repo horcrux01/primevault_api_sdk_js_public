@@ -17,7 +17,6 @@ import {
   Transaction,
   Vault,
   DetailedBalanceResponse,
-  CreateRampTransactionRequest,
   CreateOnRampTransactionRequest,
   CreateOffRampTransactionRequest,
   TransactionCategory,

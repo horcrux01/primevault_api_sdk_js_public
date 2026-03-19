@@ -182,7 +182,7 @@ export class APIClient extends BaseAPIClient {
       source: request.source,
       destination: request.destination,
       category: TransactionCategory.OFF_RAMP,
-      onRampRequestData: request.rampResponseData,
+      onRampRequestData: request.rampRequestData,
       onRampResponseData: request.rampResponseData,
       externalId: request.externalId,
       memo: request.memo,

@@ -289,14 +289,14 @@ export interface CreateTradeTransactionRequest {
 }
 
 export interface RampQuoteRequest {
-  source?: TransferPartyData;         // Source of the ramp. In case of on-ramp, this fiat source and for of off-ramp, this is the source of the crypto currency.
-  destination?: TransferPartyData;    // Destination of the ramp. In case of on-ramp, this is the crypto destination and for of off-ramp, this is the fiat destination.
+  source?: TransferPartyData;         // Source of the ramp. In case of on-ramp, this is the fiat source and in case of off-ramp, this is the source of the crypto currency.
+  destination?: TransferPartyData;    // Destination of the ramp. In case of on-ramp, this is the crypto destination and in case of off-ramp, this is the fiat destination.
   fromAsset: string;                  // Asset to be converted from.
   fromChain?: string;                 // Chain of the asset to be converted from.
   fromAmount: string;                 // Amount to be converted from.
   toAsset: string;                    // Asset to be converted to.
   toChain?: string;                   // Chain of the asset to be converted to.
-  category: string;                   // Category of the ramp.
+  category: TransactionCategory.ON_RAMP | TransactionCategory.OFF_RAMP; // Category of the ramp.
   paymentMethod?: string;             // Payment method to be used for the ramp.
 }
 

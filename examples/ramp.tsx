@@ -40,6 +40,21 @@ const createOnRampTransaction = async (
     memo: "on ramp test",
   });
 
+  // The transaction response includes bank details for the fiat deposit
+  // in the source field:
+  //
+  //   onRampTransaction.source?.type     // "EXTERNAL_BANK_ACCOUNT"
+  //   onRampTransaction.source?.name     // e.g. "PrimeVault Treasury"
+  //   onRampTransaction.source?.bank?.bankName           // e.g. "PrimeVault National Bank"
+  //   onRampTransaction.source?.bank?.beneficiaryName    // e.g. "PrimeVault Treasury"
+  //   onRampTransaction.source?.bank?.accountNumberMasked
+  //   onRampTransaction.source?.bank?.routingNumber
+  //   onRampTransaction.source?.bank?.swiftBic
+  //   onRampTransaction.source?.bank?.paymentRail        // e.g. "US_ACH"
+  //   onRampTransaction.source?.bank?.currency           // e.g. "USD"
+  //   onRampTransaction.source?.bank?.bankAddress
+  //   onRampTransaction.source?.bank?.iban
+
   return onRampTransaction;
 };
 

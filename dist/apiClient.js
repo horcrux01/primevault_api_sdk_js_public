@@ -109,18 +109,20 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.get("/api/external/transactions/trade_quote/", params);
         });
     }
-    getRampExchangeRates(request) {
+    getRampQuote(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const params = {
-                amount: request.amount,
-                currency: request.currency,
-                asset: request.asset,
+                source: request.source,
+                destination: request.destination,
+                fromAsset: request.fromAsset,
+                fromAmount: request.fromAmount,
+                fromChain: request.fromChain,
+                toAsset: request.toAsset,
+                toChain: request.toChain,
                 category: request.category,
-                blockChain: request.blockChain,
-                vaultId: request.vaultId,
                 paymentMethod: request.paymentMethod,
             };
-            return yield this.get("/api/external/transactions/ramp_exchange_rates/", params);
+            return yield this.post("/api/external/transactions/quote/", params);
         });
     }
     createTradeTransaction(request) {
@@ -137,31 +139,13 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.post("/api/external/transactions/", data);
         });
     }
-    createRampTransaction(request) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const data = {
-                vaultId: request.vaultId,
-                category: request.category,
-                tradeRequestData: request.tradeRequestData,
-                tradeResponseData: request.tradeResponseData,
-                externalId: request.externalId,
-                operationMessage: request.operationMessage,
-                memo: request.memo,
-                paymentMethod: request.paymentMethod,
-                toBlockChain: request.toBlockChain,
-            };
-            return yield this.post("/api/external/transactions/", data);
-        });
-    }
     createOnRampTransaction(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
-                vaultId: request.vaultId,
-                quoteId: request.quoteId,
-                onRampRequestData: request.onRampRequestData,
-                onRampResponseData: request.onRampResponseData,
+                destination: request.destination,
+                onRampRequestData: request.rampRequestData,
+                onRampResponseData: request.rampResponseData,
                 category: types_1.TransactionCategory.ON_RAMP,
-                blockChain: request.onRampRequestData.blockChain,
                 externalId: request.externalId,
                 memo: request.memo,
             };
@@ -171,14 +155,13 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
     createOffRampTransaction(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
-                vaultId: request.vaultId,
-                offRampRequestData: request.offRampRequestData,
-                offRampResponseData: request.offRampResponseData,
+                source: request.source,
+                destination: request.destination,
                 category: types_1.TransactionCategory.OFF_RAMP,
-                blockChain: request.offRampRequestData.blockChain,
+                onRampRequestData: request.rampRequestData,
+                onRampResponseData: request.rampResponseData,
                 externalId: request.externalId,
                 memo: request.memo,
-                quoteId: request.quoteId,
             };
             return yield this.post("/api/external/transactions/", data);
         });

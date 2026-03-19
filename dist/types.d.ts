@@ -13,12 +13,29 @@ export interface ChainData {
 export declare enum TransferPartyType {
     CONTACT = "CONTACT",
     VAULT = "VAULT",
-    EXTERNAL_ADDRESS = "EXTERNAL_ADDRESS"
+    EXTERNAL_ADDRESS = "EXTERNAL_ADDRESS",
+    EXTERNAL_BANK_ACCOUNT = "EXTERNAL_BANK_ACCOUNT"
+}
+export interface BankDetails {
+    bankName?: string;
+    beneficiaryName?: string;
+    accountNumberMasked?: string;
+    iban?: string;
+    swiftBic?: string;
+    routingNumber?: string;
+    paymentRail?: string;
+    currency?: string;
+    country?: string;
+    bankAddress?: string;
 }
 export interface TransferPartyData {
     type: TransferPartyType;
     id?: string;
     value?: string;
+    name?: string;
+    address?: string;
+    exchange?: string;
+    bank?: BankDetails;
 }
 export declare enum VaultType {
     EXCHANGE = "EXCHANGE",
@@ -164,6 +181,10 @@ export interface Transaction {
     output?: TransactionOutput;
     amountInUSD?: string;
     nonce?: number;
+    source?: TransferPartyData;
+    destination?: TransferPartyData;
+    rampRequestData?: RampQuoteRequest;
+    rampResponseData?: RampQuoteResponse;
 }
 export interface TransactionCreationGasParams {
     feeTier?: TransactionFeeTier;
@@ -249,30 +270,43 @@ export interface CreateTradeTransactionRequest {
     externalId?: string;
     memo?: string;
 }
-export interface CreateRampTransactionRequest {
-    vaultId: string;
-    tradeRequestData: TradeQuoteRequestData;
-    tradeResponseData: TradeQuoteResponseData;
-    category?: string;
-    externalId?: string;
-    operationMessage?: string;
-    memo?: string;
-    paymentMethod?: string;
-    toBlockChain?: string;
+export declare enum PaymentMethod {
+    US_ACH = "US_ACH",
+    US_WIRE = "US_WIRE",
+    SEPA = "SEPA",
+    SWIFT = "SWIFT",
+    BANK_TRANSFER = "BANK_TRANSFER"
+}
+export interface RampQuoteRequest {
+    source?: TransferPartyData;
+    destination?: TransferPartyData;
+    fromAsset: string;
+    fromChain?: string;
+    fromAmount: string;
+    toAsset: string;
+    toChain?: string;
+    category: TransactionCategory.ON_RAMP | TransactionCategory.OFF_RAMP;
+    paymentMethod?: PaymentMethod;
+}
+export interface RampQuoteResponse {
+    finalToAmount: string;
+    quoteId: string;
+    fees: RampExchangeRateFees;
+    quoteResponseDict: Record<string, any>;
+    sourceName: string;
 }
 export interface CreateOnRampTransactionRequest {
-    vaultId: string;
-    quoteId: string;
-    onRampRequestData: Record<string, any>;
-    onRampResponseData: Record<string, any>;
+    destination: TransferPartyData;
+    rampRequestData: RampQuoteRequest;
+    rampResponseData: RampQuoteResponse;
     externalId?: string;
     memo?: string;
 }
 export interface CreateOffRampTransactionRequest {
-    vaultId: string;
-    quoteId: string;
-    offRampRequestData: Record<string, any>;
-    offRampResponseData: Record<string, any>;
+    source: TransferPartyData;
+    destination: TransferPartyData;
+    rampRequestData: RampQuoteRequest;
+    rampResponseData: RampQuoteResponse;
     externalId?: string;
     memo?: string;
 }

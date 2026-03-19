@@ -19,10 +19,27 @@ export enum TransferPartyType {
   EXTERNAL_BANK_ACCOUNT = "EXTERNAL_BANK_ACCOUNT",
 }
 
+export interface BankDetails {
+  bankName?: string;
+  beneficiaryName?: string;
+  accountNumberMasked?: string;
+  iban?: string;
+  swiftBic?: string;
+  routingNumber?: string;
+  paymentRail?: string;
+  currency?: string;
+  country?: string;
+  bankAddress?: string;
+}
+
 export interface TransferPartyData {
   type: TransferPartyType;
   id?: string;
   value?: string;
+  name?: string;
+  address?: string;
+  exchange?: string;
+  bank?: BankDetails;
 }
 
 export enum VaultType {

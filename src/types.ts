@@ -274,6 +274,7 @@ export interface TradeQuoteRequest {
   expiryInMinutes?: number;
 }
 
+
 export interface CreateTradeTransactionRequest {
   vaultId: string;
   tradeRequestData: Record<string, any>;
@@ -282,32 +283,39 @@ export interface CreateTradeTransactionRequest {
   memo?: string;
 }
 
-export interface CreateRampTransactionRequest {
-  vaultId: string;
-  tradeRequestData: TradeQuoteRequestData;
-  tradeResponseData: TradeQuoteResponseData;
-  category?: string;
-  externalId?: string;
-  operationMessage?: string;
-  memo?: string;
+export interface RampQuoteRequest {
+  source?: TransferPartyData;
+  destination?: TransferPartyData;
+  fromAsset: string;
+  fromChain?: string;
+  fromAmount: string;
+  toAsset: string;
+  toChain?: string;
+  category: string;
   paymentMethod?: string;
-  toBlockChain?: string;
+}
+
+export interface RampQuoteResponse {
+  finalToAmount: string;
+  quoteId: string;
+  fees: RampExchangeRateFees;
+  quoteResponseDict: Record<string, any>;
+  sourceName: string;
 }
 
 export interface CreateOnRampTransactionRequest {
-  vaultId: string;
-  quoteId: string;
-  onRampRequestData: Record<string, any>;
-  onRampResponseData: Record<string, any>;
+  destination: TransferPartyData;
+  rampRequestData: RampQuoteRequest;
+  rampResponseData: RampQuoteResponse;
   externalId?: string;
   memo?: string;
 }
 
 export interface CreateOffRampTransactionRequest {
-  vaultId: string;
-  quoteId: string;
-  offRampRequestData: Record<string, any>;
-  offRampResponseData: Record<string, any>;
+  source: TransferPartyData;
+  destination: TransferPartyData;
+  rampRequestData: RampQuoteRequest;
+  rampResponseData: RampQuoteResponse;
   externalId?: string;
   memo?: string;
 }

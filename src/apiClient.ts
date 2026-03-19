@@ -23,6 +23,8 @@ import {
   TransactionCategory,
   DelegateResourceRequest,
   StakeResourceRequest,
+  RampQuoteRequest,
+  RampQuoteResponse,
 } from "./types";
 
 export class APIClient extends BaseAPIClient {
@@ -125,20 +127,22 @@ export class APIClient extends BaseAPIClient {
     return await this.get("/api/external/transactions/trade_quote/", params);
   }
 
-  async getRampExchangeRates(
-    request: RampExchangeRatesRequest,
-  ): Promise<RampExchangeRatesResponse> {
+  async getRampQuote(
+    request: RampQuoteRequest,
+  ): Promise<RampQuoteResponse> {
     const params = {
-      amount: request.amount,
-      currency: request.currency,
-      asset: request.asset,
+      source: request.source,
+      destination: request.destination,
+      fromAsset: request.fromAsset,
+      fromAmount: request.fromAmount,
+      fromChain: request.fromChain,
+      toAsset: request.toAsset,
+      toChain: request.toChain,
       category: request.category,
-      blockChain: request.blockChain,
-      vaultId: request.vaultId,
       paymentMethod: request.paymentMethod,
     };
-    return await this.get(
-      "/api/external/transactions/ramp_exchange_rates/",
+    return await this.post(
+      "/api/external/transactions/quote/",
       params,
     );
   }
@@ -158,33 +162,14 @@ export class APIClient extends BaseAPIClient {
     return await this.post("/api/external/transactions/", data);
   }
 
-  async createRampTransaction(
-    request: CreateRampTransactionRequest,
-  ): Promise<Transaction> {
-    const data = {
-      vaultId: request.vaultId,
-      category: request.category,
-      tradeRequestData: request.tradeRequestData,
-      tradeResponseData: request.tradeResponseData,
-      externalId: request.externalId,
-      operationMessage: request.operationMessage,
-      memo: request.memo,
-      paymentMethod: request.paymentMethod,
-      toBlockChain: request.toBlockChain,
-    };
-    return await this.post("/api/external/transactions/", data);
-  }
-
   async createOnRampTransaction(
     request: CreateOnRampTransactionRequest,
   ): Promise<Transaction> {
     const data = {
-      vaultId: request.vaultId,
-      quoteId: request.quoteId,
-      onRampRequestData: request.onRampRequestData,
-      onRampResponseData: request.onRampResponseData,
+      destination: request.destination,
+      onRampRequestData: request.rampRequestData,
+      onRampResponseData: request.rampResponseData,
       category: TransactionCategory.ON_RAMP,
-      blockChain: request.onRampRequestData.blockChain,
       externalId: request.externalId,
       memo: request.memo,
     };
@@ -195,14 +180,13 @@ export class APIClient extends BaseAPIClient {
     request: CreateOffRampTransactionRequest,
   ): Promise<Transaction> {
     const data = {
-      vaultId: request.vaultId,
-        offRampRequestData: request.offRampRequestData,
-        offRampResponseData: request.offRampResponseData,
+      source: request.source,
+      destination: request.destination,
       category: TransactionCategory.OFF_RAMP,
-      blockChain: request.offRampRequestData.blockChain,
+      onRampRequestData: request.rampResponseData,
+      onRampResponseData: request.rampResponseData,
       externalId: request.externalId,
       memo: request.memo,
-      quoteId: request.quoteId,
     };
     return await this.post("/api/external/transactions/", data);
   }

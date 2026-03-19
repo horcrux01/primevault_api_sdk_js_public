@@ -288,6 +288,14 @@ export interface CreateTradeTransactionRequest {
   memo?: string;
 }
 
+export enum PaymentMethod {
+  US_ACH = "US_ACH",
+  US_WIRE = "US_WIRE",
+  SEPA = "SEPA",
+  SWIFT = "SWIFT",
+  BANK_TRANSFER = "BANK_TRANSFER",
+}
+
 export interface RampQuoteRequest {
   source?: TransferPartyData;         // Source of the ramp. In case of on-ramp, this is the fiat source and in case of off-ramp, this is the source of the crypto currency.
   destination?: TransferPartyData;    // Destination of the ramp. In case of on-ramp, this is the crypto destination and in case of off-ramp, this is the fiat destination.
@@ -297,7 +305,7 @@ export interface RampQuoteRequest {
   toAsset: string;                    // Asset to be converted to.
   toChain?: string;                   // Chain of the asset to be converted to.
   category: TransactionCategory.ON_RAMP | TransactionCategory.OFF_RAMP; // Category of the ramp.
-  paymentMethod?: string;             // Payment method to be used for the ramp.
+  paymentMethod?: PaymentMethod;      // Payment method to be used for the ramp.
 }
 
 export interface RampQuoteResponse {

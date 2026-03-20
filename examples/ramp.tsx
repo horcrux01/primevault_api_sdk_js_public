@@ -1,52 +1,61 @@
-import { APIClient, Transaction, TransactionCategory } from "../src";
+import { APIClient, PaymentMethod, Transaction, TransactionCategory, TransferPartyType } from "../src";
 
 /**
  * Example: Create an ON_RAMP transaction (fiat → crypto).
  *
  * Flow:
- *  1. Fetch a trade quote for the ON_RAMP conversion via getTradeQuote.
- *  2. Extract the trade request/response data returned by the quote API.
- *  3. Submit a ramp transaction using the quote data via createRampTransaction.
+ *  1. Fetch a ramp quote for the ON_RAMP conversion via getRampQuote.
+ *  2. Use the quote request and response data to create the on-ramp transaction.
  */
-const createRampTransfer = async (
+const createOnRampTransaction = async (
   apiClient: APIClient,
 ): Promise<Transaction> => {
-  // Step 1: Request a trade quote for converting 100 USD → USDC on Polygon
-  // using ACH as the payment method. The category "ON_RAMP" tells the API
-  // this is a fiat-to-crypto conversion.
-  const tradeQuoteResponse = await apiClient.getTradeQuote({
-    vaultId: "393f359c-6e66-4490-bf1f-5a4ec44f49d6",
+  const vaultId = "393f359c-6e66-4490-bf1f-5a4ec44f49d6";
+
+  const destination = {
+    type: TransferPartyType.VAULT,
+    id: vaultId,
+  };
+
+  // Step 1: Request a ramp quote for converting 100 USD → USDC on Polygon on destination vault
+  // using ACH as the payment method.
+  const rampQuoteRequest = {
+    destination,
     fromAsset: "USD",
     toAsset: "USDC",
     fromAmount: "100",
-    category: "ON_RAMP",
-    paymentMethod: "US_ACH",
     toChain: "POLYGON",
-  });
+    category: TransactionCategory.ON_RAMP as const,
+    paymentMethod: PaymentMethod.US_ACH,
+  };
 
-  // Step 2: Extract the normalized request data and pick the first
-  // available route from the list of quotes returned by the API.
-  const tradeRequestData = tradeQuoteResponse.tradeRequestData;
-  const tradeRoutes = tradeQuoteResponse.tradeResponseDataList || [];
-  const tradeResponseData = tradeRoutes[0];
+  const rampQuoteResponse = await apiClient.getRampQuote(rampQuoteRequest);
 
-  const vaultId = "393f359c-6e66-4490-bf1f-5a4ec44f49d6";
-
-  // Step 3: Create the ramp transaction by passing the quote data back
-  // to the API along with payment and destination chain details.
-  const onRampTransactionResponse = await apiClient.createRampTransaction({
-    vaultId,
-    category: TransactionCategory.ON_RAMP,
-    tradeRequestData,
-    tradeResponseData,
-    externalId: "on-ramp-ext-8",
-    operationMessage: "ON_RAMP test",
+  // Step 2: Create the on-ramp transaction using the quote data.
+  const onRampTransaction = await apiClient.createOnRampTransaction({
+    destination,
+    rampRequestData: rampQuoteRequest,
+    rampResponseData: rampQuoteResponse,
+    externalId: "on-ramp-1110eee2e",
     memo: "on ramp test",
-    paymentMethod: "US_ACH",
-    toBlockChain: "POLYGON",
   });
 
-  return onRampTransactionResponse;
+  // The transaction response includes bank details for the fiat deposit
+  // in the source field:
+  //
+  //   onRampTransaction.source?.type     // "EXTERNAL_BANK_ACCOUNT"
+  //   onRampTransaction.source?.name     // e.g. "PrimeVault Treasury"
+  //   onRampTransaction.source?.bank?.bankName           // e.g. "PrimeVault National Bank"
+  //   onRampTransaction.source?.bank?.beneficiaryName    // e.g. "PrimeVault Treasury"
+  //   onRampTransaction.source?.bank?.accountNumberMasked
+  //   onRampTransaction.source?.bank?.routingNumber
+  //   onRampTransaction.source?.bank?.swiftBic
+  //   onRampTransaction.source?.bank?.paymentRail        // e.g. "US_ACH"
+  //   onRampTransaction.source?.bank?.currency           // e.g. "USD"
+  //   onRampTransaction.source?.bank?.bankAddress
+  //   onRampTransaction.source?.bank?.iban
+
+  return onRampTransaction;
 };
 
-export { createRampTransfer };
+export { createOnRampTransaction };

@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ResourceType = exports.TransactionFeeTier = exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.VaultType = exports.TransferPartyType = void 0;
+exports.ResourceType = exports.PaymentMethod = exports.TransactionFeeTier = exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.VaultType = exports.TransferPartyType = void 0;
 var TransferPartyType;
 (function (TransferPartyType) {
     TransferPartyType["CONTACT"] = "CONTACT";
     TransferPartyType["VAULT"] = "VAULT";
     TransferPartyType["EXTERNAL_ADDRESS"] = "EXTERNAL_ADDRESS";
+    TransferPartyType["EXTERNAL_BANK_ACCOUNT"] = "EXTERNAL_BANK_ACCOUNT";
 })(TransferPartyType || (exports.TransferPartyType = TransferPartyType = {}));
 var VaultType;
 (function (VaultType) {
@@ -71,6 +72,14 @@ var TransactionFeeTier;
     TransactionFeeTier["MEDIUM"] = "MEDIUM";
     TransactionFeeTier["LOW"] = "LOW";
 })(TransactionFeeTier || (exports.TransactionFeeTier = TransactionFeeTier = {}));
+var PaymentMethod;
+(function (PaymentMethod) {
+    PaymentMethod["US_ACH"] = "US_ACH";
+    PaymentMethod["US_WIRE"] = "US_WIRE";
+    PaymentMethod["SEPA"] = "SEPA";
+    PaymentMethod["SWIFT"] = "SWIFT";
+    PaymentMethod["BANK_TRANSFER"] = "BANK_TRANSFER";
+})(PaymentMethod || (exports.PaymentMethod = PaymentMethod = {}));
 var ResourceType;
 (function (ResourceType) {
     ResourceType["TRON_ENERGY"] = "TRON_ENERGY";

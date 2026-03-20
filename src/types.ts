@@ -16,12 +16,30 @@ export enum TransferPartyType {
   CONTACT = "CONTACT",
   VAULT = "VAULT",
   EXTERNAL_ADDRESS = "EXTERNAL_ADDRESS",
+  EXTERNAL_BANK_ACCOUNT = "EXTERNAL_BANK_ACCOUNT",
+}
+
+export interface BankDetails {
+  bankName?: string;
+  beneficiaryName?: string;
+  accountNumberMasked?: string;
+  iban?: string;
+  swiftBic?: string;
+  routingNumber?: string;
+  paymentRail?: string;
+  currency?: string;
+  country?: string;
+  bankAddress?: string;
 }
 
 export interface TransferPartyData {
   type: TransferPartyType;
   id?: string;
   value?: string;
+  name?: string;
+  address?: string;
+  exchange?: string;
+  bank?: BankDetails;
 }
 
 export enum VaultType {
@@ -181,6 +199,10 @@ export interface Transaction {
   output?: TransactionOutput;
   amountInUSD?: string;
   nonce?: number;
+  source?: TransferPartyData;
+  destination?: TransferPartyData;
+  rampRequestData?: RampQuoteRequest;
+  rampResponseData?: RampQuoteResponse;
 }
 
 export interface TransactionCreationGasParams {
@@ -274,6 +296,7 @@ export interface TradeQuoteRequest {
   expiryInMinutes?: number;
 }
 
+
 export interface CreateTradeTransactionRequest {
   vaultId: string;
   tradeRequestData: Record<string, any>;
@@ -282,34 +305,49 @@ export interface CreateTradeTransactionRequest {
   memo?: string;
 }
 
-export interface CreateRampTransactionRequest {
-  vaultId: string;
-  tradeRequestData: TradeQuoteRequestData;
-  tradeResponseData: TradeQuoteResponseData;
-  category?: string;
-  externalId?: string;
-  operationMessage?: string;
-  memo?: string;
-  paymentMethod?: string;
-  toBlockChain?: string;
+export enum PaymentMethod {
+  US_ACH = "US_ACH",
+  US_WIRE = "US_WIRE",
+  SEPA = "SEPA",
+  SWIFT = "SWIFT",
+  BANK_TRANSFER = "BANK_TRANSFER",
+}
+
+export interface RampQuoteRequest {
+  source?: TransferPartyData;         // Source of the ramp. In case of on-ramp, this is the fiat source and in case of off-ramp, this is the source of the crypto currency.
+  destination?: TransferPartyData;    // Destination of the ramp. In case of on-ramp, this is the crypto destination and in case of off-ramp, this is the fiat destination.
+  fromAsset: string;                  // Asset to be converted from.
+  fromChain?: string;                 // Chain of the asset to be converted from.
+  fromAmount: string;                 // Amount to be converted from.
+  toAsset: string;                    // Asset to be converted to.
+  toChain?: string;                   // Chain of the asset to be converted to.
+  category: TransactionCategory.ON_RAMP | TransactionCategory.OFF_RAMP; // Category of the ramp.
+  paymentMethod?: PaymentMethod;      // Payment method to be used for the ramp.
+}
+
+export interface RampQuoteResponse {
+  finalToAmount: string;              // Final amount to be received after conversion.
+  quoteId: string;                    // Unique identifier for the quote.
+  fees: RampExchangeRateFees;         // Fees charged for the ramp transaction.
+  quoteResponseDict: Record<string, any>; // Raw quote response data from the ramp provider.
+  sourceName: string;                 // Name of the ramp provider source.
 }
 
 export interface CreateOnRampTransactionRequest {
-  vaultId: string;
-  quoteId: string;
-  onRampRequestData: Record<string, any>;
-  onRampResponseData: Record<string, any>;
-  externalId?: string;
-  memo?: string;
+  destination: TransferPartyData;     // Destination vault for the on-ramp crypto delivery.
+  rampRequestData: RampQuoteRequest;  // The ramp quote request data used to generate the quote.
+  rampResponseData: RampQuoteResponse; // The ramp quote response data received from the provider.
+  externalId?: string;                // Optional external identifier set by the calling system.
+  memo?: string;                      // Optional memo for the transaction.
 }
 
 export interface CreateOffRampTransactionRequest {
-  vaultId: string;
-  quoteId: string;
-  offRampRequestData: Record<string, any>;
-  offRampResponseData: Record<string, any>;
-  externalId?: string;
-  memo?: string;
+  source: TransferPartyData;          // Source vault for the off-ramp crypto withdrawal.
+  destination: TransferPartyData;     // Destination for the off-ramp fiat delivery.
+  rampRequestData: RampQuoteRequest;  // The ramp quote request data used to generate the quote.
+  rampResponseData: RampQuoteResponse; // The ramp quote response data received from the provider.
+  externalId?: string;                // Optional external identifier set by the calling system.
+  memo?: string;                      // Optional memo for the transaction.
 }
 
 export interface CreateContactRequest {

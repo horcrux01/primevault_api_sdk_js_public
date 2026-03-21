@@ -17,16 +17,20 @@ export declare enum TransferPartyType {
     EXTERNAL_BANK_ACCOUNT = "EXTERNAL_BANK_ACCOUNT"
 }
 export interface BankDetails {
+    bankAccountId?: string;
     bankName?: string;
     beneficiaryName?: string;
+    accountName?: string;
+    accountNumber?: string;
     accountNumberMasked?: string;
-    iban?: string;
-    swiftBic?: string;
     routingNumber?: string;
     paymentRail?: string;
+    bankAddress?: string;
+    swiftCode?: string;
+    swiftBic?: string;
+    iban?: string;
     currency?: string;
     country?: string;
-    bankAddress?: string;
 }
 export interface TransferPartyData {
     type: TransferPartyType;
@@ -465,9 +469,9 @@ export interface BankAccountListResponse {
     next?: string;
 }
 export interface CreateBankAccountRequest {
-    accountNumber: string;
-    accountName: string;
-    thirdParty: string;
+    accountNumber?: string;
+    accountName?: string;
+    thirdParty?: string;
     routingNumber?: string;
     accountType?: string;
     clientBankAccountId?: string;

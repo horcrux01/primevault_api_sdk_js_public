@@ -20,16 +20,20 @@ export enum TransferPartyType {
 }
 
 export interface BankDetails {
+  bankAccountId?: string;
   bankName?: string;
   beneficiaryName?: string;
+  accountName?: string;
+  accountNumber?: string;
   accountNumberMasked?: string;
-  iban?: string;
-  swiftBic?: string;
   routingNumber?: string;
   paymentRail?: string;
+  bankAddress?: string;
+  swiftCode?: string;
+  swiftBic?: string;
+  iban?: string;
   currency?: string;
   country?: string;
-  bankAddress?: string;
 }
 
 export interface TransferPartyData {

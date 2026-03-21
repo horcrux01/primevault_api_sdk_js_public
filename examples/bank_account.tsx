@@ -55,7 +55,7 @@ const createAndApproveBankAccount = async (
   const fetched = await apiClient.getBankAccountById(bankAccount.id);
 
   // Step 4: Approve the pending change request
-  const approval = await apiClient.approveBankAccount(bankAccount.id);
+  const approval = await apiClient.submitBankAccountApprovalAction(bankAccount.id);
 
   // Step 5: Verify status after approval
   const verified = await apiClient.getBankAccountById(bankAccount.id);
@@ -70,7 +70,7 @@ const declineBankAccount = async (
   apiClient: APIClient,
   bankAccountId: string,
 ): Promise<void> => {
-  await apiClient.approveBankAccount(bankAccountId, ApprovalAction.REJECT);
+  await apiClient.submitBankAccountApprovalAction(bankAccountId, ApprovalAction.REJECT);
 };
 
 export { createAndApproveBankAccount, declineBankAccount };

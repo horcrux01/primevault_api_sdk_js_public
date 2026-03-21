@@ -30,6 +30,6 @@ export declare class APIClient extends BaseAPIClient {
     getBankAccounts(params?: Record<string, string>, page?: number, limit?: number): Promise<BankAccountListResponse>;
     getBankAccountById(bankAccountId: string): Promise<BankAccount>;
     createBankAccount(request: CreateBankAccountRequest): Promise<BankAccount>;
-    approveBankAccount(entityId: string, action?: ApprovalAction): Promise<ApprovalActionResponse>;
+    submitBankAccountApprovalAction(entityId: string, action?: ApprovalAction): Promise<ApprovalActionResponse>;
 }
 //# sourceMappingURL=apiClient.d.ts.map

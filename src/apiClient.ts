@@ -336,7 +336,7 @@ export class APIClient extends BaseAPIClient {
     return await this.post("/api/external/bank_accounts/", request);
   }
 
-  async approveBankAccount(
+  async submitBankAccountApprovalAction(
     entityId: string,
     action: ApprovalAction = ApprovalAction.APPROVE,
   ): Promise<ApprovalActionResponse> {

@@ -297,7 +297,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.post("/api/external/bank_accounts/", request);
         });
     }
-    approveBankAccount(entityId_1) {
+    submitBankAccountApprovalAction(entityId_1) {
         return __awaiter(this, arguments, void 0, function* (entityId, action = types_1.ApprovalAction.APPROVE) {
             const msgResponse = yield this.get("/api/external/change_requests/approvals/approval_message/", { entityId });
             const signatureHex = yield this.signatureService.sign(msgResponse.message);

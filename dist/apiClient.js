@@ -276,5 +276,38 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.post("/api/external/transactions/", data);
         });
     }
+    // ── Bank Accounts ──────────────────────────────────────────────────
+    getBankAccounts() {
+        return __awaiter(this, arguments, void 0, function* (params = {}, page = 1, limit = 20) {
+            const query = new URLSearchParams(params).toString();
+            let url = `/api/external/bank_accounts/?limit=${limit}&page=${page}`;
+            if (query) {
+                url += `&${query}`;
+            }
+            return yield this.get(url);
+        });
+    }
+    getBankAccountById(bankAccountId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.get(`/api/external/bank_accounts/${bankAccountId}/`);
+        });
+    }
+    createBankAccount(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.post("/api/external/bank_accounts/", request);
+        });
+    }
+    approveBankAccount(entityId_1) {
+        return __awaiter(this, arguments, void 0, function* (entityId, action = types_1.ApprovalAction.APPROVE) {
+            const msgResponse = yield this.get("/api/external/change_requests/approvals/approval_message/", { entityId });
+            const signatureHex = yield this.signatureService.sign(msgResponse.message);
+            return yield this.post(`/api/external/change_requests/approvals/${msgResponse.approvalId}/action/`, {
+                entityId,
+                message: msgResponse.message,
+                signature: signatureHex,
+                action,
+            });
+        });
+    }
 }
 exports.APIClient = APIClient;

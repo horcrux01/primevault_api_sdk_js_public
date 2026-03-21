@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ResourceType = exports.PaymentMethod = exports.TransactionFeeTier = exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.VaultType = exports.TransferPartyType = void 0;
+exports.ApprovalAction = exports.BankAccountStatus = exports.ResourceType = exports.PaymentMethod = exports.TransactionFeeTier = exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.VaultType = exports.TransferPartyType = void 0;
 var TransferPartyType;
 (function (TransferPartyType) {
     TransferPartyType["CONTACT"] = "CONTACT";
@@ -85,3 +85,16 @@ var ResourceType;
     ResourceType["TRON_ENERGY"] = "TRON_ENERGY";
     ResourceType["TRON_BANDWIDTH"] = "TRON_BANDWIDTH";
 })(ResourceType || (exports.ResourceType = ResourceType = {}));
+// ── Bank Accounts ──────────────────────────────────────────────────────
+var BankAccountStatus;
+(function (BankAccountStatus) {
+    BankAccountStatus["PENDING"] = "PENDING";
+    BankAccountStatus["APPROVED"] = "APPROVED";
+    BankAccountStatus["DECLINED"] = "DECLINED";
+})(BankAccountStatus || (exports.BankAccountStatus = BankAccountStatus = {}));
+// ── Change-request approvals ───────────────────────────────────────────
+var ApprovalAction;
+(function (ApprovalAction) {
+    ApprovalAction["APPROVE"] = "approve";
+    ApprovalAction["DECLINE"] = "decline";
+})(ApprovalAction || (exports.ApprovalAction = ApprovalAction = {}));

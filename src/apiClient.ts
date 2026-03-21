@@ -1,8 +1,14 @@
 import { BaseAPIClient } from "./baseApiClient";
 import {
+  ApprovalAction,
+  ApprovalActionResponse,
   Asset,
-  BalanceResponse, ChainData,
+  BalanceResponse,
+  BankAccount,
+  BankAccountListResponse,
+  ChainData,
   Contact,
+  CreateBankAccountRequest,
   CreateContactRequest,
   CreateContractCallTransactionRequest,
   CreateTradeTransactionRequest,
@@ -10,20 +16,20 @@ import {
   CreateVaultRequest,
   EstimatedFeeResponse,
   EstimateFeeRequest,
-  GetTradeQuoteResponse, ReplaceTransactionRequest,
-  RampExchangeRatesRequest,
-  RampExchangeRatesResponse,
+  GetApprovalMessageResponse,
+  GetTradeQuoteResponse,
+  RampQuoteRequest,
+  RampQuoteResponse,
+  ReplaceTransactionRequest,
   TradeQuoteRequest,
   Transaction,
+  TransactionCategory,
   Vault,
   DetailedBalanceResponse,
   CreateOnRampTransactionRequest,
   CreateOffRampTransactionRequest,
-  TransactionCategory,
   DelegateResourceRequest,
   StakeResourceRequest,
-  RampQuoteRequest,
-  RampQuoteResponse,
 } from "./types";
 
 export class APIClient extends BaseAPIClient {
@@ -303,5 +309,52 @@ export class APIClient extends BaseAPIClient {
       memo: request.memo,
     };
     return await this.post("/api/external/transactions/", data);
+  }
+
+  // ── Bank Accounts ──────────────────────────────────────────────────
+
+  async getBankAccounts(
+    params: Record<string, string> = {},
+    page: number = 1,
+    limit: number = 20,
+  ): Promise<BankAccountListResponse> {
+    const query = new URLSearchParams(params).toString();
+    let url = `/api/external/bank_accounts/?limit=${limit}&page=${page}`;
+    if (query) {
+      url += `&${query}`;
+    }
+    return await this.get(url);
+  }
+
+  async getBankAccountById(bankAccountId: string): Promise<BankAccount> {
+    return await this.get(`/api/external/bank_accounts/${bankAccountId}/`);
+  }
+
+  async createBankAccount(
+    request: CreateBankAccountRequest,
+  ): Promise<BankAccount> {
+    return await this.post("/api/external/bank_accounts/", request);
+  }
+
+  async approveBankAccount(
+    entityId: string,
+    action: ApprovalAction = ApprovalAction.APPROVE,
+  ): Promise<ApprovalActionResponse> {
+    const msgResponse: GetApprovalMessageResponse = await this.get(
+      "/api/external/change_requests/approvals/approval_message/",
+      { entityId },
+    );
+    const signatureHex = await (this as any).signatureService.sign(
+      msgResponse.message,
+    );
+    return await this.post(
+      `/api/external/change_requests/approvals/${msgResponse.approvalId}/action/`,
+      {
+        entityId,
+        message: msgResponse.message,
+        signature: signatureHex,
+        action,
+      },
+    );
   }
 }

@@ -17,16 +17,20 @@ export declare enum TransferPartyType {
     EXTERNAL_BANK_ACCOUNT = "EXTERNAL_BANK_ACCOUNT"
 }
 export interface BankDetails {
+    bankAccountId?: string;
     bankName?: string;
     beneficiaryName?: string;
+    accountName?: string;
+    accountNumber?: string;
     accountNumberMasked?: string;
-    iban?: string;
-    swiftBic?: string;
     routingNumber?: string;
     paymentRail?: string;
+    bankAddress?: string;
+    swiftCode?: string;
+    swiftBic?: string;
+    iban?: string;
     currency?: string;
     country?: string;
-    bankAddress?: string;
 }
 export interface TransferPartyData {
     type: TransferPartyType;
@@ -184,7 +188,7 @@ export interface Transaction {
     source?: TransferPartyData;
     destination?: TransferPartyData;
     rampRequestData?: RampQuoteRequest;
-    rampResponseData?: RampQuoteResponse;
+    rampResponseData?: RampQuoteResponseItem;
 }
 export interface TransactionCreationGasParams {
     feeTier?: TransactionFeeTier;
@@ -288,17 +292,20 @@ export interface RampQuoteRequest {
     category: TransactionCategory.ON_RAMP | TransactionCategory.OFF_RAMP;
     paymentMethod?: PaymentMethod;
 }
-export interface RampQuoteResponse {
+export interface RampQuoteResponseItem {
     finalToAmount: string;
     quoteId: string;
     fees: RampExchangeRateFees;
     quoteResponseDict: Record<string, any>;
     sourceName: string;
 }
+export interface RampQuoteResponse {
+    quotes: RampQuoteResponseItem[];
+}
 export interface CreateOnRampTransactionRequest {
     destination: TransferPartyData;
     rampRequestData: RampQuoteRequest;
-    rampResponseData: RampQuoteResponse;
+    rampResponseData: RampQuoteResponseItem;
     externalId?: string;
     memo?: string;
 }
@@ -306,7 +313,7 @@ export interface CreateOffRampTransactionRequest {
     source: TransferPartyData;
     destination: TransferPartyData;
     rampRequestData: RampQuoteRequest;
-    rampResponseData: RampQuoteResponse;
+    rampResponseData: RampQuoteResponseItem;
     externalId?: string;
     memo?: string;
 }
@@ -428,5 +435,73 @@ export interface StakeResourceRequest {
     resourceType?: ResourceType;
     externalId?: string;
     memo?: string;
+}
+export declare enum BankAccountStatus {
+    PENDING = "PENDING",
+    APPROVED = "APPROVED",
+    DECLINED = "DECLINED"
+}
+export interface BankAccount {
+    id: string;
+    orgId: string;
+    orgEntityId: string;
+    createdAt: string;
+    updatedAt: string;
+    isDeleted: boolean;
+    status: BankAccountStatus;
+    accountNumber?: string;
+    accountName?: string;
+    routingNumber?: string;
+    accountType?: string;
+    thirdParty?: string;
+    clientBankAccountId?: string;
+    region?: string;
+    paymentMethod?: string;
+    bankName?: string;
+    currency?: string;
+    streetLine?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+}
+export interface BankAccountListResponse {
+    results: BankAccount[];
+    count: number;
+    previous?: string;
+    next?: string;
+}
+export interface CreateBankAccountRequest {
+    accountNumber?: string;
+    accountName?: string;
+    thirdParty?: string;
+    routingNumber?: string;
+    accountType?: string;
+    clientBankAccountId?: string;
+    region?: string;
+    paymentMethod?: string;
+    bankName?: string;
+    currency?: string;
+    streetLine?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+}
+export declare enum ApprovalAction {
+    APPROVE = "approve",
+    DECLINE = "decline"
+}
+export interface GetApprovalMessageResponse {
+    approvalId: string;
+    changeRequestId: string;
+    entityId: string;
+    message: string;
+}
+export interface ApprovalActionResponse {
+    success: boolean;
+    status: string;
+    id: string;
+    entityId: string;
 }
 //# sourceMappingURL=types.d.ts.map

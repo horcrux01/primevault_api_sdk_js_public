@@ -17,19 +17,24 @@ export enum TransferPartyType {
   VAULT = "VAULT",
   EXTERNAL_ADDRESS = "EXTERNAL_ADDRESS",
   EXTERNAL_BANK_ACCOUNT = "EXTERNAL_BANK_ACCOUNT",
+  BANK_ACCOUNT = "BANK_ACCOUNT",
 }
 
 export interface BankDetails {
+  bankAccountId?: string;
   bankName?: string;
   beneficiaryName?: string;
+  accountName?: string;
+  accountNumber?: string;
   accountNumberMasked?: string;
-  iban?: string;
-  swiftBic?: string;
   routingNumber?: string;
   paymentRail?: string;
+  bankAddress?: string;
+  swiftCode?: string;
+  swiftBic?: string;
+  iban?: string;
   currency?: string;
   country?: string;
-  bankAddress?: string;
 }
 
 export interface TransferPartyData {
@@ -202,7 +207,7 @@ export interface Transaction {
   source?: TransferPartyData;
   destination?: TransferPartyData;
   rampRequestData?: RampQuoteRequest;
-  rampResponseData?: RampQuoteResponse;
+  rampResponseData?: RampQuoteResponseItem;
 }
 
 export interface TransactionCreationGasParams {
@@ -325,7 +330,7 @@ export interface RampQuoteRequest {
   paymentMethod?: PaymentMethod;      // Payment method to be used for the ramp.
 }
 
-export interface RampQuoteResponse {
+export interface RampQuoteResponseItem {
   finalToAmount: string;              // Final amount to be received after conversion.
   quoteId: string;                    // Unique identifier for the quote.
   fees: RampExchangeRateFees;         // Fees charged for the ramp transaction.
@@ -333,10 +338,14 @@ export interface RampQuoteResponse {
   sourceName: string;                 // Name of the ramp provider source.
 }
 
+export interface RampQuoteResponse {
+  quotes: RampQuoteResponseItem[];    // List of available ramp quotes.
+}
+
 export interface CreateOnRampTransactionRequest {
   destination: TransferPartyData;     // Destination vault for the on-ramp crypto delivery.
   rampRequestData: RampQuoteRequest;  // The ramp quote request data used to generate the quote.
-  rampResponseData: RampQuoteResponse; // The ramp quote response data received from the provider.
+  rampResponseData: RampQuoteResponseItem; // The selected ramp quote from the list.
   externalId?: string;                // Optional external identifier set by the calling system.
   memo?: string;                      // Optional memo for the transaction.
 }
@@ -345,7 +354,7 @@ export interface CreateOffRampTransactionRequest {
   source: TransferPartyData;          // Source vault for the off-ramp crypto withdrawal.
   destination: TransferPartyData;     // Destination for the off-ramp fiat delivery.
   rampRequestData: RampQuoteRequest;  // The ramp quote request data used to generate the quote.
-  rampResponseData: RampQuoteResponse; // The ramp quote response data received from the provider.
+  rampResponseData: RampQuoteResponseItem; // The selected ramp quote from the list.
   externalId?: string;                // Optional external identifier set by the calling system.
   memo?: string;                      // Optional memo for the transaction.
 }
@@ -496,4 +505,77 @@ export interface StakeResourceRequest {
   resourceType?: ResourceType;
   externalId?: string;
   memo?: string;
+}
+
+// ── Bank Accounts ──────────────────────────────────────────────────────
+
+export enum BankAccountStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  DECLINED = "DECLINED",
+}
+
+export interface BankAccount {
+  id: string;
+  orgId: string;
+  orgEntityId: string;
+  createdAt: string;
+  updatedAt: string;
+  isDeleted: boolean;
+  status: BankAccountStatus;
+  accountNumber?: string;
+  accountName?: string;
+  routingNumber?: string;
+  clientBankAccountId?: string;
+  paymentMethod?: string;
+  bankName?: string;
+  currency?: string;
+  streetLine?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+}
+
+export interface BankAccountListResponse {
+  results: BankAccount[];
+  count: number;
+  previous?: string;
+  next?: string;
+}
+
+export interface CreateBankAccountRequest {
+  accountNumber?: string;
+  accountName?: string;
+  routingNumber?: string;
+  clientBankAccountId?: string;
+  paymentMethod?: string;
+  bankName?: string;
+  currency?: string;
+  streetLine?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+}
+
+// ── Change-request approvals ───────────────────────────────────────────
+
+export enum ApprovalAction {
+  APPROVE = "approve",
+  DECLINE = "decline",
+}
+
+export interface GetApprovalMessageResponse {
+  approvalId: string;
+  changeRequestId: string;
+  entityId: string;
+  message: string;
+}
+
+export interface ApprovalActionResponse {
+  success: boolean;
+  status: string;
+  id: string;
+  entityId: string;
 }

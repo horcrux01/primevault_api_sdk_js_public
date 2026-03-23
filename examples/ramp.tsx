@@ -30,12 +30,13 @@ const createOnRampTransaction = async (
   };
 
   const rampQuoteResponse = await apiClient.getRampQuote(rampQuoteRequest);
+  const selectedQuote = rampQuoteResponse.quotes[0];
 
-  // Step 2: Create the on-ramp transaction using the quote data.
+  // Step 2: Create the on-ramp transaction using the selected quote.
   const onRampTransaction = await apiClient.createOnRampTransaction({
     destination,
     rampRequestData: rampQuoteRequest,
-    rampResponseData: rampQuoteResponse,
+    rampResponseData: selectedQuote,
     externalId: "on-ramp-1110eee2e",
     memo: "on ramp test",
   });
@@ -58,4 +59,61 @@ const createOnRampTransaction = async (
   return onRampTransaction;
 };
 
-export { createOnRampTransaction };
+/**
+ * Example: Create an OFF_RAMP transaction (crypto → fiat).
+ *
+ * Flow:
+ *  1. Fetch a ramp quote for the OFF_RAMP conversion via getRampQuote.
+ *  2. Use the quote request and response data to create the off-ramp transaction.
+ */
+const createOffRampTransaction = async (
+  apiClient: APIClient,
+): Promise<Transaction> => {
+  const vaultId = "393f359c-6e66-4490-bf1f-5a4ec44f49d6";
+  const bankAccountId = "your-bank-account-id";
+
+  const source = {
+    type: TransferPartyType.VAULT,
+    id: vaultId,
+  };
+
+  const destination = {
+    type: TransferPartyType.EXTERNAL_BANK_ACCOUNT,
+    id: bankAccountId,
+  };
+
+  const rampQuoteRequest = {
+    source,
+    fromAsset: "USDT",
+    toAsset: "USD",
+    fromAmount: "100",
+    fromChain: "ETHEREUM",
+    category: TransactionCategory.OFF_RAMP as const,
+    paymentMethod: PaymentMethod.US_ACH,
+  };
+
+  const rampQuoteResponse = await apiClient.getRampQuote(rampQuoteRequest);
+  const selectedQuote = rampQuoteResponse.quotes[0];
+
+  const offRampTransaction = await apiClient.createOffRampTransaction({
+    source,
+    destination,
+    rampRequestData: rampQuoteRequest,
+    rampResponseData: selectedQuote,
+    externalId: "off-ramp-example-1",
+    memo: "off ramp test",
+  });
+
+  // The transaction response includes bank details for the fiat delivery
+  // in the destination field:
+  //
+  //   offRampTransaction.destination?.type   // "EXTERNAL_BANK_ACCOUNT"
+  //   offRampTransaction.destination?.bank?.bankName
+  //   offRampTransaction.destination?.bank?.beneficiaryName
+  //   offRampTransaction.destination?.bank?.routingNumber
+  //   offRampTransaction.destination?.bank?.currency
+
+  return offRampTransaction;
+};
+
+export { createOnRampTransaction, createOffRampTransaction };

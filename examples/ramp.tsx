@@ -30,12 +30,13 @@ const createOnRampTransaction = async (
   };
 
   const rampQuoteResponse = await apiClient.getRampQuote(rampQuoteRequest);
+  const selectedQuote = rampQuoteResponse.quotes[0];
 
-  // Step 2: Create the on-ramp transaction using the quote data.
+  // Step 2: Create the on-ramp transaction using the selected quote.
   const onRampTransaction = await apiClient.createOnRampTransaction({
     destination,
     rampRequestData: rampQuoteRequest,
-    rampResponseData: rampQuoteResponse,
+    rampResponseData: selectedQuote,
     externalId: "on-ramp-1110eee2e",
     memo: "on ramp test",
   });
@@ -92,12 +93,13 @@ const createOffRampTransaction = async (
   };
 
   const rampQuoteResponse = await apiClient.getRampQuote(rampQuoteRequest);
+  const selectedQuote = rampQuoteResponse.quotes[0];
 
   const offRampTransaction = await apiClient.createOffRampTransaction({
     source,
     destination,
     rampRequestData: rampQuoteRequest,
-    rampResponseData: rampQuoteResponse,
+    rampResponseData: selectedQuote,
     externalId: "off-ramp-example-1",
     memo: "off ramp test",
   });

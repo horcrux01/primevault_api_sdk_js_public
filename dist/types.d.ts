@@ -188,7 +188,7 @@ export interface Transaction {
     source?: TransferPartyData;
     destination?: TransferPartyData;
     rampRequestData?: RampQuoteRequest;
-    rampResponseData?: RampQuoteResponse;
+    rampResponseData?: RampQuoteResponseItem;
 }
 export interface TransactionCreationGasParams {
     feeTier?: TransactionFeeTier;
@@ -292,17 +292,20 @@ export interface RampQuoteRequest {
     category: TransactionCategory.ON_RAMP | TransactionCategory.OFF_RAMP;
     paymentMethod?: PaymentMethod;
 }
-export interface RampQuoteResponse {
+export interface RampQuoteResponseItem {
     finalToAmount: string;
     quoteId: string;
     fees: RampExchangeRateFees;
     quoteResponseDict: Record<string, any>;
     sourceName: string;
 }
+export interface RampQuoteResponse {
+    quotes: RampQuoteResponseItem[];
+}
 export interface CreateOnRampTransactionRequest {
     destination: TransferPartyData;
     rampRequestData: RampQuoteRequest;
-    rampResponseData: RampQuoteResponse;
+    rampResponseData: RampQuoteResponseItem;
     externalId?: string;
     memo?: string;
 }
@@ -310,7 +313,7 @@ export interface CreateOffRampTransactionRequest {
     source: TransferPartyData;
     destination: TransferPartyData;
     rampRequestData: RampQuoteRequest;
-    rampResponseData: RampQuoteResponse;
+    rampResponseData: RampQuoteResponseItem;
     externalId?: string;
     memo?: string;
 }

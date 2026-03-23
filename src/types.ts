@@ -206,7 +206,7 @@ export interface Transaction {
   source?: TransferPartyData;
   destination?: TransferPartyData;
   rampRequestData?: RampQuoteRequest;
-  rampResponseData?: RampQuoteResponse;
+  rampResponseData?: RampQuoteResponseItem;
 }
 
 export interface TransactionCreationGasParams {
@@ -329,7 +329,7 @@ export interface RampQuoteRequest {
   paymentMethod?: PaymentMethod;      // Payment method to be used for the ramp.
 }
 
-export interface RampQuoteResponse {
+export interface RampQuoteResponseItem {
   finalToAmount: string;              // Final amount to be received after conversion.
   quoteId: string;                    // Unique identifier for the quote.
   fees: RampExchangeRateFees;         // Fees charged for the ramp transaction.
@@ -337,10 +337,14 @@ export interface RampQuoteResponse {
   sourceName: string;                 // Name of the ramp provider source.
 }
 
+export interface RampQuoteResponse {
+  quotes: RampQuoteResponseItem[];    // List of available ramp quotes.
+}
+
 export interface CreateOnRampTransactionRequest {
   destination: TransferPartyData;     // Destination vault for the on-ramp crypto delivery.
   rampRequestData: RampQuoteRequest;  // The ramp quote request data used to generate the quote.
-  rampResponseData: RampQuoteResponse; // The ramp quote response data received from the provider.
+  rampResponseData: RampQuoteResponseItem; // The selected ramp quote from the list.
   externalId?: string;                // Optional external identifier set by the calling system.
   memo?: string;                      // Optional memo for the transaction.
 }
@@ -349,7 +353,7 @@ export interface CreateOffRampTransactionRequest {
   source: TransferPartyData;          // Source vault for the off-ramp crypto withdrawal.
   destination: TransferPartyData;     // Destination for the off-ramp fiat delivery.
   rampRequestData: RampQuoteRequest;  // The ramp quote request data used to generate the quote.
-  rampResponseData: RampQuoteResponse; // The ramp quote response data received from the provider.
+  rampResponseData: RampQuoteResponseItem; // The selected ramp quote from the list.
   externalId?: string;                // Optional external identifier set by the calling system.
   memo?: string;                      // Optional memo for the transaction.
 }

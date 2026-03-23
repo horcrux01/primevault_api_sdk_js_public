@@ -526,7 +526,6 @@ export interface BankAccount {
   accountName?: string;
   routingNumber?: string;
   accountType?: string;
-  thirdParty?: string;
   clientBankAccountId?: string;
   region?: string;
   paymentMethod?: string;
@@ -549,7 +548,6 @@ export interface BankAccountListResponse {
 export interface CreateBankAccountRequest {
   accountNumber?: string;
   accountName?: string;
-  thirdParty?: string;
   routingNumber?: string;
   accountType?: string;
   clientBankAccountId?: string;

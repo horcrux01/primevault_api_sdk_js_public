@@ -17,6 +17,7 @@ export enum TransferPartyType {
   VAULT = "VAULT",
   EXTERNAL_ADDRESS = "EXTERNAL_ADDRESS",
   EXTERNAL_BANK_ACCOUNT = "EXTERNAL_BANK_ACCOUNT",
+  BANK_ACCOUNT = "BANK_ACCOUNT",
 }
 
 export interface BankDetails {
@@ -525,9 +526,7 @@ export interface BankAccount {
   accountNumber?: string;
   accountName?: string;
   routingNumber?: string;
-  accountType?: string;
   clientBankAccountId?: string;
-  region?: string;
   paymentMethod?: string;
   bankName?: string;
   currency?: string;
@@ -549,9 +548,7 @@ export interface CreateBankAccountRequest {
   accountNumber?: string;
   accountName?: string;
   routingNumber?: string;
-  accountType?: string;
   clientBankAccountId?: string;
-  region?: string;
   paymentMethod?: string;
   bankName?: string;
   currency?: string;

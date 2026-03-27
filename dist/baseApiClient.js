@@ -39,6 +39,11 @@ class BaseAPIClient {
             return this._makeRequest("POST", { urlPath: path, data });
         });
     }
+    put(path, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this._makeRequest("PUT", { urlPath: path, data });
+        });
+    }
     _makeRequest(method, options) {
         return __awaiter(this, void 0, void 0, function* () {
             const { urlPath, params, data } = options;

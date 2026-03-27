@@ -241,8 +241,29 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 blockChain: request.chain,
                 tags: request.tags,
                 externalId: request.externalId,
+                assetList: request.assetList || [],
             };
             return yield this.post("/api/external/contacts/", data);
+        });
+    }
+    updateContact(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = {
+                assetList: request.assetList || [],
+            };
+            return yield this.put(`/api/external/contacts/${request.id}/`, data);
+        });
+    }
+    submitContactApprovalAction(entityId_1) {
+        return __awaiter(this, arguments, void 0, function* (entityId, action = types_1.ApprovalAction.APPROVE) {
+            const msgResponse = yield this.get("/api/external/change_requests/approvals/approval_message/", { entityId });
+            const signatureHex = yield this.signatureService.sign(msgResponse.message);
+            return yield this.post(`/api/external/change_requests/approvals/${msgResponse.approvalId}/action/`, {
+                entityId,
+                message: msgResponse.message,
+                signature: signatureHex,
+                action,
+            });
         });
     }
     delegateResource(request) {

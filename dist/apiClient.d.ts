@@ -1,5 +1,5 @@
 import { BaseAPIClient } from "./baseApiClient";
-import { ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAccount, BankAccountListResponse, ChainData, Contact, CreateBankAccountRequest, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, RampQuoteRequest, RampQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, Vault, DetailedBalanceResponse, CreateOnRampTransactionRequest, CreateOffRampTransactionRequest, DelegateResourceRequest, StakeResourceRequest } from "./types";
+import { ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAccount, BankAccountListResponse, ChainData, Contact, CreateBankAccountRequest, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, RampQuoteRequest, RampQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, Vault, DetailedBalanceResponse, CreateOnRampTransactionRequest, CreateOffRampTransactionRequest, DelegateResourceRequest, StakeResourceRequest, UpdateContactRequest, UpdateContactResponse } from "./types";
 export declare class APIClient extends BaseAPIClient {
     getAssetsData(): Promise<Asset[]>;
     getSupportedChains(): Promise<ChainData[]>;
@@ -25,6 +25,8 @@ export declare class APIClient extends BaseAPIClient {
     getContacts(params?: Record<string, string>, page?: number, limit?: number): Promise<Contact[]>;
     getContactById(contactId: string): Promise<Contact>;
     createContact(request: CreateContactRequest): Promise<Contact>;
+    updateContact(request: UpdateContactRequest): Promise<UpdateContactResponse>;
+    submitContactApprovalAction(entityId: string, action?: ApprovalAction): Promise<ApprovalActionResponse>;
     delegateResource(request: DelegateResourceRequest): Promise<Transaction>;
     stakeResource(request: StakeResourceRequest): Promise<Transaction>;
     getBankAccounts(params?: Record<string, string>, page?: number, limit?: number): Promise<BankAccountListResponse>;

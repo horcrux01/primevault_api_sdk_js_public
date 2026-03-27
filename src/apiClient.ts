@@ -255,6 +255,7 @@ export class APIClient extends BaseAPIClient {
     );
   }
 
+
   async getContacts(
     params: Record<string, string> = {},
     page: number = 1,
@@ -312,6 +313,14 @@ export class APIClient extends BaseAPIClient {
         action,
       },
     );
+  }
+
+  async approveContact(contactId: string): Promise<ApprovalActionResponse> {
+    return await this.submitContactApprovalAction(contactId, ApprovalAction.APPROVE);
+  }
+
+  async declineContact(contactId: string): Promise<ApprovalActionResponse> {
+    return await this.submitContactApprovalAction(contactId, ApprovalAction.DECLINE);
   }
 
   async delegateResource(request: DelegateResourceRequest): Promise<Transaction> {

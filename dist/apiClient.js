@@ -266,6 +266,16 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             });
         });
     }
+    approveContact(contactId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.submitContactApprovalAction(contactId, types_1.ApprovalAction.APPROVE);
+        });
+    }
+    declineContact(contactId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.submitContactApprovalAction(contactId, types_1.ApprovalAction.DECLINE);
+        });
+    }
     delegateResource(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {

@@ -27,8 +27,6 @@ export declare class APIClient extends BaseAPIClient {
     createContact(request: CreateContactRequest): Promise<Contact>;
     updateContact(request: UpdateContactRequest): Promise<UpdateContactResponse>;
     submitContactApprovalAction(entityId: string, action?: ApprovalAction): Promise<ApprovalActionResponse>;
-    approveContact(contactId: string): Promise<ApprovalActionResponse>;
-    declineContact(contactId: string): Promise<ApprovalActionResponse>;
     delegateResource(request: DelegateResourceRequest): Promise<Transaction>;
     stakeResource(request: StakeResourceRequest): Promise<Transaction>;
     getBankAccounts(params?: Record<string, string>, page?: number, limit?: number): Promise<BankAccountListResponse>;

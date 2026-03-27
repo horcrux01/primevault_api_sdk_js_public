@@ -315,13 +315,6 @@ export class APIClient extends BaseAPIClient {
     );
   }
 
-  async approveContact(contactId: string): Promise<ApprovalActionResponse> {
-    return await this.submitContactApprovalAction(contactId, ApprovalAction.APPROVE);
-  }
-
-  async declineContact(contactId: string): Promise<ApprovalActionResponse> {
-    return await this.submitContactApprovalAction(contactId, ApprovalAction.DECLINE);
-  }
 
   async delegateResource(request: DelegateResourceRequest): Promise<Transaction> {
     const data = {

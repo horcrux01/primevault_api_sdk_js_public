@@ -1,4 +1,4 @@
-import { APIClient } from "../src";
+import { APIClient, ApprovalAction } from "../src";
 import type { Contact, UpdateContactResponse } from "../src";
 
 /**
@@ -22,8 +22,11 @@ const createAndApproveContact = async (
 
   console.log(`Contact created: ${contact.id} (${contact.status})`);
 
-  // Step 2: Approve the contact
-  const approval = await apiClient.approveContact(contact.id);
+  // Step 2: Approve the contact using its ID as the entityId
+  const approval = await apiClient.submitContactApprovalAction(
+    contact.id,
+    ApprovalAction.APPROVE,
+  );
 
   console.log(`Approval result: ${JSON.stringify(approval)}`);
 
@@ -41,7 +44,10 @@ const declineContactExample = async (
   apiClient: APIClient,
   contactId: string,
 ): Promise<void> => {
-  await apiClient.declineContact(contactId);
+  await apiClient.submitContactApprovalAction(
+    contactId,
+    ApprovalAction.DECLINE,
+  );
 };
 
 /**

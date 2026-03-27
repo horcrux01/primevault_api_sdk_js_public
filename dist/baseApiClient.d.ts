@@ -7,6 +7,7 @@ export declare class BaseAPIClient {
     constructor(apiKey: string, apiUrl: string, privateKeyHex?: string, keyId?: string);
     get(path: string, params?: Record<string, any>): Promise<any>;
     post(path: string, data?: Record<string, any>): Promise<any>;
+    put(path: string, data?: Record<string, any>): Promise<any>;
     private _makeRequest;
 }
 export declare class BaseAPIException extends Error {

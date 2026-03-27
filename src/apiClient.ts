@@ -30,6 +30,8 @@ import {
   CreateOffRampTransactionRequest,
   DelegateResourceRequest,
   StakeResourceRequest,
+  UpdateContactRequest,
+  UpdateContactResponse,
 } from "./types";
 
 export class APIClient extends BaseAPIClient {
@@ -278,8 +280,38 @@ export class APIClient extends BaseAPIClient {
       blockChain: request.chain,
       tags: request.tags,
       externalId: request.externalId,
+      assetList: request.assetList || [],
     };
     return await this.post("/api/external/contacts/", data);
+  }
+
+  async updateContact(request: UpdateContactRequest): Promise<UpdateContactResponse> {
+    const data = {
+      assetList: request.assetList || [],
+    };
+    return await this.put(`/api/external/contacts/${request.id}/`, data);
+  }
+
+  async submitContactApprovalAction(
+    entityId: string,
+    action: ApprovalAction = ApprovalAction.APPROVE,
+  ): Promise<ApprovalActionResponse> {
+    const msgResponse: GetApprovalMessageResponse = await this.get(
+      "/api/external/change_requests/approvals/approval_message/",
+      { entityId },
+    );
+    const signatureHex = await (this as any).signatureService.sign(
+      msgResponse.message,
+    );
+    return await this.post(
+      `/api/external/change_requests/approvals/${msgResponse.approvalId}/action/`,
+      {
+        entityId,
+        message: msgResponse.message,
+        signature: signatureHex,
+        action,
+      },
+    );
   }
 
   async delegateResource(request: DelegateResourceRequest): Promise<Transaction> {

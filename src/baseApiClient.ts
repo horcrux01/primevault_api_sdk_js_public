@@ -41,6 +41,10 @@ export class BaseAPIClient {
     return this._makeRequest("POST", { urlPath: path, data });
   }
 
+  async put(path: string, data?: Record<string, any>): Promise<any> {
+    return this._makeRequest("PUT", { urlPath: path, data });
+  }
+
   private async _makeRequest(
     method: string,
     options: RequestOptions,

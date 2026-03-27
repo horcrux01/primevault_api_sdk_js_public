@@ -104,6 +104,7 @@ export interface Contact {
   updatedAt: string;
   isDeleted: boolean;
   operationId?: string;
+  assetList?: string[];
 }
 
 export enum TransactionType {
@@ -365,6 +366,22 @@ export interface CreateContactRequest {
   chain: string;
   tags?: string[];
   externalId?: string;
+  assetList?: string[];
+}
+
+export interface UpdateContactRequest {
+  id: string;
+  assetList?: string[];
+}
+
+export interface UpdateContactResponse {
+  id: string;
+  name: string;
+  address: string;
+  blockChain: string;
+  tags?: string[];
+  externalId?: string;
+  assetList?: string[];
 }
 
 export interface FeeData {

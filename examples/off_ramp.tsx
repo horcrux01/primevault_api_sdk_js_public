@@ -1,4 +1,4 @@
-import { APIClient, PaymentMethod, Transaction, TransactionCategory, TransferPartyType } from "../src";
+import { APIClient, Transaction, TransactionCategory, TransferPartyType } from "../src";
 
 /**
  * Example: Create an OFF_RAMP transaction (crypto → fiat).
@@ -36,7 +36,6 @@ const createOffRampTransaction = async (
     fromAmount: "100",
     fromChain: "ETHEREUM",
     category: TransactionCategory.OFF_RAMP as const,
-    paymentMethod: PaymentMethod.US_ACH,
   };
 
   const rampQuoteResponse = await apiClient.getRampQuote(rampQuoteRequest);
@@ -46,8 +45,7 @@ const createOffRampTransaction = async (
   const offRampTransaction = await apiClient.createOffRampTransaction({
     source,
     destination,
-    rampRequestData: rampQuoteRequest,
-    rampResponseData: selectedQuote,
+    quoteId: selectedQuote.quoteId,
     externalId: "off-ramp-example-1",
     memo: "off ramp example",
   });

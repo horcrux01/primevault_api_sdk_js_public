@@ -80,6 +80,7 @@ var PaymentMethod;
     PaymentMethod["SEPA"] = "SEPA";
     PaymentMethod["SWIFT"] = "SWIFT";
     PaymentMethod["BANK_TRANSFER"] = "BANK_TRANSFER";
+    PaymentMethod["WIRE"] = "WIRE";
 })(PaymentMethod || (exports.PaymentMethod = PaymentMethod = {}));
 var ResourceType;
 (function (ResourceType) {

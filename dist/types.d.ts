@@ -281,7 +281,8 @@ export declare enum PaymentMethod {
     US_WIRE = "US_WIRE",
     SEPA = "SEPA",
     SWIFT = "SWIFT",
-    BANK_TRANSFER = "BANK_TRANSFER"
+    BANK_TRANSFER = "BANK_TRANSFER",
+    WIRE = "WIRE"
 }
 export interface RampQuoteRequest {
     source?: TransferPartyData;

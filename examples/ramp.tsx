@@ -1,11 +1,11 @@
-import { APIClient, PaymentMethod, Transaction, TransactionCategory, TransferPartyType } from "../src";
+import { APIClient, Transaction, TransactionCategory, TransferPartyType } from "../src";
 
 /**
  * Example: Create an ON_RAMP transaction (fiat → crypto).
  *
  * Flow:
  *  1. Fetch a ramp quote for the ON_RAMP conversion via getRampQuote.
- *  2. Use the quote request and response data to create the on-ramp transaction.
+ *  2. Pass the selected quote's quoteId to create the on-ramp transaction.
  */
 const createOnRampTransaction = async (
   apiClient: APIClient,
@@ -17,8 +17,7 @@ const createOnRampTransaction = async (
     id: vaultId,
   };
 
-  // Step 1: Request a ramp quote for converting 100 USD → USDC on Polygon on destination vault
-  // using ACH as the payment method.
+  // Step 1: Request a ramp quote for converting 100 USD → USDC on Polygon on destination vault.
   const rampQuoteRequest = {
     destination,
     fromAsset: "USD",
@@ -26,7 +25,6 @@ const createOnRampTransaction = async (
     fromAmount: "100",
     toChain: "POLYGON",
     category: TransactionCategory.ON_RAMP as const,
-    paymentMethod: PaymentMethod.US_ACH,
   };
 
   const rampQuoteResponse = await apiClient.getRampQuote(rampQuoteRequest);
@@ -35,8 +33,7 @@ const createOnRampTransaction = async (
   // Step 2: Create the on-ramp transaction using the selected quote.
   const onRampTransaction = await apiClient.createOnRampTransaction({
     destination,
-    rampRequestData: rampQuoteRequest,
-    rampResponseData: selectedQuote,
+    quoteId: selectedQuote.quoteId,
     externalId: "on-ramp-1110eee2e",
     memo: "on ramp test",
   });
@@ -64,7 +61,7 @@ const createOnRampTransaction = async (
  *
  * Flow:
  *  1. Fetch a ramp quote for the OFF_RAMP conversion via getRampQuote.
- *  2. Use the quote request and response data to create the off-ramp transaction.
+ *  2. Pass the selected quote's quoteId to create the off-ramp transaction.
  */
 const createOffRampTransaction = async (
   apiClient: APIClient,
@@ -89,7 +86,6 @@ const createOffRampTransaction = async (
     fromAmount: "100",
     fromChain: "ETHEREUM",
     category: TransactionCategory.OFF_RAMP as const,
-    paymentMethod: PaymentMethod.US_ACH,
   };
 
   const rampQuoteResponse = await apiClient.getRampQuote(rampQuoteRequest);
@@ -98,8 +94,7 @@ const createOffRampTransaction = async (
   const offRampTransaction = await apiClient.createOffRampTransaction({
     source,
     destination,
-    rampRequestData: rampQuoteRequest,
-    rampResponseData: selectedQuote,
+    quoteId: selectedQuote.quoteId,
     externalId: "off-ramp-example-1",
     memo: "off ramp test",
   });

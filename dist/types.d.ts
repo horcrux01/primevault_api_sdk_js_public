@@ -292,7 +292,6 @@ export interface RampQuoteRequest {
     toAsset: string;
     toChain?: string;
     category: TransactionCategory.ON_RAMP | TransactionCategory.OFF_RAMP;
-    paymentMethod?: PaymentMethod;
 }
 export interface RampQuoteResponseItem {
     finalToAmount: string;
@@ -300,22 +299,21 @@ export interface RampQuoteResponseItem {
     fees: RampExchangeRateFees;
     quoteResponseDict: Record<string, any>;
     sourceName: string;
+    rate?: string;
 }
 export interface RampQuoteResponse {
     quotes: RampQuoteResponseItem[];
 }
 export interface CreateOnRampTransactionRequest {
     destination: TransferPartyData;
-    rampRequestData: RampQuoteRequest;
-    rampResponseData: RampQuoteResponseItem;
+    quoteId: string;
     externalId?: string;
     memo?: string;
 }
 export interface CreateOffRampTransactionRequest {
     source: TransferPartyData;
     destination: TransferPartyData;
-    rampRequestData: RampQuoteRequest;
-    rampResponseData: RampQuoteResponseItem;
+    quoteId: string;
     externalId?: string;
     memo?: string;
 }

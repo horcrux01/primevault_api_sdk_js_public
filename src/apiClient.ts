@@ -146,7 +146,6 @@ export class APIClient extends BaseAPIClient {
       toAsset: request.toAsset,
       toChain: request.toChain,
       category: request.category,
-      paymentMethod: request.paymentMethod,
     };
     return await this.post(
       "/api/external/transactions/quote/",
@@ -174,8 +173,7 @@ export class APIClient extends BaseAPIClient {
   ): Promise<Transaction> {
     const data = {
       destination: request.destination,
-      onRampRequestData: request.rampRequestData,
-      onRampResponseData: request.rampResponseData,
+      quoteId: request.quoteId,
       category: TransactionCategory.ON_RAMP,
       externalId: request.externalId,
       memo: request.memo,
@@ -189,9 +187,8 @@ export class APIClient extends BaseAPIClient {
     const data = {
       source: request.source,
       destination: request.destination,
+      quoteId: request.quoteId,
       category: TransactionCategory.OFF_RAMP,
-      onRampRequestData: request.rampRequestData,
-      onRampResponseData: request.rampResponseData,
       externalId: request.externalId,
       memo: request.memo,
     };

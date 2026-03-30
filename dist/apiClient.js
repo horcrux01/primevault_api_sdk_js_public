@@ -120,7 +120,6 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 toAsset: request.toAsset,
                 toChain: request.toChain,
                 category: request.category,
-                paymentMethod: request.paymentMethod,
             };
             return yield this.post("/api/external/transactions/quote/", params);
         });
@@ -143,8 +142,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
                 destination: request.destination,
-                onRampRequestData: request.rampRequestData,
-                onRampResponseData: request.rampResponseData,
+                quoteId: request.quoteId,
                 category: types_1.TransactionCategory.ON_RAMP,
                 externalId: request.externalId,
                 memo: request.memo,
@@ -157,9 +155,8 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             const data = {
                 source: request.source,
                 destination: request.destination,
+                quoteId: request.quoteId,
                 category: types_1.TransactionCategory.OFF_RAMP,
-                onRampRequestData: request.rampRequestData,
-                onRampResponseData: request.rampResponseData,
                 externalId: request.externalId,
                 memo: request.memo,
             };

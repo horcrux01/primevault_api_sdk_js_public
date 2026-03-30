@@ -31,7 +31,7 @@ const createOffRampTransaction = async (
   // Step 1: Get off-ramp quote
   const rampQuoteRequest = {
     source,
-    fromAsset: "USDT",
+    fromAsset: "USDC",
     toAsset: "USD",
     fromAmount: "100",
     fromChain: "ETHEREUM",

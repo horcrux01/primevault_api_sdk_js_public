@@ -17,13 +17,13 @@ const createOnRampTransaction = async (
     id: vaultId,
   };
 
-  // Step 1: Request a ramp quote for converting 100 USD → USDC on Polygon on destination vault.
+  // Step 1: Request a ramp quote for converting 137,500 NGN → USDC on Ethereum.
   const rampQuoteRequest = {
     destination,
-    fromAsset: "USD",
+    fromAsset: "NGN",
     toAsset: "USDC",
-    fromAmount: "100",
-    toChain: "POLYGON",
+    fromAmount: "137500",
+    toChain: "ETHEREUM",
     category: TransactionCategory.ON_RAMP as const,
   };
 
@@ -48,8 +48,8 @@ const createOnRampTransaction = async (
   //   onRampTransaction.source?.bank?.accountNumberMasked
   //   onRampTransaction.source?.bank?.routingNumber
   //   onRampTransaction.source?.bank?.swiftBic
-  //   onRampTransaction.source?.bank?.paymentRail        // e.g. "US_ACH"
-  //   onRampTransaction.source?.bank?.currency           // e.g. "USD"
+  //   onRampTransaction.source?.bank?.paymentRail        // e.g. "WIRE"
+  //   onRampTransaction.source?.bank?.currency           // e.g. "NGN"
   //   onRampTransaction.source?.bank?.bankAddress
   //   onRampTransaction.source?.bank?.iban
 
@@ -81,7 +81,7 @@ const createOffRampTransaction = async (
 
   const rampQuoteRequest = {
     source,
-    fromAsset: "USDT",
+    fromAsset: "USDC",
     toAsset: "USD",
     fromAmount: "100",
     fromChain: "ETHEREUM",

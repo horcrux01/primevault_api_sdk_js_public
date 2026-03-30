@@ -344,20 +344,18 @@ export interface RampQuoteResponse {
 }
 
 export interface CreateOnRampTransactionRequest {
-  destination: TransferPartyData;     // Destination vault for the on-ramp crypto delivery.
-  rampRequestData: RampQuoteRequest;  // The ramp quote request data used to generate the quote.
-  rampResponseData: RampQuoteResponseItem; // The selected ramp quote from the list.
-  externalId?: string;                // Optional external identifier set by the calling system.
-  memo?: string;                      // Optional memo for the transaction.
+  destination: TransferPartyData;
+  quoteId: string;
+  externalId?: string;
+  memo?: string;
 }
 
 export interface CreateOffRampTransactionRequest {
-  source: TransferPartyData;          // Source vault for the off-ramp crypto withdrawal.
-  destination: TransferPartyData;     // Destination for the off-ramp fiat delivery.
-  rampRequestData: RampQuoteRequest;  // The ramp quote request data used to generate the quote.
-  rampResponseData: RampQuoteResponseItem; // The selected ramp quote from the list.
-  externalId?: string;                // Optional external identifier set by the calling system.
-  memo?: string;                      // Optional memo for the transaction.
+  source: TransferPartyData;
+  destination: TransferPartyData;
+  quoteId: string;
+  externalId?: string;
+  memo?: string;
 }
 
 export interface CreateContactRequest {

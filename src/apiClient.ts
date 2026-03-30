@@ -146,6 +146,7 @@ export class APIClient extends BaseAPIClient {
       toAsset: request.toAsset,
       toChain: request.toChain,
       category: request.category,
+      paymentMethod: request.paymentMethod,
     };
     return await this.post(
       "/api/external/transactions/quote/",

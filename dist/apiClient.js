@@ -120,6 +120,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 toAsset: request.toAsset,
                 toChain: request.toChain,
                 category: request.category,
+                paymentMethod: request.paymentMethod,
             };
             return yield this.post("/api/external/transactions/quote/", params);
         });

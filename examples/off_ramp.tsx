@@ -24,7 +24,7 @@ const createOffRampTransaction = async (
   };
 
   const destination = {
-    type: TransferPartyType.EXTERNAL_BANK_ACCOUNT,
+    type: TransferPartyType.BANK_ACCOUNT,
     id: bankAccountId,
   };
 
@@ -53,7 +53,7 @@ const createOffRampTransaction = async (
   // The transaction response includes bank details for the fiat delivery
   // in the destination field:
   //
-  //   offRampTransaction.destination?.type   // "EXTERNAL_BANK_ACCOUNT"
+  //   offRampTransaction.destination?.type   // "BANK_ACCOUNT"
   //   offRampTransaction.destination?.bank?.bankName
   //   offRampTransaction.destination?.bank?.beneficiaryName
   //   offRampTransaction.destination?.bank?.routingNumber

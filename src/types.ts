@@ -207,8 +207,11 @@ export interface Transaction {
   nonce?: number;
   source?: TransferPartyData;
   destination?: TransferPartyData;
-  rampRequestData?: RampQuoteRequest;
-  rampResponseData?: RampQuoteResponseItem;
+  bankDetails?: Record<string, any>;
+  toAsset?: string;
+  toBlockChain?: string;
+  rampRequestData?: Record<string, any>;
+  rampResponseData?: Record<string, any>;
 }
 
 export interface TransactionCreationGasParams {

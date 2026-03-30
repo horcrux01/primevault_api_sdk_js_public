@@ -306,16 +306,14 @@ export interface RampQuoteResponse {
 }
 export interface CreateOnRampTransactionRequest {
     destination: TransferPartyData;
-    rampRequestData: RampQuoteRequest;
-    rampResponseData: RampQuoteResponseItem;
+    quoteId: string;
     externalId?: string;
     memo?: string;
 }
 export interface CreateOffRampTransactionRequest {
     source: TransferPartyData;
     destination: TransferPartyData;
-    rampRequestData: RampQuoteRequest;
-    rampResponseData: RampQuoteResponseItem;
+    quoteId: string;
     externalId?: string;
     memo?: string;
 }

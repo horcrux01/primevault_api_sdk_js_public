@@ -1,4 +1,4 @@
-import { APIClient, PaymentMethod, Transaction, TransactionCategory, TransferPartyType } from "../src";
+import { APIClient, Transaction, TransactionCategory, TransferPartyType } from "../src";
 
 /**
  * Example: Create an OFF_RAMP transaction (crypto → fiat).
@@ -24,19 +24,18 @@ const createOffRampTransaction = async (
   };
 
   const destination = {
-    type: TransferPartyType.EXTERNAL_BANK_ACCOUNT,
+    type: TransferPartyType.BANK_ACCOUNT,
     id: bankAccountId,
   };
 
   // Step 1: Get off-ramp quote
   const rampQuoteRequest = {
     source,
-    fromAsset: "USDT",
+    fromAsset: "USDC",
     toAsset: "USD",
     fromAmount: "100",
     fromChain: "ETHEREUM",
     category: TransactionCategory.OFF_RAMP as const,
-    paymentMethod: PaymentMethod.US_ACH,
   };
 
   const rampQuoteResponse = await apiClient.getRampQuote(rampQuoteRequest);
@@ -46,8 +45,7 @@ const createOffRampTransaction = async (
   const offRampTransaction = await apiClient.createOffRampTransaction({
     source,
     destination,
-    rampRequestData: rampQuoteRequest,
-    rampResponseData: selectedQuote,
+    quoteId: selectedQuote.quoteId,
     externalId: "off-ramp-example-1",
     memo: "off ramp example",
   });
@@ -55,7 +53,7 @@ const createOffRampTransaction = async (
   // The transaction response includes bank details for the fiat delivery
   // in the destination field:
   //
-  //   offRampTransaction.destination?.type   // "EXTERNAL_BANK_ACCOUNT"
+  //   offRampTransaction.destination?.type   // "BANK_ACCOUNT"
   //   offRampTransaction.destination?.bank?.bankName
   //   offRampTransaction.destination?.bank?.beneficiaryName
   //   offRampTransaction.destination?.bank?.routingNumber

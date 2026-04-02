@@ -34,14 +34,14 @@ const createTransfer = async (apiClient: APIClient) => {
     )!;
 
     // Get source and destinations
-    const sourceVaults: Vault[] = await apiClient.getVaults({
+    const sourceVaults: Vault[] = (await apiClient.getVaults({
         vaultName: "core-vault-1",
-    }); // Source Vault
+    })).results; // Source Vault
 
     let destinationContacts: Contact[];
-    destinationContacts = await apiClient.getContacts({
+    destinationContacts = (await apiClient.getContacts({
         name: "Brandi Taylor",
-    });  // Destination Contact. This could be Core or Exchange Vault or External address.
+    })).results;  // Destination Contact. This could be Core or Exchange Vault or External address.
 
     /*
      To send the transaction to an external non-whitelisted address, change the type and set the value
@@ -114,17 +114,17 @@ const createTransferWithFeePayer = async (apiClient: APIClient) => {
             asset.blockChain === "SOLANA" && asset.symbol === "USDT",
     )!;
 
-    const sourceVaults: Vault[] = await apiClient.getVaults({
+    const sourceVaults: Vault[] = (await apiClient.getVaults({
         vaultName: "core-vault-1",
-    });
-    const destinationContacts: Contact[] = await apiClient.getContacts({
+    })).results;
+    const destinationContacts: Contact[] = (await apiClient.getContacts({
         name: "Brandi Taylor",
-    });
+    })).results;
 
     // Vault to act as Fee Payer (network fee will be paid by this vault)
-    const feePayerVaults: Vault[] = await apiClient.getVaults({
+    const feePayerVaults: Vault[] = (await apiClient.getVaults({
         vaultName: "fee-payer-1",
-    });
+    })).results;
 
     const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaults[0].id };
     const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContacts[0].id };
@@ -217,7 +217,6 @@ const getTransactions = async (apiClient: APIClient) => {
                 vaultId: "7ad54443-21d2-4075-abef-83758c9dceb7",
                 status: TransactionStatus.COMPLETED,
             },
-            1,
             limit,
             cursor,
         );

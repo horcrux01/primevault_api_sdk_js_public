@@ -20,9 +20,9 @@ const rawMessageSignatureForNear = async (apiClient: APIClient) => {
     // messageHex is the hash of the serialized transaction object
     */
 
-    const vaults = await apiClient.getVaults({
+    const vaults = (await apiClient.getVaults({
         vaultName: "core-vault-1",
-    });
+    })).results;
 
     const vaultId = vaults[0].id;
 

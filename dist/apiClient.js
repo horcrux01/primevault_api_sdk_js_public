@@ -24,15 +24,9 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
         });
     }
     getTransactions() {
-        return __awaiter(this, arguments, void 0, function* (params = {}, page = 1, limit = 20, cursor) {
+        return __awaiter(this, arguments, void 0, function* (params = {}, limit = 20, cursor = "") {
             const query = new URLSearchParams(params).toString();
-            let url;
-            if (cursor !== undefined) {
-                url = `/api/external/transactions/?limit=${limit}&cursor=${cursor !== null && cursor !== void 0 ? cursor : ""}`;
-            }
-            else {
-                url = `/api/external/transactions/?limit=${limit}&page=${page}`;
-            }
+            let url = `/api/external/transactions/?limit=${limit}&cursor=${cursor !== null && cursor !== void 0 ? cursor : ""}`;
             if (query) {
                 url += `&${query}`;
             }
@@ -170,14 +164,13 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
         });
     }
     getVaults() {
-        return __awaiter(this, arguments, void 0, function* (params = {}, page = 1, limit = 20, reverse = false) {
+        return __awaiter(this, arguments, void 0, function* (params = {}, limit = 20, cursor = "") {
             const query = new URLSearchParams(params).toString();
-            let url = `/api/external/vaults/?limit=${limit}&page=${page}&reverse=${reverse}`;
+            let url = `/api/external/vaults/?limit=${limit}&cursor=${cursor !== null && cursor !== void 0 ? cursor : ""}`;
             if (query) {
                 url += `&${query}`;
             }
-            const vaultsResponse = yield this.get(url);
-            return vaultsResponse.results;
+            return yield this.get(url);
         });
     }
     getVaultById(vaultId) {
@@ -221,14 +214,13 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
         });
     }
     getContacts() {
-        return __awaiter(this, arguments, void 0, function* (params = {}, page = 1, limit = 20) {
+        return __awaiter(this, arguments, void 0, function* (params = {}, limit = 20, cursor = "") {
             const query = new URLSearchParams(params).toString();
-            let url = `/api/external/contacts/?limit=${limit}&page=${page}`;
+            let url = `/api/external/contacts/?limit=${limit}&cursor=${cursor !== null && cursor !== void 0 ? cursor : ""}`;
             if (query) {
                 url += `&${query}`;
             }
-            const contactsResponse = yield this.get(url);
-            return contactsResponse.results;
+            return yield this.get(url);
         });
     }
     getContactById(contactId) {
@@ -302,9 +294,9 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
     }
     // ── Bank Accounts ──────────────────────────────────────────────────
     getBankAccounts() {
-        return __awaiter(this, arguments, void 0, function* (params = {}, page = 1, limit = 20) {
+        return __awaiter(this, arguments, void 0, function* (params = {}, limit = 20, cursor = "") {
             const query = new URLSearchParams(params).toString();
-            let url = `/api/external/bank_accounts/?limit=${limit}&page=${page}`;
+            let url = `/api/external/bank_accounts/?limit=${limit}&cursor=${cursor !== null && cursor !== void 0 ? cursor : ""}`;
             if (query) {
                 url += `&${query}`;
             }

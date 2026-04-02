@@ -205,3 +205,30 @@ const stakeResource = async (apiClient: APIClient) => {
     txnResponse = await pollForTransaction(apiClient, txnResponse.id);
     console.log(txnResponse);
 }
+
+const getTransactions = async (apiClient: APIClient) => {
+    const limit = 50;
+    let cursor: string | null = "";
+    const allTransactions: Transaction[] = [];
+
+    while (true) {
+        const response = await apiClient.getTransactions(
+            {
+                vaultId: "7ad54443-21d2-4075-abef-83758c9dceb7",
+                status: TransactionStatus.COMPLETED,
+            },
+            1,
+            limit,
+            cursor,
+        );
+
+        allTransactions.push(...response.results);
+
+        if (!response.has_next || !response.next_cursor) {
+            break;
+        }
+        cursor = response.next_cursor;
+    }
+
+    console.log(`Total transactions: ${allTransactions.length}`);
+}

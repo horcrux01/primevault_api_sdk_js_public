@@ -220,7 +220,7 @@ const getTransactions = async (apiClient: APIClient) => {
             1,
             limit,
             cursor,
-        ) as TransactionListResponse;
+        );
 
         allTransactions.push(...response.results);
 

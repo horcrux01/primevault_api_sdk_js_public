@@ -49,7 +49,7 @@ export class APIClient extends BaseAPIClient {
     page: number = 1,
     limit: number = 20,
     cursor?: string | null,
-  ): Promise<Transaction[] | TransactionListResponse> {
+  ): Promise<TransactionListResponse> {
     const query = new URLSearchParams(params).toString();
     let url: string;
     if (cursor !== undefined) {
@@ -60,11 +60,7 @@ export class APIClient extends BaseAPIClient {
     if (query) {
       url += `&${query}`;
     }
-    const response = await this.get(url);
-    if (cursor !== undefined) {
-      return response as TransactionListResponse;
-    }
-    return response.results as Transaction[];
+    return await this.get(url) as TransactionListResponse;
   }
 
   async getTransactionById(transactionId: string): Promise<Transaction> {

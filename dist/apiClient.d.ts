@@ -3,7 +3,7 @@ import { ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAcc
 export declare class APIClient extends BaseAPIClient {
     getAssetsData(): Promise<Asset[]>;
     getSupportedChains(): Promise<ChainData[]>;
-    getTransactions(params?: Record<string, string>, page?: number, limit?: number, cursor?: string | null): Promise<Transaction[] | TransactionListResponse>;
+    getTransactions(params?: Record<string, string>, page?: number, limit?: number, cursor?: string | null): Promise<TransactionListResponse>;
     getTransactionById(transactionId: string): Promise<Transaction>;
     estimateFee(request: EstimateFeeRequest): Promise<EstimatedFeeResponse>;
     createTransferTransaction(request: CreateTransferTransactionRequest): Promise<Transaction>;

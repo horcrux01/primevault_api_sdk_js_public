@@ -36,11 +36,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             if (query) {
                 url += `&${query}`;
             }
-            const response = yield this.get(url);
-            if (cursor !== undefined) {
-                return response;
-            }
-            return response.results;
+            return yield this.get(url);
         });
     }
     getTransactionById(transactionId) {

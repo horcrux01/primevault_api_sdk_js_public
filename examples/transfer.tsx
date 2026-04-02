@@ -2,12 +2,14 @@ import {
     APIClient,
     Asset,
     Contact,
+    ContactListResponse,
     ResourceType,
     Transaction,
     TransactionStatus,
     TransferPartyData,
     TransferPartyType,
-    Vault
+    Vault,
+    VaultListResponse,
 } from "../src"; // Import the APIClient and types from the SDK @primevault/js-api-sdk
 import {BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError, TooManyRequestsError, InternalServerError} from "../src/baseApiClient";
 
@@ -34,21 +36,20 @@ const createTransfer = async (apiClient: APIClient) => {
     )!;
 
     // Get source and destinations
-    const sourceVaults: Vault[] = (await apiClient.getVaults({
+    const sourceVaultsResponse: VaultListResponse = await apiClient.getVaults({
         vaultName: "core-vault-1",
-    })).results; // Source Vault
+    }); // Source Vault
 
-    let destinationContacts: Contact[];
-    destinationContacts = (await apiClient.getContacts({
+    const destinationContactsResponse: ContactListResponse = await apiClient.getContacts({
         name: "Brandi Taylor",
-    })).results;  // Destination Contact. This could be Core or Exchange Vault or External address.
+    });  // Destination Contact. This could be Core or Exchange Vault or External address.
 
     /*
      To send the transaction to an external non-whitelisted address, change the type and set the value
      const destination: TransferPartyData = { type: TransferPartyType.EXTERNAL_ADDRESS, value: '0x123456789..'};
     */
-    const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaults[0].id};
-    const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContacts[0].id};
+    const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaultsResponse.results[0].id};
+    const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContactsResponse.results[0].id};
 
     // create and submit transaction and wait for processing
     let txnResponse: Transaction | null = null;
@@ -114,20 +115,20 @@ const createTransferWithFeePayer = async (apiClient: APIClient) => {
             asset.blockChain === "SOLANA" && asset.symbol === "USDT",
     )!;
 
-    const sourceVaults: Vault[] = (await apiClient.getVaults({
+    const sourceVaultsResponse: VaultListResponse = await apiClient.getVaults({
         vaultName: "core-vault-1",
-    })).results;
-    const destinationContacts: Contact[] = (await apiClient.getContacts({
+    });
+    const destinationContactsResponse: ContactListResponse = await apiClient.getContacts({
         name: "Brandi Taylor",
-    })).results;
+    });
 
     // Vault to act as Fee Payer (network fee will be paid by this vault)
-    const feePayerVaults: Vault[] = (await apiClient.getVaults({
+    const feePayerVaultsResponse: VaultListResponse = await apiClient.getVaults({
         vaultName: "fee-payer-1",
-    })).results;
+    });
 
-    const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaults[0].id };
-    const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContacts[0].id };
+    const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaultsResponse.results[0].id };
+    const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContactsResponse.results[0].id };
 
     try {
         const txnResponse: Transaction = await apiClient.createTransferTransaction({
@@ -137,7 +138,7 @@ const createTransferWithFeePayer = async (apiClient: APIClient) => {
             asset: solUsdt.symbol,
             chain: solUsdt.blockChain,
             gasParams: {},
-            feePayer: { id: feePayerVaults[0].id },   // Use GAS vault as fee payer
+            feePayer: { id: feePayerVaultsResponse.results[0].id },   // Use GAS vault as fee payer
             memo: "Transfer with FeePayer vault example",
         });
         console.log("Created transfer with fee payer:", txnResponse.id);

@@ -24,14 +24,23 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
         });
     }
     getTransactions() {
-        return __awaiter(this, arguments, void 0, function* (params = {}, page = 1, limit = 20) {
+        return __awaiter(this, arguments, void 0, function* (params = {}, page = 1, limit = 20, cursor) {
             const query = new URLSearchParams(params).toString();
-            let url = `/api/external/transactions/?limit=${limit}&page=${page}`;
+            let url;
+            if (cursor !== undefined) {
+                url = `/api/external/transactions/?limit=${limit}&cursor=${cursor !== null && cursor !== void 0 ? cursor : ""}`;
+            }
+            else {
+                url = `/api/external/transactions/?limit=${limit}&page=${page}`;
+            }
             if (query) {
                 url += `&${query}`;
             }
-            const transactionsResponse = yield this.get(url);
-            return transactionsResponse.results;
+            const response = yield this.get(url);
+            if (cursor !== undefined) {
+                return response;
+            }
+            return response.results;
         });
     }
     getTransactionById(transactionId) {

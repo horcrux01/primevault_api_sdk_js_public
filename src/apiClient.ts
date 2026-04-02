@@ -24,6 +24,7 @@ import {
   TradeQuoteRequest,
   Transaction,
   TransactionCategory,
+  TransactionListResponse,
   Vault,
   DetailedBalanceResponse,
   CreateOnRampTransactionRequest,
@@ -47,14 +48,23 @@ export class APIClient extends BaseAPIClient {
     params: Record<string, string> = {},
     page: number = 1,
     limit: number = 20,
-  ): Promise<Transaction[]> {
+    cursor?: string | null,
+  ): Promise<Transaction[] | TransactionListResponse> {
     const query = new URLSearchParams(params).toString();
-    let url = `/api/external/transactions/?limit=${limit}&page=${page}`;
+    let url: string;
+    if (cursor !== undefined) {
+      url = `/api/external/transactions/?limit=${limit}&cursor=${cursor ?? ""}`;
+    } else {
+      url = `/api/external/transactions/?limit=${limit}&page=${page}`;
+    }
     if (query) {
       url += `&${query}`;
     }
-    const transactionsResponse = await this.get(url);
-    return transactionsResponse.results;
+    const response = await this.get(url);
+    if (cursor !== undefined) {
+      return response as TransactionListResponse;
+    }
+    return response.results as Transaction[];
   }
 
   async getTransactionById(transactionId: string): Promise<Transaction> {

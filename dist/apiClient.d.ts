@@ -1,9 +1,9 @@
 import { BaseAPIClient } from "./baseApiClient";
-import { ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAccount, BankAccountListResponse, ChainData, Contact, CreateBankAccountRequest, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, RampQuoteRequest, RampQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, Vault, DetailedBalanceResponse, CreateOnRampTransactionRequest, CreateOffRampTransactionRequest, DelegateResourceRequest, StakeResourceRequest, UpdateContactRequest, UpdateContactResponse } from "./types";
+import { ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAccount, BankAccountListResponse, ChainData, Contact, CreateBankAccountRequest, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, RampQuoteRequest, RampQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, TransactionListResponse, Vault, DetailedBalanceResponse, CreateOnRampTransactionRequest, CreateOffRampTransactionRequest, DelegateResourceRequest, StakeResourceRequest, UpdateContactRequest, UpdateContactResponse } from "./types";
 export declare class APIClient extends BaseAPIClient {
     getAssetsData(): Promise<Asset[]>;
     getSupportedChains(): Promise<ChainData[]>;
-    getTransactions(params?: Record<string, string>, page?: number, limit?: number): Promise<Transaction[]>;
+    getTransactions(params?: Record<string, string>, page?: number, limit?: number, cursor?: string | null): Promise<Transaction[] | TransactionListResponse>;
     getTransactionById(transactionId: string): Promise<Transaction>;
     estimateFee(request: EstimateFeeRequest): Promise<EstimatedFeeResponse>;
     createTransferTransaction(request: CreateTransferTransactionRequest): Promise<Transaction>;

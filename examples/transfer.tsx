@@ -34,12 +34,11 @@ const createTransfer = async (apiClient: APIClient) => {
     )!;
 
     // Get source and destinations
-    const sourceVaults: Vault[] = await apiClient.getVaults({
+    const sourceVaultsResponse = await apiClient.getVaults({
         vaultName: "core-vault-1",
     }); // Source Vault
 
-    let destinationContacts: Contact[];
-    destinationContacts = await apiClient.getContacts({
+    const destinationContactsResponse = await apiClient.getContacts({
         name: "Brandi Taylor",
     });  // Destination Contact. This could be Core or Exchange Vault or External address.
 
@@ -47,8 +46,8 @@ const createTransfer = async (apiClient: APIClient) => {
      To send the transaction to an external non-whitelisted address, change the type and set the value
      const destination: TransferPartyData = { type: TransferPartyType.EXTERNAL_ADDRESS, value: '0x123456789..'};
     */
-    const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaults[0].id};
-    const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContacts[0].id};
+    const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaultsResponse.results[0].id};
+    const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContactsResponse.results[0].id};
 
     // create and submit transaction and wait for processing
     let txnResponse: Transaction | null = null;
@@ -114,20 +113,20 @@ const createTransferWithFeePayer = async (apiClient: APIClient) => {
             asset.blockChain === "SOLANA" && asset.symbol === "USDT",
     )!;
 
-    const sourceVaults: Vault[] = await apiClient.getVaults({
+    const sourceVaultsResponse = await apiClient.getVaults({
         vaultName: "core-vault-1",
     });
-    const destinationContacts: Contact[] = await apiClient.getContacts({
+    const destinationContactsResponse = await apiClient.getContacts({
         name: "Brandi Taylor",
     });
 
     // Vault to act as Fee Payer (network fee will be paid by this vault)
-    const feePayerVaults: Vault[] = await apiClient.getVaults({
+    const feePayerVaultsResponse = await apiClient.getVaults({
         vaultName: "fee-payer-1",
     });
 
-    const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaults[0].id };
-    const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContacts[0].id };
+    const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaultsResponse.results[0].id };
+    const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContactsResponse.results[0].id };
 
     try {
         const txnResponse: Transaction = await apiClient.createTransferTransaction({
@@ -137,7 +136,7 @@ const createTransferWithFeePayer = async (apiClient: APIClient) => {
             asset: solUsdt.symbol,
             chain: solUsdt.blockChain,
             gasParams: {},
-            feePayer: { id: feePayerVaults[0].id },   // Use GAS vault as fee payer
+            feePayer: { id: feePayerVaultsResponse.results[0].id },   // Use GAS vault as fee payer
             memo: "Transfer with FeePayer vault example",
         });
         console.log("Created transfer with fee payer:", txnResponse.id);
@@ -208,7 +207,7 @@ const stakeResource = async (apiClient: APIClient) => {
 
 const getTransactions = async (apiClient: APIClient) => {
     const limit = 50;
-    let cursor: string | null = "";
+    let cursor: string | null = null;
     const allTransactions: Transaction[] = [];
 
     while (true) {
@@ -217,12 +216,12 @@ const getTransactions = async (apiClient: APIClient) => {
                 vaultId: "7ad54443-21d2-4075-abef-83758c9dceb7",
                 status: TransactionStatus.COMPLETED,
             },
-            1,
             limit,
             cursor,
         );
 
         allTransactions.push(...response.results);
+        console.log(`Fetched ${response.results.length} transactions (total: ${allTransactions.length})`);
 
         if (!response.has_next || !response.next_cursor) {
             break;

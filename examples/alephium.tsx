@@ -4,7 +4,7 @@ const alephiumContractCall = async (apiClient: APIClient) => {
     const vaults = await apiClient.getVaults({
         vaultName: "DeFi vault",
     });
-    const vaultId = vaults[0].id;
+    const vaultId = vaults.results[0].id;
 
     // Calling a contract call on Alephium
     let txnResponse = await apiClient.createContractCallTransaction({

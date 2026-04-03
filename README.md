@@ -67,5 +67,33 @@ Config.set("AWS_REGION", "us-east-1")  // replace this with your region
 const apiClient = new APIClient(apiKey, apiUrl, undefined, keyId)
 ```
 
+### Cursor Pagination
+All list endpoints use cursor-based pagination. Pass `cursor` to iterate through results.
+
+```typescript
+// Fetch first page
+const response = await apiClient.getTransactions({}, 20);
+console.log(response.results);
+
+// Fetch next page using the cursor from the previous response
+if (response.has_next) {
+  const nextResponse = await apiClient.getTransactions({}, 20, response.next_cursor);
+  console.log(nextResponse.results);
+}
+
+// Iterate through all pages
+let cursor: string | null = null;
+const allItems: Vault[] = [];
+while (true) {
+  const res = await apiClient.getVaults({}, 50, cursor);
+  allItems.push(...res.results);
+  if (!res.has_next) break;
+  cursor = res.next_cursor;
+}
+
+// With filters
+const contacts = await apiClient.getContacts({ blockChain: "ETHEREUM" }, 10);
+```
+
 ### Examples
 Code examples [here](https://github.com/horcrux01/primevault_api_sdk_js_public/tree/main/examples)

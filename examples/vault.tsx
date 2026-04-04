@@ -1,4 +1,4 @@
-import {APIClient, DetailedBalanceResponse, Vault} from "../src";
+import {APIClient, DetailedBalanceResponse, Vault, VaultListResponse} from "../src";
 import {BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError, TooManyRequestsError, InternalServerError} from "../src/baseApiClient";
 
 const createVault = async (apiClient: APIClient) => {
@@ -55,6 +55,29 @@ const createVault = async (apiClient: APIClient) => {
     // balance of a vault
     const balances: DetailedBalanceResponse = await apiClient.getDetailedBalances(vaultId);
     console.log("Vault balances:", balances);
+}
+
+const getVaults = async (apiClient: APIClient) => {
+    const allVaults: Vault[] = [];
+    let cursor: string | null = null;
+
+    while (true) {
+        const response: VaultListResponse = await apiClient.getVaults({}, 50, cursor);
+        allVaults.push(...response.results);
+        console.log(`Fetched ${response.results.length} vaults (total: ${allVaults.length})`);
+
+        if (!response.hasNext || !response.nextCursor) break;
+        cursor = response.nextCursor;
+    }
+
+    console.log(`Total vaults: ${allVaults.length}`);
+}
+
+const getVaultsFiltered = async (apiClient: APIClient) => {
+    const response = await apiClient.getVaults({ vaultName: "core-vault-1" }, 10);
+    for (const vault of response.results) {
+        console.log(`  ${vault.id} — ${vault.vaultName} (${vault.vaultType})`);
+    }
 }
 
 const getDetailedBalance = async (apiClient: APIClient) => {

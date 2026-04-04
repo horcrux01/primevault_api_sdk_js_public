@@ -554,18 +554,26 @@ export interface BankAccount {
 
 export interface TransactionListResponse {
   results: Transaction[];
-  count?: number;
-  previous?: string;
-  next?: string;
-  next_cursor?: string | null;
-  has_next?: boolean;
+  nextCursor?: string | null;
+  hasNext?: boolean;
+}
+
+export interface VaultListResponse {
+  results: Vault[];
+  nextCursor?: string | null;
+  hasNext?: boolean;
+}
+
+export interface ContactListResponse {
+  results: Contact[];
+  nextCursor?: string | null;
+  hasNext?: boolean;
 }
 
 export interface BankAccountListResponse {
   results: BankAccount[];
-  count: number;
-  previous?: string;
-  next?: string;
+  nextCursor?: string | null;
+  hasNext?: boolean;
 }
 
 export interface CreateBankAccountRequest {

@@ -33,6 +33,8 @@ import {
   StakeResourceRequest,
   UpdateContactRequest,
   UpdateContactResponse,
+  VaultListResponse,
+  ContactListResponse,
 } from "./types";
 
 export class APIClient extends BaseAPIClient {
@@ -46,17 +48,11 @@ export class APIClient extends BaseAPIClient {
 
   async getTransactions(
     params: Record<string, string> = {},
-    page: number = 1,
     limit: number = 20,
     cursor?: string | null,
   ): Promise<TransactionListResponse> {
     const query = new URLSearchParams(params).toString();
-    let url: string;
-    if (cursor !== undefined) {
-      url = `/api/external/transactions/?limit=${limit}&cursor=${cursor ?? ""}`;
-    } else {
-      url = `/api/external/transactions/?limit=${limit}&page=${page}`;
-    }
+    let url = `/api/external/transactions/?limit=${limit}&cursor=${cursor ?? ""}`;
     if (query) {
       url += `&${query}`;
     }
@@ -204,17 +200,15 @@ export class APIClient extends BaseAPIClient {
 
   async getVaults(
     params: Record<string, string> = {},
-    page: number = 1,
     limit: number = 20,
-    reverse: boolean = false,
-  ): Promise<Vault[]> {
+    cursor?: string | null,
+  ): Promise<VaultListResponse> {
     const query = new URLSearchParams(params).toString();
-    let url = `/api/external/vaults/?limit=${limit}&page=${page}&reverse=${reverse}`;
+    let url = `/api/external/vaults/?limit=${limit}&cursor=${cursor ?? ""}`;
     if (query) {
       url += `&${query}`;
     }
-    const vaultsResponse = await this.get(url);
-    return vaultsResponse.results;
+    return await this.get(url) as VaultListResponse;
   }
 
   async getVaultById(vaultId: string): Promise<Vault> {
@@ -262,16 +256,15 @@ export class APIClient extends BaseAPIClient {
 
   async getContacts(
     params: Record<string, string> = {},
-    page: number = 1,
     limit: number = 20,
-  ): Promise<Contact[]> {
+    cursor?: string | null,
+  ): Promise<ContactListResponse> {
     const query = new URLSearchParams(params).toString();
-    let url = `/api/external/contacts/?limit=${limit}&page=${page}`;
+    let url = `/api/external/contacts/?limit=${limit}&cursor=${cursor ?? ""}`;
     if (query) {
       url += `&${query}`;
     }
-    const contactsResponse = await this.get(url);
-    return contactsResponse.results;
+    return await this.get(url) as ContactListResponse;
   }
 
   async getContactById(contactId: string): Promise<Contact> {
@@ -353,15 +346,15 @@ export class APIClient extends BaseAPIClient {
 
   async getBankAccounts(
     params: Record<string, string> = {},
-    page: number = 1,
     limit: number = 20,
+    cursor?: string | null,
   ): Promise<BankAccountListResponse> {
     const query = new URLSearchParams(params).toString();
-    let url = `/api/external/bank_accounts/?limit=${limit}&page=${page}`;
+    let url = `/api/external/bank_accounts/?limit=${limit}&cursor=${cursor ?? ""}`;
     if (query) {
       url += `&${query}`;
     }
-    return await this.get(url);
+    return await this.get(url) as BankAccountListResponse;
   }
 
   async getBankAccountById(bankAccountId: string): Promise<BankAccount> {

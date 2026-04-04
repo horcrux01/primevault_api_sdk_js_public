@@ -78,8 +78,8 @@ const getContacts = async (apiClient: APIClient) => {
         allContacts.push(...response.results);
         console.log(`Fetched ${response.results.length} contacts (total: ${allContacts.length})`);
 
-        if (!response.has_next || !response.next_cursor) break;
-        cursor = response.next_cursor;
+        if (!response.hasNext || !response.nextCursor) break;
+        cursor = response.nextCursor;
     }
 
     console.log(`Total contacts: ${allContacts.length}`);

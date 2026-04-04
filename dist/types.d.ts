@@ -478,23 +478,23 @@ export interface BankAccount {
 }
 export interface TransactionListResponse {
     results: Transaction[];
-    next_cursor?: string | null;
-    has_next?: boolean;
+    nextCursor?: string | null;
+    hasNext?: boolean;
 }
 export interface VaultListResponse {
     results: Vault[];
-    next_cursor?: string | null;
-    has_next?: boolean;
+    nextCursor?: string | null;
+    hasNext?: boolean;
 }
 export interface ContactListResponse {
     results: Contact[];
-    next_cursor?: string | null;
-    has_next?: boolean;
+    nextCursor?: string | null;
+    hasNext?: boolean;
 }
 export interface BankAccountListResponse {
     results: BankAccount[];
-    next_cursor?: string | null;
-    has_next?: boolean;
+    nextCursor?: string | null;
+    hasNext?: boolean;
 }
 export interface CreateBankAccountRequest {
     accountNumber?: string;

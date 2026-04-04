@@ -223,10 +223,10 @@ const getTransactions = async (apiClient: APIClient) => {
         allTransactions.push(...response.results);
         console.log(`Fetched ${response.results.length} transactions (total: ${allTransactions.length})`);
 
-        if (!response.has_next || !response.next_cursor) {
+        if (!response.hasNext || !response.nextCursor) {
             break;
         }
-        cursor = response.next_cursor;
+        cursor = response.nextCursor;
     }
 
     console.log(`Total transactions: ${allTransactions.length}`);

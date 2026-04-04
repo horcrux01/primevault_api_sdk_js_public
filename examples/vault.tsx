@@ -66,8 +66,8 @@ const getVaults = async (apiClient: APIClient) => {
         allVaults.push(...response.results);
         console.log(`Fetched ${response.results.length} vaults (total: ${allVaults.length})`);
 
-        if (!response.has_next || !response.next_cursor) break;
-        cursor = response.next_cursor;
+        if (!response.hasNext || !response.nextCursor) break;
+        cursor = response.nextCursor;
     }
 
     console.log(`Total vaults: ${allVaults.length}`);

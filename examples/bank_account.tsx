@@ -86,8 +86,8 @@ const listBankAccounts = async (apiClient: APIClient) => {
             console.log(`  ${account.id} — ${account.accountName} (${account.status})`);
         }
 
-        if (!response.has_next || !response.next_cursor) break;
-        cursor = response.next_cursor;
+        if (!response.hasNext || !response.nextCursor) break;
+        cursor = response.nextCursor;
     }
 
     console.log(`Total bank accounts: ${allAccounts.length}`);

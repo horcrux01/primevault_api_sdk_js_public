@@ -49,7 +49,7 @@ export class APIClient extends BaseAPIClient {
   async getTransactions(
     params: Record<string, string> = {},
     limit: number = 20,
-    cursor?: string | null,
+    cursor: string | null = "",
   ): Promise<TransactionListResponse> {
     const query = new URLSearchParams(params).toString();
     let url = `/api/external/transactions/?limit=${limit}&cursor=${cursor ?? ""}`;

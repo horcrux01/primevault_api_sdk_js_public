@@ -45,7 +45,8 @@ describe("APIClient", () => {
   });
 
   test("getVaults", async () => {
-    const vaults = await apiClient.getVaults({ vaultName: "core-vault-1" });
+    const vaults = (await apiClient.getVaults({ vaultName: "core-vault-1" }))
+      .results;
     expect(vaults).toBeDefined();
     expect(vaults).toBeInstanceOf(Array);
     expect(vaults.length).toBe(1);
@@ -81,7 +82,8 @@ describe("APIClient", () => {
   });
 
   test("getBalances", async () => {
-    let vaults = await apiClient.getVaults({ vaultName: "core-vault-1" });
+    let vaults = (await apiClient.getVaults({ vaultName: "core-vault-1" }))
+      .results;
     const balances = await apiClient.getBalances(vaults[0].id);
     expect(balances).toBeDefined();
     expect(balances).toBeInstanceOf(Object);
@@ -91,7 +93,8 @@ describe("APIClient", () => {
     });
 
     // non-zero balances
-    vaults = await apiClient.getVaults({ vaultName: "Ethereum Vault" });
+    vaults = (await apiClient.getVaults({ vaultName: "Ethereum Vault" }))
+      .results;
     const balances2 = await apiClient.getBalances(vaults[0].id);
     expect(balances2).toBeDefined();
     expect(balances2).toBeInstanceOf(Object);
@@ -113,7 +116,8 @@ describe("APIClient", () => {
 
   test("getDetailedBalances", async () => {
     // Test with vault having non-zero balances
-    const vaults = await apiClient.getVaults({ vaultName: "Ethereum Vault" });
+    const vaults = (await apiClient.getVaults({ vaultName: "Ethereum Vault" }))
+      .results;
     const vaultId = vaults[0].id;
     const detailedBalances = await apiClient.getDetailedBalances(vaultId);
 
@@ -150,7 +154,8 @@ describe("APIClient", () => {
   });
 
   test("getContacts", async () => {
-    const contacts = await apiClient.getContacts({ name: "Lynn Bell" });
+    const contacts = (await apiClient.getContacts({ name: "Lynn Bell" }))
+      .results;
     expect(contacts).toBeDefined();
     expect(contacts).toBeInstanceOf(Array);
     expect(contacts.length).toBe(1);
@@ -184,12 +189,16 @@ describe("APIClient", () => {
         asset.blockChain === "ETHEREUM" && asset.symbol === "ETH",
     )!;
 
-    const sourceVaults = await apiClient.getVaults({
-      vaultName: "core-vault-1",
-    }); // source
-    const destinationContacts = await apiClient.getContacts({
-      name: "Lynn Bell",
-    }); // destination
+    const sourceVaults = (
+      await apiClient.getVaults({
+        vaultName: "core-vault-1",
+      })
+    ).results; // source
+    const destinationContacts = (
+      await apiClient.getContacts({
+        name: "Lynn Bell",
+      })
+    ).results; // destination
 
     const source = { type: TransferPartyType.VAULT, id: sourceVaults[0].id };
     const destination = {
@@ -233,9 +242,11 @@ describe("APIClient", () => {
   });
 
   test("createContractCallTransaction", async () => {
-    const vaults = await apiClient.getVaults({
-      vaultName: "core-vault-1",
-    });
+    const vaults = (
+      await apiClient.getVaults({
+        vaultName: "core-vault-1",
+      })
+    ).results;
     const vaultId = vaults[0].id;
     try {
       await apiClient.createContractCallTransaction({
@@ -255,9 +266,11 @@ describe("APIClient", () => {
   });
 
   test("getTradeQuote", async () => {
-    const sourceVaults = await apiClient.getVaults({
-      vaultName: "core-vault-1",
-    });
+    const sourceVaults = (
+      await apiClient.getVaults({
+        vaultName: "core-vault-1",
+      })
+    ).results;
     const vaultId = sourceVaults[0].id;
     const tradeQuoteResponse = await apiClient.getTradeQuote({
       vaultId,
@@ -295,9 +308,11 @@ describe("APIClient", () => {
   }, 10000);
 
   test("createTradeTransaction", async () => {
-    const sourceVaults = await apiClient.getVaults({
-      vaultName: "core-vault-1",
-    });
+    const sourceVaults = (
+      await apiClient.getVaults({
+        vaultName: "core-vault-1",
+      })
+    ).results;
     const vaultId = sourceVaults[0].id;
     const tradeQuoteResponse = await apiClient.getTradeQuote({
       vaultId,

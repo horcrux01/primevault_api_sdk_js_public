@@ -4,9 +4,9 @@ const createContractCall = async (apiClient: APIClient) => {
     /*
     Example code to call a contract on POLYGON
     */
-    const vaults = await apiClient.getVaults({
+    const vaults = (await apiClient.getVaults({
         vaultName: "core-vault-1",
-    });
+    })).results;
 
     const vaultId = vaults.results[0].id;
 
@@ -38,9 +38,9 @@ const rawMessageSignatureForEVM = async (apiClient: APIClient) => {
     /*
      Example code to sign a raw message on ETHEREUM
     */
-    const vaults = await apiClient.getVaults({
+    const vaults = (await apiClient.getVaults({
         vaultName: "core-vault-1",
-    });
+    })).results;
 
     const vaultId = vaults.results[0].id;
 

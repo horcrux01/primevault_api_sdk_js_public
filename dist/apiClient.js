@@ -24,7 +24,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
         });
     }
     getTransactions() {
-        return __awaiter(this, arguments, void 0, function* (params = {}, limit = 20, cursor) {
+        return __awaiter(this, arguments, void 0, function* (params = {}, limit = 20, cursor = "") {
             const query = new URLSearchParams(params).toString();
             let url = `/api/external/transactions/?limit=${limit}&cursor=${cursor !== null && cursor !== void 0 ? cursor : ""}`;
             if (query) {

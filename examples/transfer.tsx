@@ -1,13 +1,11 @@
 import {
     APIClient,
     Asset,
-    Contact,
     ResourceType,
     Transaction,
     TransactionStatus,
     TransferPartyData,
     TransferPartyType,
-    Vault
 } from "../src"; // Import the APIClient and types from the SDK @primevault/js-api-sdk
 import {BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError, TooManyRequestsError, InternalServerError} from "../src/baseApiClient";
 
@@ -207,7 +205,7 @@ const stakeResource = async (apiClient: APIClient) => {
 
 const getTransactions = async (apiClient: APIClient) => {
     const limit = 50;
-    let cursor: string | null = null;
+    let cursor: string | null = "";
     const allTransactions: Transaction[] = [];
 
     while (true) {
@@ -221,7 +219,6 @@ const getTransactions = async (apiClient: APIClient) => {
         );
 
         allTransactions.push(...response.results);
-        console.log(`Fetched ${response.results.length} transactions (total: ${allTransactions.length})`);
 
         if (!response.hasNext || !response.nextCursor) {
             break;

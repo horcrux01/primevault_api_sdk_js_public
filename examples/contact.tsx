@@ -1,5 +1,5 @@
 import { APIClient, ApprovalAction } from "../src";
-import type { Contact, UpdateContactResponse } from "../src";
+import type { Contact, ContactListResponse, UpdateContactResponse } from "../src";
 
 /**
  * Example: Create a contact with an asset whitelist and approve it.
@@ -69,4 +69,27 @@ const updateContactAssetList = async (
   return updated;
 };
 
-export { createAndApproveContact, declineContactExample, updateContactAssetList };
+const getContacts = async (apiClient: APIClient) => {
+    const allContacts: Contact[] = [];
+    let cursor: string | null = null;
+
+    while (true) {
+        const response: ContactListResponse = await apiClient.getContacts({}, 50, cursor);
+        allContacts.push(...response.results);
+        console.log(`Fetched ${response.results.length} contacts (total: ${allContacts.length})`);
+
+        if (!response.hasNext || !response.nextCursor) break;
+        cursor = response.nextCursor;
+    }
+
+    console.log(`Total contacts: ${allContacts.length}`);
+}
+
+const getContactsFiltered = async (apiClient: APIClient) => {
+    const response = await apiClient.getContacts({ blockChain: "ETHEREUM" }, 10);
+    for (const contact of response.results) {
+        console.log(`  ${contact.id} — ${contact.name} (${contact.blockChain})`);
+    }
+}
+
+export { createAndApproveContact, declineContactExample, updateContactAssetList, getContacts, getContactsFiltered };

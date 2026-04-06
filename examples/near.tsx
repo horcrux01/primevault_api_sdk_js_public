@@ -24,7 +24,7 @@ const rawMessageSignatureForNear = async (apiClient: APIClient) => {
         vaultName: "core-vault-1",
     })).results;
 
-    const vaultId = vaults[0].id;
+    const vaultId = vaults.results[0].id;
 
     // Signing a raw message on ETHEREUM
     let txnResponse = await apiClient.createContractCallTransaction({

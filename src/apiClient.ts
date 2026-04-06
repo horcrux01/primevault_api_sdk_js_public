@@ -26,8 +26,6 @@ import {
   TransactionCategory,
   TransactionListResponse,
   Vault,
-  VaultListResponse,
-  ContactListResponse,
   DetailedBalanceResponse,
   CreateOnRampTransactionRequest,
   CreateOffRampTransactionRequest,
@@ -35,6 +33,8 @@ import {
   StakeResourceRequest,
   UpdateContactRequest,
   UpdateContactResponse,
+  VaultListResponse,
+  ContactListResponse,
 } from "./types";
 
 export class APIClient extends BaseAPIClient {
@@ -201,7 +201,7 @@ export class APIClient extends BaseAPIClient {
   async getVaults(
     params: Record<string, string> = {},
     limit: number = 20,
-    cursor: string | null = "",
+    cursor?: string | null,
   ): Promise<VaultListResponse> {
     const query = new URLSearchParams(params).toString();
     let url = `/api/external/vaults/?limit=${limit}&cursor=${cursor ?? ""}`;
@@ -257,7 +257,7 @@ export class APIClient extends BaseAPIClient {
   async getContacts(
     params: Record<string, string> = {},
     limit: number = 20,
-    cursor: string | null = "",
+    cursor?: string | null,
   ): Promise<ContactListResponse> {
     const query = new URLSearchParams(params).toString();
     let url = `/api/external/contacts/?limit=${limit}&cursor=${cursor ?? ""}`;
@@ -347,7 +347,7 @@ export class APIClient extends BaseAPIClient {
   async getBankAccounts(
     params: Record<string, string> = {},
     limit: number = 20,
-    cursor: string | null = "",
+    cursor?: string | null,
   ): Promise<BankAccountListResponse> {
     const query = new URLSearchParams(params).toString();
     let url = `/api/external/bank_accounts/?limit=${limit}&cursor=${cursor ?? ""}`;

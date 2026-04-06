@@ -1,15 +1,11 @@
 import {
     APIClient,
     Asset,
-    Contact,
-    ContactListResponse,
     ResourceType,
     Transaction,
     TransactionStatus,
     TransferPartyData,
     TransferPartyType,
-    Vault,
-    VaultListResponse,
 } from "../src"; // Import the APIClient and types from the SDK @primevault/js-api-sdk
 import {BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError, TooManyRequestsError, InternalServerError} from "../src/baseApiClient";
 
@@ -36,11 +32,11 @@ const createTransfer = async (apiClient: APIClient) => {
     )!;
 
     // Get source and destinations
-    const sourceVaultsResponse: VaultListResponse = await apiClient.getVaults({
+    const sourceVaultsResponse = await apiClient.getVaults({
         vaultName: "core-vault-1",
     }); // Source Vault
 
-    const destinationContactsResponse: ContactListResponse = await apiClient.getContacts({
+    const destinationContactsResponse = await apiClient.getContacts({
         name: "Brandi Taylor",
     });  // Destination Contact. This could be Core or Exchange Vault or External address.
 
@@ -115,15 +111,15 @@ const createTransferWithFeePayer = async (apiClient: APIClient) => {
             asset.blockChain === "SOLANA" && asset.symbol === "USDT",
     )!;
 
-    const sourceVaultsResponse: VaultListResponse = await apiClient.getVaults({
+    const sourceVaultsResponse = await apiClient.getVaults({
         vaultName: "core-vault-1",
     });
-    const destinationContactsResponse: ContactListResponse = await apiClient.getContacts({
+    const destinationContactsResponse = await apiClient.getContacts({
         name: "Brandi Taylor",
     });
 
     // Vault to act as Fee Payer (network fee will be paid by this vault)
-    const feePayerVaultsResponse: VaultListResponse = await apiClient.getVaults({
+    const feePayerVaultsResponse = await apiClient.getVaults({
         vaultName: "fee-payer-1",
     });
 

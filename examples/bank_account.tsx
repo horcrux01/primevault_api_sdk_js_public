@@ -1,5 +1,5 @@
 import { APIClient, ApprovalAction } from "../src";
-import type { BankAccount, CreateBankAccountRequest } from "../src";
+import type { BankAccount, BankAccountListResponse, CreateBankAccountRequest } from "../src";
 
 /**
  * Example: Create a bank account and approve it.
@@ -45,7 +45,7 @@ const createAndApproveBankAccount = async (
   //   bankAccount.city            // "New York"
 
   // Step 2: List bank accounts (optionally filter by status)
-  const listResponse = await apiClient.getBankAccounts({ status: "PENDING" });
+  const listResponse: BankAccountListResponse = await apiClient.getBankAccounts({ status: "PENDING" }, 20);
 
   for (const account of listResponse.results) {
     console.log(`  ${account.id} — ${account.accountName} (${account.status})`);
@@ -73,4 +73,24 @@ const declineBankAccount = async (
   await apiClient.submitBankAccountApprovalAction(bankAccountId, ApprovalAction.REJECT);
 };
 
-export { createAndApproveBankAccount, declineBankAccount };
+const listBankAccounts = async (apiClient: APIClient) => {
+    const allAccounts: BankAccount[] = [];
+    let cursor: string | null = null;
+
+    while (true) {
+        const response: BankAccountListResponse = await apiClient.getBankAccounts(
+            { status: "APPROVED" }, 20, cursor
+        );
+        allAccounts.push(...response.results);
+        for (const account of response.results) {
+            console.log(`  ${account.id} — ${account.accountName} (${account.status})`);
+        }
+
+        if (!response.hasNext || !response.nextCursor) break;
+        cursor = response.nextCursor;
+    }
+
+    console.log(`Total bank accounts: ${allAccounts.length}`);
+}
+
+export { createAndApproveBankAccount, declineBankAccount, listBankAccounts };

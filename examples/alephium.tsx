@@ -1,10 +1,10 @@
 import {APIClient, TransactionStatus} from "../src"; // Import the APIClient and types from the SDK @primevault/js-api-sdk
 
 const alephiumContractCall = async (apiClient: APIClient) => {
-    const vaults = (await apiClient.getVaults({
+    const vaults = await apiClient.getVaults({
         vaultName: "DeFi vault",
-    })).results;
-    const vaultId = vaults[0].id;
+    });
+    const vaultId = vaults.results[0].id;
 
     // Calling a contract call on Alephium
     let txnResponse = await apiClient.createContractCallTransaction({

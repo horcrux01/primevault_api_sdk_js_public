@@ -28,7 +28,10 @@ jobs:
           BRANCH_NAME="${{ github.event.inputs.branch_name }}"
           PR_TITLE="${{ github.event.inputs.pr_title }}"
 
-          git remote add public https://x-access-token:${GH_TOKEN}@github.com/horcrux01/primevault_api_sdk_js_public.git
+          git config --global credential.helper store
+          echo "https://x-access-token:${GH_TOKEN}@github.com" > ~/.git-credentials
+
+          git remote add public https://github.com/horcrux01/primevault_api_sdk_js_public.git
           git checkout -b "$BRANCH_NAME"
           git push public "$BRANCH_NAME"
 

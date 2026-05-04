@@ -319,28 +319,48 @@ export enum PaymentMethod {
   BANK_TRANSFER = "BANK_TRANSFER",
 }
 
-export interface RampQuoteRequest {
+export interface RampQuoteRequestBase {
   source?: TransferPartyData;         // Source of the ramp. In case of on-ramp, this is the fiat source and in case of off-ramp, this is the source of the crypto currency.
   destination?: TransferPartyData;    // Destination of the ramp. In case of on-ramp, this is the crypto destination and in case of off-ramp, this is the fiat destination.
   fromAsset: string;                  // Asset to be converted from.
   fromChain?: string;                 // Chain of the asset to be converted from.
-  fromAmount: string;                 // Amount to be converted from.
   toAsset: string;                    // Asset to be converted to.
   toChain?: string;                   // Chain of the asset to be converted to.
   category: TransactionCategory.ON_RAMP | TransactionCategory.OFF_RAMP; // Category of the ramp.
   paymentMethod?: PaymentMethod;      // Payment method to be used for the ramp.
 }
 
-export interface RampQuoteResponseItem {
-  finalToAmount: string;              // Final amount to be received after conversion.
+export type RampQuoteRequest = RampQuoteRequestBase & (
+  | {
+      fromAmount: string;             // Amount to be converted from.
+      toAmount?: string;              // Amount to receive on the other side of the quote.
+    }
+  | {
+      fromAmount?: string;            // Amount to be converted from.
+      toAmount: string;               // Amount to receive on the other side of the quote.
+    }
+);
+
+export interface RampQuoteResponseItemBase {
   quoteId: string;                    // Unique identifier for the quote.
   fees: RampExchangeRateFees;         // Fees charged for the ramp transaction.
   quoteResponseDict: Record<string, any>; // Raw quote response data from the ramp provider.
   sourceName: string;                 // Name of the ramp provider source.
 }
 
-export interface RampQuoteResponse {
-  quotes: RampQuoteResponseItem[];    // List of available ramp quotes.
+export type RampQuoteResponseItem = RampQuoteResponseItemBase & (
+  | {
+      finalToAmount: string;          // Final amount to be received after conversion.
+      finalFromAmount?: never;
+    }
+  | {
+      finalFromAmount: string;        // Final amount to be paid when quoting by toAmount.
+      finalToAmount?: never;
+    }
+);
+
+export interface RampQuoteResponse<TQuote extends RampQuoteResponseItem = RampQuoteResponseItem> {
+  quotes: TQuote[];                   // List of available ramp quotes.
 }
 
 export interface CreateOnRampTransactionRequest {

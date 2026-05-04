@@ -283,26 +283,38 @@ export declare enum PaymentMethod {
     SWIFT = "SWIFT",
     BANK_TRANSFER = "BANK_TRANSFER"
 }
-export interface RampQuoteRequest {
+export interface RampQuoteRequestBase {
     source?: TransferPartyData;
     destination?: TransferPartyData;
     fromAsset: string;
     fromChain?: string;
-    fromAmount: string;
     toAsset: string;
     toChain?: string;
     category: TransactionCategory.ON_RAMP | TransactionCategory.OFF_RAMP;
     paymentMethod?: PaymentMethod;
 }
-export interface RampQuoteResponseItem {
-    finalToAmount: string;
+export type RampQuoteRequest = RampQuoteRequestBase & ({
+    fromAmount: string;
+    toAmount?: string;
+} | {
+    fromAmount?: string;
+    toAmount: string;
+});
+export interface RampQuoteResponseItemBase {
     quoteId: string;
     fees: RampExchangeRateFees;
     quoteResponseDict: Record<string, any>;
     sourceName: string;
 }
-export interface RampQuoteResponse {
-    quotes: RampQuoteResponseItem[];
+export type RampQuoteResponseItem = RampQuoteResponseItemBase & ({
+    finalToAmount: string;
+    finalFromAmount?: never;
+} | {
+    finalFromAmount: string;
+    finalToAmount?: never;
+});
+export interface RampQuoteResponse<TQuote extends RampQuoteResponseItem = RampQuoteResponseItem> {
+    quotes: TQuote[];
 }
 export interface CreateOnRampTransactionRequest {
     destination: TransferPartyData;

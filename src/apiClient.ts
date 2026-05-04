@@ -146,6 +146,7 @@ export class APIClient extends BaseAPIClient {
       fromAmount: request.fromAmount,
       fromChain: request.fromChain,
       toAsset: request.toAsset,
+      toAmount: request.toAmount,
       toChain: request.toChain,
       category: request.category,
       paymentMethod: request.paymentMethod,

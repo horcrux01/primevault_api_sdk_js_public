@@ -1,6 +1,6 @@
 {
   "name": "@primevault/js-api-sdk",
-  "version": "1.0.39",
+  "version": "1.0.40",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -41,6 +41,6 @@
     "axios": "1.15.0",
     "base64url": "3.0.1",
     "dotenv": "16.4.5",
-    "uuid": "10.0.0"
+    "uuid": "14.0.0"
   }
 }

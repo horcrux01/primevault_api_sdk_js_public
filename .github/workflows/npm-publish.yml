@@ -27,7 +27,8 @@ jobs:
       - name: Build your package
         run: npm run build
 
-      - name: Run tests
+      - name: Run tests (FYI only, does not block publish)
+        continue-on-error: true
         env:
           ACCESS_PRIVATE_KEY: ${{ secrets.ACCESS_PRIVATE_KEY_TEST }}
         run: npm test

@@ -8,9 +8,11 @@ import {
   BankAccountListResponse,
   ChainData,
   Contact,
+  CreateAssetTransferRequest,
   CreateBankAccountRequest,
   CreateContactRequest,
   CreateContractCallTransactionRequest,
+  CreateRampTransactionRequest,
   CreateTradeTransactionRequest,
   CreateTransferTransactionRequest,
   CreateVaultRequest,
@@ -194,6 +196,41 @@ export class APIClient extends BaseAPIClient {
       category: TransactionCategory.OFF_RAMP,
       externalId: request.externalId,
       memo: request.memo,
+    };
+    return await this.post("/api/external/transactions/", data);
+  }
+
+  async createAssetTransfer(
+    request: CreateAssetTransferRequest,
+  ): Promise<Transaction> {
+    const data: Record<string, any> = {
+      vaultId: request.vaultId,
+      category: request.category ?? TransactionCategory.TRANSFER,
+      subCategory: request.subCategory,
+      asset: request.asset,
+      amount: request.amount,
+      externalId: request.externalId,
+      memo: request.memo,
+    };
+    if (request.counterparty) {
+      data.counterparty = request.counterparty;
+    }
+    return await this.post("/api/external/transactions/", data);
+  }
+
+  async createRampTransaction(
+    request: CreateRampTransactionRequest,
+  ): Promise<Transaction> {
+    const data = {
+      vaultId: request.vaultId,
+      category: request.category ?? TransactionCategory.ON_RAMP,
+      tradeRequestData: request.tradeRequestData,
+      tradeResponseData: request.tradeResponseData,
+      externalId: request.externalId,
+      operationMessage: request.operationMessage,
+      memo: request.memo,
+      paymentMethod: request.paymentMethod,
+      toBlockChain: request.toBlockChain,
     };
     return await this.post("/api/external/transactions/", data);
   }

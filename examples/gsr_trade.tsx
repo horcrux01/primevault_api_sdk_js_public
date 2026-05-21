@@ -1,5 +1,6 @@
 import {
   APIClient,
+  RampQuoteResponse,
   Transaction,
   TransactionCategory,
   TransactionSubCategory,
@@ -8,8 +9,8 @@ import {
 
 /**
  * GSR FIX Trade E2E example — full lifecycle:
- *  1. Get quote (GSR FIX 4.2 QuoteRequest)
- *  2. Execute quote (FIX NewOrderSingle with IOC)
+ *  1. Get quote (category=TRADE) — quotes stored server-side, returns quoteId
+ *  2. Execute quote using quoteId (FIX NewOrderSingle with IOC)
  *  3. Get deposit address
  *  4. Create deposit transfer
  *  5. Create withdraw transfer
@@ -27,9 +28,9 @@ const getQuote = async (apiClient: APIClient) => {
     toAsset: "USDT",
     fromAmount: "1000",
     category: TransactionCategory.TRADE,
-  });
+  }) as RampQuoteResponse;
 
-  const gsrQuotes = quoteResponse.tradeResponseDataList.filter(
+  const gsrQuotes = quoteResponse.quotes.filter(
     (q) => q.sourceName === "GSR",
   );
 
@@ -38,7 +39,7 @@ const getQuote = async (apiClient: APIClient) => {
 };
 
 /**
- * Step 2: Execute GSR quote — BUY (USD → USDT).
+ * Step 2: Execute GSR quote — BUY (USD -> USDT).
  */
 const executeQuote = async (apiClient: APIClient): Promise<Transaction> => {
   const quoteResponse = await apiClient.getTradeQuote({
@@ -47,9 +48,9 @@ const executeQuote = async (apiClient: APIClient): Promise<Transaction> => {
     toAsset: "USDT",
     fromAmount: "1000",
     category: TransactionCategory.TRADE,
-  });
+  }) as RampQuoteResponse;
 
-  const gsrQuote = quoteResponse.tradeResponseDataList.find(
+  const gsrQuote = quoteResponse.quotes.find(
     (q) => q.sourceName === "GSR",
   );
   if (!gsrQuote) {
@@ -57,9 +58,9 @@ const executeQuote = async (apiClient: APIClient): Promise<Transaction> => {
   }
 
   const transaction = await apiClient.createTradeTransaction({
-    vaultId: GSR_VAULT_ID,
-    tradeRequestData: quoteResponse.tradeRequestData,
-    tradeResponseData: gsrQuote,
+    quoteId: gsrQuote.quoteId,
+    category: TransactionCategory.TRADE,
+    operationMessage: "GSR FIX trade — USD to USDT",
     externalId: "gsr-trade-001",
     memo: "GSR FIX trade — USD to USDT",
   });
@@ -69,7 +70,7 @@ const executeQuote = async (apiClient: APIClient): Promise<Transaction> => {
 };
 
 /**
- * Step 2b: Execute GSR quote — SELL (USDT → USD).
+ * Step 2b: Execute GSR quote — SELL (USDT -> USD).
  */
 const executeSellQuote = async (apiClient: APIClient): Promise<Transaction> => {
   const quoteResponse = await apiClient.getTradeQuote({
@@ -78,9 +79,9 @@ const executeSellQuote = async (apiClient: APIClient): Promise<Transaction> => {
     toAsset: "USD",
     fromAmount: "500",
     category: TransactionCategory.TRADE,
-  });
+  }) as RampQuoteResponse;
 
-  const gsrQuote = quoteResponse.tradeResponseDataList.find(
+  const gsrQuote = quoteResponse.quotes.find(
     (q) => q.sourceName === "GSR",
   );
   if (!gsrQuote) {
@@ -88,9 +89,9 @@ const executeSellQuote = async (apiClient: APIClient): Promise<Transaction> => {
   }
 
   const transaction = await apiClient.createTradeTransaction({
-    vaultId: GSR_VAULT_ID,
-    tradeRequestData: quoteResponse.tradeRequestData,
-    tradeResponseData: gsrQuote,
+    quoteId: gsrQuote.quoteId,
+    category: TransactionCategory.TRADE,
+    operationMessage: "GSR FIX trade — USDT to USD",
     externalId: "gsr-sell-001",
     memo: "GSR FIX trade — USDT to USD",
   });

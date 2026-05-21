@@ -309,9 +309,10 @@ export interface TradeQuoteRequest {
 
 
 export interface CreateTradeTransactionRequest {
-  vaultId: string;
-  tradeRequestData: Record<string, any>;
-  tradeResponseData: Record<string, any>;
+  vaultId?: string;
+  quoteId?: string;
+  tradeRequestData?: Record<string, any>;
+  tradeResponseData?: Record<string, any>;
   category?: TransactionCategory;
   externalId?: string;
   operationMessage?: string;

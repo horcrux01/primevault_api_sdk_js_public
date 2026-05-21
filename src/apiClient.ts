@@ -121,7 +121,18 @@ export class APIClient extends BaseAPIClient {
 
   async getTradeQuote(
     request: TradeQuoteRequest,
-  ): Promise<GetTradeQuoteResponse> {
+  ): Promise<GetTradeQuoteResponse | RampQuoteResponse> {
+    if (request.category === TransactionCategory.TRADE) {
+      const data = {
+        source: request.vaultId ? { type: "VAULT", id: request.vaultId } : undefined,
+        fromAsset: request.fromAsset,
+        toAsset: request.toAsset,
+        fromAmount: request.fromAmount,
+        category: request.category,
+        paymentMethod: request.paymentMethod,
+      };
+      return await this.post("/api/external/transactions/quote/", data);
+    }
     const params = {
       vaultId: request.vaultId,
       fromAsset: request.fromAsset,
@@ -161,12 +172,23 @@ export class APIClient extends BaseAPIClient {
   async createTradeTransaction(
     request: CreateTradeTransactionRequest,
   ): Promise<Transaction> {
+    const category = request.category ?? TransactionCategory.SWAP;
+    if (request.quoteId) {
+      const data = {
+        quoteId: request.quoteId,
+        category,
+        externalId: request.externalId,
+        operationMessage: request.operationMessage,
+        memo: request.memo,
+      };
+      return await this.post("/api/external/transactions/", data);
+    }
     const data = {
       vaultId: request.vaultId,
       tradeRequestData: request.tradeRequestData,
       tradeResponseData: request.tradeResponseData,
-      category: request.category ?? TransactionCategory.SWAP,
-      blockChain: request.tradeRequestData.blockChain,
+      category,
+      blockChain: request.tradeRequestData?.blockChain,
       externalId: request.externalId,
       operationMessage: request.operationMessage,
       memo: request.memo,

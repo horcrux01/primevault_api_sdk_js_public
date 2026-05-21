@@ -163,6 +163,50 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.post("/api/external/transactions/", data);
         });
     }
+    getDepositAddress(vaultId, currency) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const params = { vaultId };
+            if (currency) {
+                params.currency = currency;
+            }
+            return yield this.get("/api/external/transactions/get_deposit_address/", params);
+        });
+    }
+    createAssetTransfer(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            const data = {
+                vaultId: request.vaultId,
+                category: (_a = request.category) !== null && _a !== void 0 ? _a : types_1.TransactionCategory.TRANSFER,
+                subCategory: request.subCategory,
+                asset: request.asset,
+                amount: request.amount,
+                externalId: request.externalId,
+                memo: request.memo,
+            };
+            if (request.counterparty) {
+                data.counterparty = request.counterparty;
+            }
+            return yield this.post("/api/external/transactions/", data);
+        });
+    }
+    createTradeV2Transaction(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            const data = {
+                vaultId: request.vaultId,
+                category: (_a = request.category) !== null && _a !== void 0 ? _a : types_1.TransactionCategory.TRADE,
+                tradeRequestData: request.tradeRequestData,
+                tradeResponseData: request.tradeResponseData,
+                externalId: request.externalId,
+                operationMessage: request.operationMessage,
+                memo: request.memo,
+                paymentMethod: request.paymentMethod,
+                toBlockChain: request.toBlockChain,
+            };
+            return yield this.post("/api/external/transactions/", data);
+        });
+    }
     getVaults() {
         return __awaiter(this, arguments, void 0, function* (params = {}, limit = 20, cursor) {
             const query = new URLSearchParams(params).toString();

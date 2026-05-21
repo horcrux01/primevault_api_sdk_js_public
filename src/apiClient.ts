@@ -12,7 +12,6 @@ import {
   CreateBankAccountRequest,
   CreateContactRequest,
   CreateContractCallTransactionRequest,
-  CreateTradeV2TransactionRequest,
   DepositAddressResponse,
   CreateTradeTransactionRequest,
   CreateTransferTransactionRequest,
@@ -166,9 +165,10 @@ export class APIClient extends BaseAPIClient {
       vaultId: request.vaultId,
       tradeRequestData: request.tradeRequestData,
       tradeResponseData: request.tradeResponseData,
-      category: TransactionCategory.SWAP,
+      category: request.category ?? TransactionCategory.SWAP,
       blockChain: request.tradeRequestData.blockChain,
       externalId: request.externalId,
+      operationMessage: request.operationMessage,
       memo: request.memo,
     };
     return await this.post("/api/external/transactions/", data);
@@ -227,23 +227,6 @@ export class APIClient extends BaseAPIClient {
     if (request.counterparty) {
       data.counterparty = request.counterparty;
     }
-    return await this.post("/api/external/transactions/", data);
-  }
-
-  async createTradeV2Transaction(
-    request: CreateTradeV2TransactionRequest,
-  ): Promise<Transaction> {
-    const data = {
-      vaultId: request.vaultId,
-      category: request.category ?? TransactionCategory.TRADE,
-      tradeRequestData: request.tradeRequestData,
-      tradeResponseData: request.tradeResponseData,
-      externalId: request.externalId,
-      operationMessage: request.operationMessage,
-      memo: request.memo,
-      paymentMethod: request.paymentMethod,
-      toBlockChain: request.toBlockChain,
-    };
     return await this.post("/api/external/transactions/", data);
   }
 

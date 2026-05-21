@@ -15,6 +15,7 @@ export interface ChainData {
 export enum TransferPartyType {
   CONTACT = "CONTACT",
   VAULT = "VAULT",
+  EXTERNAL = "EXTERNAL",
   EXTERNAL_ADDRESS = "EXTERNAL_ADDRESS",
   EXTERNAL_BANK_ACCOUNT = "EXTERNAL_BANK_ACCOUNT",
   BANK_ACCOUNT = "BANK_ACCOUNT",
@@ -311,7 +312,9 @@ export interface CreateTradeTransactionRequest {
   vaultId: string;
   tradeRequestData: Record<string, any>;
   tradeResponseData: Record<string, any>;
+  category?: TransactionCategory;
   externalId?: string;
+  operationMessage?: string;
   memo?: string;
 }
 
@@ -371,18 +374,6 @@ export interface CreateAssetTransferRequest {
   category?: TransactionCategory;
   externalId?: string;
   memo?: string;
-}
-
-export interface CreateTradeV2TransactionRequest {
-  vaultId: string;
-  tradeRequestData: Record<string, any>;
-  tradeResponseData: Record<string, any>;
-  category?: TransactionCategory;
-  externalId?: string;
-  operationMessage?: string;
-  memo?: string;
-  paymentMethod?: string;
-  toBlockChain?: string;
 }
 
 export interface DepositAddress {

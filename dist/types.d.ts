@@ -105,6 +105,7 @@ export declare enum TransactionType {
 export declare enum TransactionCategory {
     TRANSFER = "TRANSFER",
     SWAP = "SWAP",
+    TRADE = "TRADE",
     TOKEN_TRANSFER = "TOKEN_TRANSFER",
     TOKEN_APPROVAL = "TOKEN_APPROVAL",
     CONTRACT_CALL = "CONTRACT_CALL",
@@ -120,6 +121,9 @@ export declare enum TransactionSubCategory {
     INTERNAL_TRANSFER = "INTERNAL_TRANSFER",
     LIMIT_TRADE = "LIMIT_TRADE",
     MARKET_TRADE = "MARKET_TRADE",
+    TRADE = "TRADE",
+    DEPOSIT = "DEPOSIT",
+    WITHDRAW = "WITHDRAW",
     APPROVE_TOKEN_ALLOWANCE = "APPROVE_TOKEN_ALLOWANCE",
     CUSTOM_MESSAGE = "CUSTOM_MESSAGE",
     CONTRACT_CALL = "CONTRACT_CALL",
@@ -316,6 +320,38 @@ export interface CreateOffRampTransactionRequest {
     quoteId: string;
     externalId?: string;
     memo?: string;
+}
+export interface CreateAssetTransferRequest {
+    vaultId: string;
+    asset: string;
+    amount: string;
+    subCategory: TransactionSubCategory.DEPOSIT | TransactionSubCategory.WITHDRAW;
+    counterparty?: TransferPartyData;
+    category?: TransactionCategory;
+    externalId?: string;
+    memo?: string;
+}
+export interface CreateTradeV2TransactionRequest {
+    vaultId: string;
+    tradeRequestData: Record<string, any>;
+    tradeResponseData: Record<string, any>;
+    category?: TransactionCategory;
+    externalId?: string;
+    operationMessage?: string;
+    memo?: string;
+    paymentMethod?: string;
+    toBlockChain?: string;
+}
+export interface DepositAddress {
+    address?: string;
+    id?: string | number;
+    label?: string;
+    chain?: string;
+    chainName?: string;
+    asset?: string;
+}
+export interface DepositAddressResponse {
+    addresses: DepositAddress[];
 }
 export interface CreateContactRequest {
     name: string;

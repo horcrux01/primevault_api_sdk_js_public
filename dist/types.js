@@ -30,6 +30,7 @@ var TransactionCategory;
 (function (TransactionCategory) {
     TransactionCategory["TRANSFER"] = "TRANSFER";
     TransactionCategory["SWAP"] = "SWAP";
+    TransactionCategory["TRADE"] = "TRADE";
     TransactionCategory["TOKEN_TRANSFER"] = "TOKEN_TRANSFER";
     TransactionCategory["TOKEN_APPROVAL"] = "TOKEN_APPROVAL";
     TransactionCategory["CONTRACT_CALL"] = "CONTRACT_CALL";
@@ -46,6 +47,9 @@ var TransactionSubCategory;
     TransactionSubCategory["INTERNAL_TRANSFER"] = "INTERNAL_TRANSFER";
     TransactionSubCategory["LIMIT_TRADE"] = "LIMIT_TRADE";
     TransactionSubCategory["MARKET_TRADE"] = "MARKET_TRADE";
+    TransactionSubCategory["TRADE"] = "TRADE";
+    TransactionSubCategory["DEPOSIT"] = "DEPOSIT";
+    TransactionSubCategory["WITHDRAW"] = "WITHDRAW";
     TransactionSubCategory["APPROVE_TOKEN_ALLOWANCE"] = "APPROVE_TOKEN_ALLOWANCE";
     TransactionSubCategory["CUSTOM_MESSAGE"] = "CUSTOM_MESSAGE";
     TransactionSubCategory["CONTRACT_CALL"] = "CONTRACT_CALL";

@@ -1,5 +1,5 @@
 import { BaseAPIClient } from "./baseApiClient";
-import { ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAccount, BankAccountListResponse, ChainData, Contact, CreateBankAccountRequest, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, RampQuoteRequest, RampQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, TransactionListResponse, Vault, DetailedBalanceResponse, CreateOnRampTransactionRequest, CreateOffRampTransactionRequest, DelegateResourceRequest, StakeResourceRequest, UpdateContactRequest, UpdateContactResponse, VaultListResponse, ContactListResponse } from "./types";
+import { ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAccount, BankAccountListResponse, ChainData, Contact, CreateAssetTransferRequest, CreateBankAccountRequest, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeV2TransactionRequest, DepositAddressResponse, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, RampQuoteRequest, RampQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, TransactionListResponse, Vault, DetailedBalanceResponse, CreateOnRampTransactionRequest, CreateOffRampTransactionRequest, DelegateResourceRequest, StakeResourceRequest, UpdateContactRequest, UpdateContactResponse, VaultListResponse, ContactListResponse } from "./types";
 export declare class APIClient extends BaseAPIClient {
     getAssetsData(): Promise<Asset[]>;
     getSupportedChains(): Promise<ChainData[]>;
@@ -14,6 +14,9 @@ export declare class APIClient extends BaseAPIClient {
     createTradeTransaction(request: CreateTradeTransactionRequest): Promise<Transaction>;
     createOnRampTransaction(request: CreateOnRampTransactionRequest): Promise<Transaction>;
     createOffRampTransaction(request: CreateOffRampTransactionRequest): Promise<Transaction>;
+    getDepositAddress(vaultId: string, currency?: string): Promise<DepositAddressResponse>;
+    createAssetTransfer(request: CreateAssetTransferRequest): Promise<Transaction>;
+    createTradeV2Transaction(request: CreateTradeV2TransactionRequest): Promise<Transaction>;
     getVaults(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<VaultListResponse>;
     getVaultById(vaultId: string): Promise<Vault>;
     createVault(data: CreateVaultRequest): Promise<Vault>;

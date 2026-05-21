@@ -7,36 +7,40 @@ import {
 } from "../src";
 
 /**
- * Example: OTC trade — fetch a quote and execute it.
- *
- * Flow:
- *  1. Call getTradeQuote with category=TRADE to get OTC quotes (GSR, Telegram, etc.)
- *  2. Pick a quote from the response list
- *  3. Create the trade transaction to execute the quote
+ * OTC Trade E2E example — full lifecycle:
+ *  1. Get quote (category=TRADE)
+ *  2. Execute quote (create trade transaction)
+ *  3. Get deposit address
+ *  4. Create deposit transfer
+ *  5. Create withdraw transfer
  */
-const getOTCQuote = async (apiClient: APIClient) => {
-  const vaultId = "your-vault-id";
 
+const VAULT_ID = "your-vault-id";
+
+/**
+ * Step 1: Get OTC trade quote.
+ * Returns quotes from all configured OTC sources (GSR, Telegram, etc.)
+ */
+const getQuote = async (apiClient: APIClient) => {
   const quoteResponse = await apiClient.getTradeQuote({
-    vaultId,
+    vaultId: VAULT_ID,
     fromAsset: "USD",
     toAsset: "USDT",
     fromAmount: "100",
     category: TransactionCategory.TRADE,
   });
 
-  console.log("Trade request:", quoteResponse.tradeRequestData);
-  console.log("Available quotes:", quoteResponse.tradeResponseDataList);
+  console.log("Request:", quoteResponse.tradeRequestData);
+  console.log("Quotes:", quoteResponse.tradeResponseDataList);
   return quoteResponse;
 };
 
-const executeOTCTrade = async (
-  apiClient: APIClient,
-): Promise<Transaction> => {
-  const vaultId = "your-vault-id";
-
+/**
+ * Step 2: Execute quote — pick first quote and create trade transaction.
+ */
+const executeQuote = async (apiClient: APIClient): Promise<Transaction> => {
   const quoteResponse = await apiClient.getTradeQuote({
-    vaultId,
+    vaultId: VAULT_ID,
     fromAsset: "USD",
     toAsset: "USDT",
     fromAmount: "100",
@@ -46,59 +50,67 @@ const executeOTCTrade = async (
   const selectedQuote = quoteResponse.tradeResponseDataList[0];
 
   const transaction = await apiClient.createTradeTransaction({
-    vaultId,
+    vaultId: VAULT_ID,
     tradeRequestData: quoteResponse.tradeRequestData,
     tradeResponseData: selectedQuote,
     externalId: "otc-trade-001",
     memo: "USD to USDT OTC trade",
   });
 
-  console.log("Trade transaction created:", transaction.id, transaction.status);
+  console.log("Transaction:", transaction.id, transaction.status);
   return transaction;
 };
 
 /**
- * Example: Create a DEPOSIT (asset transfer into the vault).
+ * Step 3: Get deposit address for the vault.
  */
-const createDeposit = async (
-  apiClient: APIClient,
-): Promise<Transaction> => {
+const getDepositAddr = async (apiClient: APIClient) => {
+  const response = await apiClient.getDepositAddress(VAULT_ID, "USDC");
+
+  console.log("Deposit addresses:", response.addresses);
+  return response;
+};
+
+/**
+ * Step 4: Create deposit transfer (asset coming into the vault).
+ */
+const createDeposit = async (apiClient: APIClient): Promise<Transaction> => {
   const transaction = await apiClient.createAssetTransfer({
-    vaultId: "your-vault-id",
-    asset: "USDC",
-    amount: "1000",
+    vaultId: VAULT_ID,
+    asset: "USDT",
+    amount: "500",
     subCategory: TransactionSubCategory.DEPOSIT,
     counterparty: {
-      type: TransferPartyType.VAULT,
-      id: "source-vault-id",
+      type: TransferPartyType.EXTERNAL_ADDRESS,
+      name: "Circle Treasury",
     },
     externalId: "deposit-001",
+    memo: "USDT deposit from Circle",
   });
 
-  console.log("Deposit created:", transaction.id, transaction.status);
+  console.log("Deposit:", transaction.id, transaction.status);
   return transaction;
 };
 
 /**
- * Example: Create a WITHDRAW (asset transfer out of the vault).
+ * Step 5: Create withdraw transfer (asset leaving the vault).
  */
-const createWithdraw = async (
-  apiClient: APIClient,
-): Promise<Transaction> => {
+const createWithdraw = async (apiClient: APIClient): Promise<Transaction> => {
   const transaction = await apiClient.createAssetTransfer({
-    vaultId: "your-vault-id",
-    asset: "USDC",
-    amount: "500",
+    vaultId: VAULT_ID,
+    asset: "USD",
+    amount: "250",
     subCategory: TransactionSubCategory.WITHDRAW,
     counterparty: {
-      type: TransferPartyType.EXTERNAL_ADDRESS,
-      address: "0x1234567890abcdef1234567890abcdef12345678",
+      type: TransferPartyType.BANK_ACCOUNT,
+      id: "your-bank-account-id",
     },
     externalId: "withdraw-001",
+    memo: "USD withdrawal to bank",
   });
 
-  console.log("Withdraw created:", transaction.id, transaction.status);
+  console.log("Withdraw:", transaction.id, transaction.status);
   return transaction;
 };
 
-export { getOTCQuote, executeOTCTrade, createDeposit, createWithdraw };
+export { getQuote, executeQuote, getDepositAddr, createDeposit, createWithdraw };

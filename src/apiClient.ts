@@ -13,6 +13,7 @@ import {
   CreateContactRequest,
   CreateContractCallTransactionRequest,
   CreateTradeV2TransactionRequest,
+  DepositAddressResponse,
   CreateTradeTransactionRequest,
   CreateTransferTransactionRequest,
   CreateVaultRequest,
@@ -198,6 +199,17 @@ export class APIClient extends BaseAPIClient {
       memo: request.memo,
     };
     return await this.post("/api/external/transactions/", data);
+  }
+
+  async getDepositAddress(
+    vaultId: string,
+    currency?: string,
+  ): Promise<DepositAddressResponse> {
+    const params: Record<string, string> = { vaultId };
+    if (currency) {
+      params.currency = currency;
+    }
+    return await this.get("/api/external/transactions/get_deposit_address/", params);
   }
 
   async createAssetTransfer(

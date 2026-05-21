@@ -1,22 +1,28 @@
-import { APIClient, Transaction, TransactionCategory } from "../src";
+import {
+  APIClient,
+  Transaction,
+  TransactionCategory,
+  TransactionSubCategory,
+  TransferPartyType,
+} from "../src";
 
 /**
- * Example: GSR FIX trade — fetch a quote from GSR and execute it.
- *
- * GSR quotes are returned alongside other OTC quotes when category=TRADE.
- * The sourceName field identifies "GSR" quotes. Execution sends a FIX 4.2
- * NewOrderSingle to GSR's LumeFX venue with IOC time-in-force.
+ * GSR FIX Trade E2E example — full lifecycle:
+ *  1. Get quote (GSR FIX 4.2 QuoteRequest)
+ *  2. Execute quote (FIX NewOrderSingle with IOC)
+ *  3. Get deposit address
+ *  4. Create deposit transfer
+ *  5. Create withdraw transfer
  */
+
+const GSR_VAULT_ID = "your-gsr-vault-id";
 
 /**
- * Fetch GSR quotes for a USD → USDT trade.
- * The response includes quotes from all configured sources (GSR, Telegram OTC, etc.)
+ * Step 1: Get GSR quote — filter by sourceName "GSR".
  */
-const getGSRQuote = async (apiClient: APIClient) => {
-  const vaultId = "your-gsr-vault-id";
-
+const getQuote = async (apiClient: APIClient) => {
   const quoteResponse = await apiClient.getTradeQuote({
-    vaultId,
+    vaultId: GSR_VAULT_ID,
     fromAsset: "USD",
     toAsset: "USDT",
     fromAmount: "1000",
@@ -28,20 +34,15 @@ const getGSRQuote = async (apiClient: APIClient) => {
   );
 
   console.log("GSR quotes:", gsrQuotes);
-  console.log("All quotes:", quoteResponse.tradeResponseDataList);
   return quoteResponse;
 };
 
 /**
- * Execute a GSR trade: fetch quote, select the GSR source, create transaction.
+ * Step 2: Execute GSR quote — BUY (USD → USDT).
  */
-const executeGSRTrade = async (
-  apiClient: APIClient,
-): Promise<Transaction> => {
-  const vaultId = "your-gsr-vault-id";
-
+const executeQuote = async (apiClient: APIClient): Promise<Transaction> => {
   const quoteResponse = await apiClient.getTradeQuote({
-    vaultId,
+    vaultId: GSR_VAULT_ID,
     fromAsset: "USD",
     toAsset: "USDT",
     fromAmount: "1000",
@@ -52,37 +53,27 @@ const executeGSRTrade = async (
     (q) => q.sourceName === "GSR",
   );
   if (!gsrQuote) {
-    throw new Error("No GSR quote available for this pair");
+    throw new Error("No GSR quote available");
   }
 
-  console.log("Selected GSR quote:", {
-    quoteId: gsrQuote.quoteId,
-    finalToAmount: gsrQuote.finalToAmount,
-    rate: gsrQuote.quoteResponseDict,
-  });
-
   const transaction = await apiClient.createTradeTransaction({
-    vaultId,
+    vaultId: GSR_VAULT_ID,
     tradeRequestData: quoteResponse.tradeRequestData,
     tradeResponseData: gsrQuote,
     externalId: "gsr-trade-001",
     memo: "GSR FIX trade — USD to USDT",
   });
 
-  console.log("GSR trade transaction:", transaction.id, transaction.status);
+  console.log("Transaction:", transaction.id, transaction.status);
   return transaction;
 };
 
 /**
- * Sell-side GSR trade: USDT → USD.
+ * Step 2b: Execute GSR quote — SELL (USDT → USD).
  */
-const executeGSRSellTrade = async (
-  apiClient: APIClient,
-): Promise<Transaction> => {
-  const vaultId = "your-gsr-vault-id";
-
+const executeSellQuote = async (apiClient: APIClient): Promise<Transaction> => {
   const quoteResponse = await apiClient.getTradeQuote({
-    vaultId,
+    vaultId: GSR_VAULT_ID,
     fromAsset: "USDT",
     toAsset: "USD",
     fromAmount: "500",
@@ -97,15 +88,67 @@ const executeGSRSellTrade = async (
   }
 
   const transaction = await apiClient.createTradeTransaction({
-    vaultId,
+    vaultId: GSR_VAULT_ID,
     tradeRequestData: quoteResponse.tradeRequestData,
     tradeResponseData: gsrQuote,
     externalId: "gsr-sell-001",
     memo: "GSR FIX trade — USDT to USD",
   });
 
-  console.log("GSR sell trade:", transaction.id, transaction.status);
+  console.log("Transaction:", transaction.id, transaction.status);
   return transaction;
 };
 
-export { getGSRQuote, executeGSRTrade, executeGSRSellTrade };
+/**
+ * Step 3: Get deposit address for the GSR vault.
+ */
+const getDepositAddr = async (apiClient: APIClient) => {
+  const response = await apiClient.getDepositAddress(GSR_VAULT_ID, "USDC");
+
+  console.log("Deposit addresses:", response.addresses);
+  return response;
+};
+
+/**
+ * Step 4: Create deposit transfer on GSR vault.
+ */
+const createDeposit = async (apiClient: APIClient): Promise<Transaction> => {
+  const transaction = await apiClient.createAssetTransfer({
+    vaultId: GSR_VAULT_ID,
+    asset: "USDT",
+    amount: "500",
+    subCategory: TransactionSubCategory.DEPOSIT,
+    counterparty: {
+      type: TransferPartyType.EXTERNAL_ADDRESS,
+      name: "Circle Treasury",
+    },
+    externalId: "gsr-deposit-001",
+    memo: "USDT deposit to GSR vault",
+  });
+
+  console.log("Deposit:", transaction.id, transaction.status);
+  return transaction;
+};
+
+/**
+ * Step 5: Create withdraw transfer from GSR vault.
+ */
+const createWithdraw = async (apiClient: APIClient): Promise<Transaction> => {
+  const transaction = await apiClient.createAssetTransfer({
+    vaultId: GSR_VAULT_ID,
+    asset: "USD",
+    amount: "250",
+    subCategory: TransactionSubCategory.WITHDRAW,
+    counterparty: {
+      type: TransferPartyType.BANK_ACCOUNT,
+      id: "your-bank-account-id",
+    },
+    externalId: "gsr-withdraw-001",
+    memo: "USD withdrawal from GSR vault",
+  });
+
+  console.log("Withdraw:", transaction.id, transaction.status);
+  return transaction;
+};
+
+export { getQuote, executeQuote, executeSellQuote, getDepositAddr, createDeposit, createWithdraw };

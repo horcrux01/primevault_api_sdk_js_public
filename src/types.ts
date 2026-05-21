@@ -385,6 +385,19 @@ export interface CreateTradeV2TransactionRequest {
   toBlockChain?: string;
 }
 
+export interface DepositAddress {
+  address?: string;
+  id?: string | number;
+  label?: string;
+  chain?: string;
+  chainName?: string;
+  asset?: string;
+}
+
+export interface DepositAddressResponse {
+  addresses: DepositAddress[];
+}
+
 export interface CreateContactRequest {
   name: string;
   address: string;

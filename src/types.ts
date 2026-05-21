@@ -373,11 +373,11 @@ export interface CreateAssetTransferRequest {
   memo?: string;
 }
 
-export interface CreateRampTransactionRequest {
+export interface CreateTradeV2TransactionRequest {
   vaultId: string;
   tradeRequestData: Record<string, any>;
   tradeResponseData: Record<string, any>;
-  category?: TransactionCategory.ON_RAMP | TransactionCategory.OFF_RAMP;
+  category?: TransactionCategory;
   externalId?: string;
   operationMessage?: string;
   memo?: string;

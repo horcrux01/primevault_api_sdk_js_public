@@ -12,7 +12,7 @@ import {
   CreateBankAccountRequest,
   CreateContactRequest,
   CreateContractCallTransactionRequest,
-  CreateRampTransactionRequest,
+  CreateTradeV2TransactionRequest,
   CreateTradeTransactionRequest,
   CreateTransferTransactionRequest,
   CreateVaultRequest,
@@ -218,12 +218,12 @@ export class APIClient extends BaseAPIClient {
     return await this.post("/api/external/transactions/", data);
   }
 
-  async createRampTransaction(
-    request: CreateRampTransactionRequest,
+  async createTradeV2Transaction(
+    request: CreateTradeV2TransactionRequest,
   ): Promise<Transaction> {
     const data = {
       vaultId: request.vaultId,
-      category: request.category ?? TransactionCategory.ON_RAMP,
+      category: request.category ?? TransactionCategory.TRADE,
       tradeRequestData: request.tradeRequestData,
       tradeResponseData: request.tradeResponseData,
       externalId: request.externalId,

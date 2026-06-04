@@ -19,9 +19,7 @@ const createAndApproveBankAccount = async (
     accountNumber: "123456789",
     accountName: "Treasury Account",
     routingNumber: "021000021",
-    thirdParty: "Bridge",
     paymentMethod: "ACH",
-    region: "US",
     bankName: "Chase",
     currency: "USD",
     streetLine: "123 Main St",
@@ -55,7 +53,10 @@ const createAndApproveBankAccount = async (
   const fetched = await apiClient.getBankAccountById(bankAccount.id);
 
   // Step 4: Approve the pending change request
-  const approval = await apiClient.submitBankAccountApprovalAction(bankAccount.id);
+  const approval = await apiClient.approveChangeRequest({
+    entityId: bankAccount.id,
+    action: ApprovalAction.APPROVE,
+  });
 
   // Step 5: Verify status after approval
   const verified = await apiClient.getBankAccountById(bankAccount.id);
@@ -70,7 +71,10 @@ const declineBankAccount = async (
   apiClient: APIClient,
   bankAccountId: string,
 ): Promise<void> => {
-  await apiClient.submitBankAccountApprovalAction(bankAccountId, ApprovalAction.REJECT);
+  await apiClient.approveChangeRequest({
+    entityId: bankAccountId,
+    action: ApprovalAction.REJECT,
+  });
 };
 
 const listBankAccounts = async (apiClient: APIClient) => {

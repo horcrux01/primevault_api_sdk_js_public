@@ -41,8 +41,8 @@ const createTransfer = async (apiClient: APIClient) => {
     });  // Destination Contact. This could be Core or Exchange Vault or External address.
 
     /*
-     To send the transaction to an external non-whitelisted address, change the type and set the value
-     const destination: TransferPartyData = { type: TransferPartyType.EXTERNAL_ADDRESS, value: '0x123456789..'};
+     To send the transaction to an external non-whitelisted address, change the type and set the address
+     const destination: TransferPartyData = { type: TransferPartyType.EXTERNAL_ADDRESS, address: '0x123456789..'};
     */
     const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaultsResponse.results[0].id};
     const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContactsResponse.results[0].id};

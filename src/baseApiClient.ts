@@ -3,6 +3,8 @@ import { AuthTokenService } from "./authTokenService";
 import { getSignatureService } from "./signatureService";
 import { sortObjectKeys } from "./utils";
 
+const SDK_VERSION = require("../package.json").version as string;
+
 interface RequestOptions {
   urlPath?: string;
   params?: Record<string, any>;
@@ -28,6 +30,7 @@ export class BaseAPIClient {
       "Content-Type": "application/json",
       Accept: "application/json",
       "Api-Key": this.apiKey,
+      version: SDK_VERSION,
     };
     this.authTokenService = new AuthTokenService(apiKey, privateKeyHex, keyId);
     this.signatureService = getSignatureService(privateKeyHex, keyId);

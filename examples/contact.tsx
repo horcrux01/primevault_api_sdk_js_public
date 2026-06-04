@@ -23,10 +23,10 @@ const createAndApproveContact = async (
   console.log(`Contact created: ${contact.id} (${contact.status})`);
 
   // Step 2: Approve the contact using its ID as the entityId
-  const approval = await apiClient.submitContactApprovalAction(
-    contact.id,
-    ApprovalAction.APPROVE,
-  );
+  const approval = await apiClient.approveChangeRequest({
+    entityId: contact.id,
+    action: ApprovalAction.APPROVE,
+  });
 
   console.log(`Approval result: ${JSON.stringify(approval)}`);
 
@@ -44,10 +44,10 @@ const declineContactExample = async (
   apiClient: APIClient,
   contactId: string,
 ): Promise<void> => {
-  await apiClient.submitContactApprovalAction(
-    contactId,
-    ApprovalAction.DECLINE,
-  );
+  await apiClient.approveChangeRequest({
+    entityId: contactId,
+    action: ApprovalAction.REJECT,
+  });
 };
 
 /**
@@ -66,6 +66,12 @@ const updateContactAssetList = async (
   });
 
   console.log(`Contact ${updated.id} asset list updated to: ${updated.assetList}`);
+  const approval = await apiClient.approveChangeRequest({
+    entityId: updated.id,
+    action: ApprovalAction.APPROVE,
+  });
+  console.log(`Update approval result: ${JSON.stringify(approval)}`);
+
   return updated;
 };
 

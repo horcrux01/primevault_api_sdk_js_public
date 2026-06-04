@@ -17,6 +17,7 @@ const axios_1 = __importDefault(require("axios"));
 const authTokenService_1 = require("./authTokenService");
 const signatureService_1 = require("./signatureService");
 const utils_1 = require("./utils");
+const SDK_VERSION = require("../package.json").version;
 class BaseAPIClient {
     constructor(apiKey, apiUrl, privateKeyHex, keyId) {
         this.apiKey = apiKey;
@@ -25,6 +26,7 @@ class BaseAPIClient {
             "Content-Type": "application/json",
             Accept: "application/json",
             "Api-Key": this.apiKey,
+            version: SDK_VERSION,
         };
         this.authTokenService = new authTokenService_1.AuthTokenService(apiKey, privateKeyHex, keyId);
         this.signatureService = (0, signatureService_1.getSignatureService)(privateKeyHex, keyId);

@@ -4,6 +4,7 @@ import {
   ApprovalActionResponse,
   Asset,
   BalanceResponse,
+  BankDetails,
   BankAccount,
   BankAccountListResponse,
   ChainData,
@@ -11,24 +12,24 @@ import {
   CreateBankAccountRequest,
   CreateContactRequest,
   CreateContractCallTransactionRequest,
-  CreateTradeTransactionRequest,
   CreateTransferTransactionRequest,
   CreateVaultRequest,
   EstimatedFeeResponse,
   EstimateFeeRequest,
+  GetApprovalRequest,
   GetApprovalMessageResponse,
-  GetTradeQuoteResponse,
-  RampQuoteRequest,
-  RampQuoteResponse,
+  GetQuoteRequest,
+  QuoteResponse,
   ReplaceTransactionRequest,
-  TradeQuoteRequest,
   Transaction,
   TransactionCategory,
+  TransactionExecuteIntentRequest,
+  TransactionIntentRequest,
   TransactionListResponse,
+  TransactionStatus,
+  TransferPartyData,
   Vault,
   DetailedBalanceResponse,
-  CreateOnRampTransactionRequest,
-  CreateOffRampTransactionRequest,
   DelegateResourceRequest,
   StakeResourceRequest,
   UpdateContactRequest,
@@ -36,6 +37,70 @@ import {
   VaultListResponse,
   ContactListResponse,
 } from "./types";
+
+function buildBankDetailsData(
+  bank?: BankDetails | null,
+): Record<string, any> | null {
+  if (!bank) {
+    return null;
+  }
+
+  return {
+    bankAccountId: bank.bankAccountId ?? null,
+    bankName: bank.bankName ?? null,
+    beneficiaryName: bank.beneficiaryName ?? null,
+    accountName: bank.accountName ?? null,
+    accountNumber: bank.accountNumber ?? null,
+    routingNumber: bank.routingNumber ?? null,
+    paymentRail: bank.paymentRail ?? null,
+    bankAddress: bank.bankAddress ?? null,
+    swiftCode: bank.swiftCode ?? null,
+    swiftBic: bank.swiftBic ?? null,
+    iban: bank.iban ?? null,
+    currency: bank.currency ?? null,
+    country: bank.country ?? null,
+  };
+}
+
+function buildTransferPartyData(
+  party?: TransferPartyData | null,
+): Record<string, any> | null {
+  if (!party) {
+    return null;
+  }
+
+  return {
+    type: party.type,
+    id: party.id ?? null,
+    name: party.name ?? null,
+    address: party.address ?? null,
+    provider: party.provider ?? null,
+    bankDetails: buildBankDetailsData(party.bankDetails),
+    chain: party.chain ?? null,
+    paymentRail: party.paymentRail ?? null,
+  };
+}
+
+function buildTransactionIntentData(
+  request?: TransactionIntentRequest | null,
+): Record<string, any> | null {
+  if (!request) {
+    return null;
+  }
+
+  return {
+    source: buildTransferPartyData(request.source),
+    destination: buildTransferPartyData(request.destination),
+    fromAsset: request.fromAsset ?? null,
+    toAsset: request.toAsset ?? null,
+    fromAmount: request.fromAmount ?? null,
+    fromChain: request.fromChain ?? null,
+    fromPaymentRail: request.fromPaymentRail ?? null,
+    toAmount: request.toAmount ?? null,
+    toChain: request.toChain ?? null,
+    toPaymentRail: request.toPaymentRail ?? null,
+  };
+}
 
 export class APIClient extends BaseAPIClient {
   async getAssetsData(): Promise<Asset[]> {
@@ -56,11 +121,71 @@ export class APIClient extends BaseAPIClient {
     if (query) {
       url += `&${query}`;
     }
-    return await this.get(url) as TransactionListResponse;
+    return (await this.get(url)) as TransactionListResponse;
   }
 
   async getTransactionById(transactionId: string): Promise<Transaction> {
     return await this.get(`/api/external/transactions/${transactionId}/`);
+  }
+
+  async getChangeApprovalMessage(
+    entityId: string,
+  ): Promise<GetApprovalMessageResponse> {
+    return await this.get(
+      "/api/external/change_requests/approvals/approval_message/",
+      { entityId },
+    );
+  }
+
+  async submitChangeApprovalAction(
+    approvalId: string,
+    action: ApprovalAction | string,
+    signatureHex: string,
+    reason: string | null = "ok",
+  ): Promise<ApprovalActionResponse> {
+    const data: Record<string, string> = {
+      action,
+      signature: signatureHex,
+    };
+    if (reason !== null) {
+      data.reason = reason;
+    }
+
+    return await this.post(
+      `/api/external/change_requests/approvals/${approvalId}/action/`,
+      data,
+    );
+  }
+
+  async approveChangeRequest(
+    request: GetApprovalRequest,
+  ): Promise<ApprovalActionResponse> {
+    const approvalMessage = await this.getChangeApprovalMessage(
+      request.entityId,
+    );
+    const signatureHex = await (this as any).signatureService.sign(
+      approvalMessage.message,
+    );
+    return await this.submitChangeApprovalAction(
+      approvalMessage.approvalId,
+      request.action,
+      signatureHex,
+      request.reason,
+    );
+  }
+
+  private async approvePendingTransactionChangeRequest(
+    transaction: Transaction,
+  ): Promise<Transaction> {
+    if (transaction.status !== TransactionStatus.PENDING) {
+      return transaction;
+    }
+
+    await this.approveChangeRequest({
+      entityId: transaction.id,
+      action: ApprovalAction.APPROVE,
+    });
+    return await this.getTransactionById(transaction.id);
   }
 
   async estimateFee(
@@ -114,89 +239,47 @@ export class APIClient extends BaseAPIClient {
   }
 
   async replaceTransaction(request: ReplaceTransactionRequest) {
-    return await this.post("/api/external/transactions/replace_transaction/", request);
-  }
-
-  async getTradeQuote(
-    request: TradeQuoteRequest,
-  ): Promise<GetTradeQuoteResponse> {
-    const params = {
-      vaultId: request.vaultId,
-      fromAsset: request.fromAsset,
-      toAsset: request.toAsset,
-      fromAmount: request.fromAmount,
-      blockChain: request.fromChain,
-      toBlockchain: request.toChain,
-      slippage: request.slippage,
-      expectedToAmount: request.expectedToAmount,
-      expiryInMinutes: request.expiryInMinutes,
-      category: request.category,
-      paymentMethod: request.paymentMethod,
-    };
-    return await this.get("/api/external/transactions/trade_quote/", params);
-  }
-
-  async getRampQuote(
-    request: RampQuoteRequest,
-  ): Promise<RampQuoteResponse> {
-    const params = {
-      source: request.source,
-      destination: request.destination,
-      fromAsset: request.fromAsset,
-      fromAmount: request.fromAmount,
-      fromChain: request.fromChain,
-      toAsset: request.toAsset,
-      toAmount: request.toAmount,
-      toChain: request.toChain,
-      category: request.category,
-      paymentMethod: request.paymentMethod,
-    };
     return await this.post(
-      "/api/external/transactions/quote/",
-      params,
+      "/api/external/transactions/replace_transaction/",
+      request,
     );
   }
 
-  async createTradeTransaction(
-    request: CreateTradeTransactionRequest,
-  ): Promise<Transaction> {
-    const data = {
-      vaultId: request.vaultId,
-      tradeRequestData: request.tradeRequestData,
-      tradeResponseData: request.tradeResponseData,
-      category: TransactionCategory.SWAP,
-      blockChain: request.tradeRequestData.blockChain,
-      externalId: request.externalId,
-      memo: request.memo,
-    };
-    return await this.post("/api/external/transactions/", data);
+  async getQuote(request: GetQuoteRequest): Promise<QuoteResponse> {
+    const intent = buildTransactionIntentData(request.intent);
+    if (intent && request.intent.routeAccounts) {
+      intent.routeAccounts = request.intent.routeAccounts.map(
+        (routeAccount) => ({
+          provider: routeAccount.provider,
+          id: routeAccount.id,
+        }),
+      );
+    }
+
+    return await this.post("/api/external/transactions/quote/", {
+      intent,
+    });
   }
 
-  async createOnRampTransaction(
-    request: CreateOnRampTransactionRequest,
+  async createTransactionFromIntent(
+    request: TransactionExecuteIntentRequest,
   ): Promise<Transaction> {
-    const data = {
-      destination: request.destination,
-      quoteId: request.quoteId,
-      category: TransactionCategory.ON_RAMP,
-      externalId: request.externalId,
-      memo: request.memo,
-    };
-    return await this.post("/api/external/transactions/", data);
+    const transaction = (await this.post(
+      "/api/external/transactions/intent/create/",
+      {
+        intent: buildTransactionIntentData(request.intent),
+        quoteId: request.quoteId,
+        externalId: request.externalId,
+        memo: request.memo,
+      },
+    )) as Transaction;
+    return await this.approvePendingTransactionChangeRequest(transaction);
   }
 
-  async createOffRampTransaction(
-    request: CreateOffRampTransactionRequest,
-  ): Promise<Transaction> {
-    const data = {
-      source: request.source,
-      destination: request.destination,
-      quoteId: request.quoteId,
-      category: TransactionCategory.OFF_RAMP,
-      externalId: request.externalId,
-      memo: request.memo,
-    };
-    return await this.post("/api/external/transactions/", data);
+  async markDepositDone(transactionId: string): Promise<Transaction> {
+    return await this.post("/api/external/transactions/mark_deposit_done/", {
+      transactionId,
+    });
   }
 
   async getVaults(
@@ -209,7 +292,7 @@ export class APIClient extends BaseAPIClient {
     if (query) {
       url += `&${query}`;
     }
-    return await this.get(url) as VaultListResponse;
+    return (await this.get(url)) as VaultListResponse;
   }
 
   async getVaultById(vaultId: string): Promise<Vault> {
@@ -224,8 +307,14 @@ export class APIClient extends BaseAPIClient {
     return await this.get(`/api/external/vaults/${vaultId}/balances/`);
   }
 
-  async getDetailedBalances(vaultId: string): Promise<DetailedBalanceResponse> {
-    return await this.get(`/api/external/vaults/${vaultId}/detailed_balances/`);
+  async getDetailedBalances(
+    vaultId: string,
+    params: Record<string, string> = {},
+  ): Promise<DetailedBalanceResponse> {
+    return await this.get(
+      `/api/external/vaults/${vaultId}/detailed_balances/`,
+      params,
+    );
   }
 
   async updateBalances(vaultId: string): Promise<BalanceResponse> {
@@ -254,7 +343,6 @@ export class APIClient extends BaseAPIClient {
     );
   }
 
-
   async getContacts(
     params: Record<string, string> = {},
     limit: number = 20,
@@ -265,7 +353,7 @@ export class APIClient extends BaseAPIClient {
     if (query) {
       url += `&${query}`;
     }
-    return await this.get(url) as ContactListResponse;
+    return (await this.get(url)) as ContactListResponse;
   }
 
   async getContactById(contactId: string): Promise<Contact> {
@@ -284,37 +372,18 @@ export class APIClient extends BaseAPIClient {
     return await this.post("/api/external/contacts/", data);
   }
 
-  async updateContact(request: UpdateContactRequest): Promise<UpdateContactResponse> {
+  async updateContact(
+    request: UpdateContactRequest,
+  ): Promise<UpdateContactResponse> {
     const data = {
       assetList: request.assetList || [],
     };
     return await this.put(`/api/external/contacts/${request.id}/`, data);
   }
 
-  async submitContactApprovalAction(
-    entityId: string,
-    action: ApprovalAction = ApprovalAction.APPROVE,
-  ): Promise<ApprovalActionResponse> {
-    const msgResponse: GetApprovalMessageResponse = await this.get(
-      "/api/external/change_requests/approvals/approval_message/",
-      { entityId },
-    );
-    const signatureHex = await (this as any).signatureService.sign(
-      msgResponse.message,
-    );
-    return await this.post(
-      `/api/external/change_requests/approvals/${msgResponse.approvalId}/action/`,
-      {
-        entityId,
-        message: msgResponse.message,
-        signature: signatureHex,
-        action,
-      },
-    );
-  }
-
-
-  async delegateResource(request: DelegateResourceRequest): Promise<Transaction> {
+  async delegateResource(
+    request: DelegateResourceRequest,
+  ): Promise<Transaction> {
     const data = {
       source: request.source,
       destination: request.destination,
@@ -355,7 +424,7 @@ export class APIClient extends BaseAPIClient {
     if (query) {
       url += `&${query}`;
     }
-    return await this.get(url) as BankAccountListResponse;
+    return (await this.get(url)) as BankAccountListResponse;
   }
 
   async getBankAccountById(bankAccountId: string): Promise<BankAccount> {
@@ -366,27 +435,5 @@ export class APIClient extends BaseAPIClient {
     request: CreateBankAccountRequest,
   ): Promise<BankAccount> {
     return await this.post("/api/external/bank_accounts/", request);
-  }
-
-  async submitBankAccountApprovalAction(
-    entityId: string,
-    action: ApprovalAction = ApprovalAction.APPROVE,
-  ): Promise<ApprovalActionResponse> {
-    const msgResponse: GetApprovalMessageResponse = await this.get(
-      "/api/external/change_requests/approvals/approval_message/",
-      { entityId },
-    );
-    const signatureHex = await (this as any).signatureService.sign(
-      msgResponse.message,
-    );
-    return await this.post(
-      `/api/external/change_requests/approvals/${msgResponse.approvalId}/action/`,
-      {
-        entityId,
-        message: msgResponse.message,
-        signature: signatureHex,
-        action,
-      },
-    );
   }
 }

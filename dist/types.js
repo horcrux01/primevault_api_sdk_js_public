@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ApprovalAction = exports.BankAccountStatus = exports.ResourceType = exports.PaymentMethod = exports.TransactionFeeTier = exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.VaultType = exports.TransferPartyType = void 0;
+exports.ApprovalAction = exports.BankAccountStatus = exports.ResourceType = exports.PaymentMethod = exports.TransactionOperationType = exports.TransactionFeeTier = exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.VaultType = exports.TransferPartyType = void 0;
 var TransferPartyType;
 (function (TransferPartyType) {
     TransferPartyType["CONTACT"] = "CONTACT";
@@ -73,6 +73,13 @@ var TransactionFeeTier;
     TransactionFeeTier["MEDIUM"] = "MEDIUM";
     TransactionFeeTier["LOW"] = "LOW";
 })(TransactionFeeTier || (exports.TransactionFeeTier = TransactionFeeTier = {}));
+var TransactionOperationType;
+(function (TransactionOperationType) {
+    TransactionOperationType["DEPOSIT"] = "DEPOSIT";
+    TransactionOperationType["TRADE"] = "TRADE";
+    TransactionOperationType["TRANSFER"] = "TRANSFER";
+    TransactionOperationType["WITHDRAW"] = "WITHDRAW";
+})(TransactionOperationType || (exports.TransactionOperationType = TransactionOperationType = {}));
 var PaymentMethod;
 (function (PaymentMethod) {
     PaymentMethod["US_ACH"] = "US_ACH";
@@ -97,5 +104,6 @@ var BankAccountStatus;
 var ApprovalAction;
 (function (ApprovalAction) {
     ApprovalAction["APPROVE"] = "approve";
-    ApprovalAction["DECLINE"] = "decline";
+    ApprovalAction["REJECT"] = "reject";
+    ApprovalAction["DECLINE"] = "reject";
 })(ApprovalAction || (exports.ApprovalAction = ApprovalAction = {}));

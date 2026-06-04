@@ -12,6 +12,61 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.APIClient = void 0;
 const baseApiClient_1 = require("./baseApiClient");
 const types_1 = require("./types");
+function buildBankDetailsData(bank) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+    if (!bank) {
+        return null;
+    }
+    return {
+        bankAccountId: (_a = bank.bankAccountId) !== null && _a !== void 0 ? _a : null,
+        bankName: (_b = bank.bankName) !== null && _b !== void 0 ? _b : null,
+        beneficiaryName: (_c = bank.beneficiaryName) !== null && _c !== void 0 ? _c : null,
+        accountName: (_d = bank.accountName) !== null && _d !== void 0 ? _d : null,
+        accountNumber: (_e = bank.accountNumber) !== null && _e !== void 0 ? _e : null,
+        routingNumber: (_f = bank.routingNumber) !== null && _f !== void 0 ? _f : null,
+        paymentRail: (_g = bank.paymentRail) !== null && _g !== void 0 ? _g : null,
+        bankAddress: (_h = bank.bankAddress) !== null && _h !== void 0 ? _h : null,
+        swiftCode: (_j = bank.swiftCode) !== null && _j !== void 0 ? _j : null,
+        swiftBic: (_k = bank.swiftBic) !== null && _k !== void 0 ? _k : null,
+        iban: (_l = bank.iban) !== null && _l !== void 0 ? _l : null,
+        currency: (_m = bank.currency) !== null && _m !== void 0 ? _m : null,
+        country: (_o = bank.country) !== null && _o !== void 0 ? _o : null,
+    };
+}
+function buildTransferPartyData(party) {
+    var _a, _b, _c, _d, _e, _f;
+    if (!party) {
+        return null;
+    }
+    return {
+        type: party.type,
+        id: (_a = party.id) !== null && _a !== void 0 ? _a : null,
+        name: (_b = party.name) !== null && _b !== void 0 ? _b : null,
+        address: (_c = party.address) !== null && _c !== void 0 ? _c : null,
+        provider: (_d = party.provider) !== null && _d !== void 0 ? _d : null,
+        bankDetails: buildBankDetailsData(party.bankDetails),
+        chain: (_e = party.chain) !== null && _e !== void 0 ? _e : null,
+        paymentRail: (_f = party.paymentRail) !== null && _f !== void 0 ? _f : null,
+    };
+}
+function buildTransactionIntentData(request) {
+    var _a, _b, _c, _d, _e, _f, _g, _h;
+    if (!request) {
+        return null;
+    }
+    return {
+        source: buildTransferPartyData(request.source),
+        destination: buildTransferPartyData(request.destination),
+        fromAsset: (_a = request.fromAsset) !== null && _a !== void 0 ? _a : null,
+        toAsset: (_b = request.toAsset) !== null && _b !== void 0 ? _b : null,
+        fromAmount: (_c = request.fromAmount) !== null && _c !== void 0 ? _c : null,
+        fromChain: (_d = request.fromChain) !== null && _d !== void 0 ? _d : null,
+        fromPaymentRail: (_e = request.fromPaymentRail) !== null && _e !== void 0 ? _e : null,
+        toAmount: (_f = request.toAmount) !== null && _f !== void 0 ? _f : null,
+        toChain: (_g = request.toChain) !== null && _g !== void 0 ? _g : null,
+        toPaymentRail: (_h = request.toPaymentRail) !== null && _h !== void 0 ? _h : null,
+    };
+}
 class APIClient extends baseApiClient_1.BaseAPIClient {
     getAssetsData() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -30,12 +85,48 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             if (query) {
                 url += `&${query}`;
             }
-            return yield this.get(url);
+            return (yield this.get(url));
         });
     }
     getTransactionById(transactionId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.get(`/api/external/transactions/${transactionId}/`);
+        });
+    }
+    getChangeApprovalMessage(entityId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.get("/api/external/change_requests/approvals/approval_message/", { entityId });
+        });
+    }
+    submitChangeApprovalAction(approvalId_1, action_1, signatureHex_1) {
+        return __awaiter(this, arguments, void 0, function* (approvalId, action, signatureHex, reason = "ok") {
+            const data = {
+                action,
+                signature: signatureHex,
+            };
+            if (reason !== null) {
+                data.reason = reason;
+            }
+            return yield this.post(`/api/external/change_requests/approvals/${approvalId}/action/`, data);
+        });
+    }
+    approveChangeRequest(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const approvalMessage = yield this.getChangeApprovalMessage(request.entityId);
+            const signatureHex = yield this.signatureService.sign(approvalMessage.message);
+            return yield this.submitChangeApprovalAction(approvalMessage.approvalId, request.action, signatureHex, request.reason);
+        });
+    }
+    approvePendingTransactionChangeRequest(transaction) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (transaction.status !== types_1.TransactionStatus.PENDING) {
+                return transaction;
+            }
+            yield this.approveChangeRequest({
+                entityId: transaction.id,
+                action: types_1.ApprovalAction.APPROVE,
+            });
+            return yield this.getTransactionById(transaction.id);
         });
     }
     estimateFee(request) {
@@ -90,78 +181,36 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.post("/api/external/transactions/replace_transaction/", request);
         });
     }
-    getTradeQuote(request) {
+    getQuote(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            const params = {
-                vaultId: request.vaultId,
-                fromAsset: request.fromAsset,
-                toAsset: request.toAsset,
-                fromAmount: request.fromAmount,
-                blockChain: request.fromChain,
-                toBlockchain: request.toChain,
-                slippage: request.slippage,
-                expectedToAmount: request.expectedToAmount,
-                expiryInMinutes: request.expiryInMinutes,
-                category: request.category,
-                paymentMethod: request.paymentMethod,
-            };
-            return yield this.get("/api/external/transactions/trade_quote/", params);
+            const intent = buildTransactionIntentData(request.intent);
+            if (intent && request.intent.routeAccounts) {
+                intent.routeAccounts = request.intent.routeAccounts.map((routeAccount) => ({
+                    provider: routeAccount.provider,
+                    id: routeAccount.id,
+                }));
+            }
+            return yield this.post("/api/external/transactions/quote/", {
+                intent,
+            });
         });
     }
-    getRampQuote(request) {
+    createTransactionFromIntent(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            const params = {
-                source: request.source,
-                destination: request.destination,
-                fromAsset: request.fromAsset,
-                fromAmount: request.fromAmount,
-                fromChain: request.fromChain,
-                toAsset: request.toAsset,
-                toAmount: request.toAmount,
-                toChain: request.toChain,
-                category: request.category,
-                paymentMethod: request.paymentMethod,
-            };
-            return yield this.post("/api/external/transactions/quote/", params);
-        });
-    }
-    createTradeTransaction(request) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const data = {
-                vaultId: request.vaultId,
-                tradeRequestData: request.tradeRequestData,
-                tradeResponseData: request.tradeResponseData,
-                category: types_1.TransactionCategory.SWAP,
-                blockChain: request.tradeRequestData.blockChain,
-                externalId: request.externalId,
-                memo: request.memo,
-            };
-            return yield this.post("/api/external/transactions/", data);
-        });
-    }
-    createOnRampTransaction(request) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const data = {
-                destination: request.destination,
+            const transaction = (yield this.post("/api/external/transactions/intent/create/", {
+                intent: buildTransactionIntentData(request.intent),
                 quoteId: request.quoteId,
-                category: types_1.TransactionCategory.ON_RAMP,
                 externalId: request.externalId,
                 memo: request.memo,
-            };
-            return yield this.post("/api/external/transactions/", data);
+            }));
+            return yield this.approvePendingTransactionChangeRequest(transaction);
         });
     }
-    createOffRampTransaction(request) {
+    markDepositDone(transactionId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const data = {
-                source: request.source,
-                destination: request.destination,
-                quoteId: request.quoteId,
-                category: types_1.TransactionCategory.OFF_RAMP,
-                externalId: request.externalId,
-                memo: request.memo,
-            };
-            return yield this.post("/api/external/transactions/", data);
+            return yield this.post("/api/external/transactions/mark_deposit_done/", {
+                transactionId,
+            });
         });
     }
     getVaults() {
@@ -171,7 +220,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             if (query) {
                 url += `&${query}`;
             }
-            return yield this.get(url);
+            return (yield this.get(url));
         });
     }
     getVaultById(vaultId) {
@@ -189,9 +238,9 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.get(`/api/external/vaults/${vaultId}/balances/`);
         });
     }
-    getDetailedBalances(vaultId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.get(`/api/external/vaults/${vaultId}/detailed_balances/`);
+    getDetailedBalances(vaultId_1) {
+        return __awaiter(this, arguments, void 0, function* (vaultId, params = {}) {
+            return yield this.get(`/api/external/vaults/${vaultId}/detailed_balances/`, params);
         });
     }
     updateBalances(vaultId) {
@@ -221,7 +270,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             if (query) {
                 url += `&${query}`;
             }
-            return yield this.get(url);
+            return (yield this.get(url));
         });
     }
     getContactById(contactId) {
@@ -248,18 +297,6 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 assetList: request.assetList || [],
             };
             return yield this.put(`/api/external/contacts/${request.id}/`, data);
-        });
-    }
-    submitContactApprovalAction(entityId_1) {
-        return __awaiter(this, arguments, void 0, function* (entityId, action = types_1.ApprovalAction.APPROVE) {
-            const msgResponse = yield this.get("/api/external/change_requests/approvals/approval_message/", { entityId });
-            const signatureHex = yield this.signatureService.sign(msgResponse.message);
-            return yield this.post(`/api/external/change_requests/approvals/${msgResponse.approvalId}/action/`, {
-                entityId,
-                message: msgResponse.message,
-                signature: signatureHex,
-                action,
-            });
         });
     }
     delegateResource(request) {
@@ -301,7 +338,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             if (query) {
                 url += `&${query}`;
             }
-            return yield this.get(url);
+            return (yield this.get(url));
         });
     }
     getBankAccountById(bankAccountId) {
@@ -312,18 +349,6 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
     createBankAccount(request) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.post("/api/external/bank_accounts/", request);
-        });
-    }
-    submitBankAccountApprovalAction(entityId_1) {
-        return __awaiter(this, arguments, void 0, function* (entityId, action = types_1.ApprovalAction.APPROVE) {
-            const msgResponse = yield this.get("/api/external/change_requests/approvals/approval_message/", { entityId });
-            const signatureHex = yield this.signatureService.sign(msgResponse.message);
-            return yield this.post(`/api/external/change_requests/approvals/${msgResponse.approvalId}/action/`, {
-                entityId,
-                message: msgResponse.message,
-                signature: signatureHex,
-                action,
-            });
         });
     }
 }

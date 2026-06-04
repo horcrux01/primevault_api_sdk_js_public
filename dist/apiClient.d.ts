@@ -1,24 +1,26 @@
 import { BaseAPIClient } from "./baseApiClient";
-import { ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAccount, BankAccountListResponse, ChainData, Contact, CreateBankAccountRequest, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, RampQuoteRequest, RampQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, TransactionListResponse, Vault, DetailedBalanceResponse, CreateOnRampTransactionRequest, CreateOffRampTransactionRequest, DelegateResourceRequest, StakeResourceRequest, UpdateContactRequest, UpdateContactResponse, VaultListResponse, ContactListResponse } from "./types";
+import { ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAccount, BankAccountListResponse, ChainData, Contact, CreateBankAccountRequest, CreateContactRequest, CreateContractCallTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetApprovalRequest, GetApprovalMessageResponse, GetQuoteRequest, QuoteResponse, ReplaceTransactionRequest, Transaction, TransactionExecuteIntentRequest, TransactionListResponse, Vault, DetailedBalanceResponse, DelegateResourceRequest, StakeResourceRequest, UpdateContactRequest, UpdateContactResponse, VaultListResponse, ContactListResponse } from "./types";
 export declare class APIClient extends BaseAPIClient {
     getAssetsData(): Promise<Asset[]>;
     getSupportedChains(): Promise<ChainData[]>;
     getTransactions(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<TransactionListResponse>;
     getTransactionById(transactionId: string): Promise<Transaction>;
+    getChangeApprovalMessage(entityId: string): Promise<GetApprovalMessageResponse>;
+    submitChangeApprovalAction(approvalId: string, action: ApprovalAction | string, signatureHex: string, reason?: string | null): Promise<ApprovalActionResponse>;
+    approveChangeRequest(request: GetApprovalRequest): Promise<ApprovalActionResponse>;
+    private approvePendingTransactionChangeRequest;
     estimateFee(request: EstimateFeeRequest): Promise<EstimatedFeeResponse>;
     createTransferTransaction(request: CreateTransferTransactionRequest): Promise<Transaction>;
     createContractCallTransaction(request: CreateContractCallTransactionRequest): Promise<Transaction>;
     replaceTransaction(request: ReplaceTransactionRequest): Promise<any>;
-    getTradeQuote(request: TradeQuoteRequest): Promise<GetTradeQuoteResponse>;
-    getRampQuote(request: RampQuoteRequest): Promise<RampQuoteResponse>;
-    createTradeTransaction(request: CreateTradeTransactionRequest): Promise<Transaction>;
-    createOnRampTransaction(request: CreateOnRampTransactionRequest): Promise<Transaction>;
-    createOffRampTransaction(request: CreateOffRampTransactionRequest): Promise<Transaction>;
+    getQuote(request: GetQuoteRequest): Promise<QuoteResponse>;
+    createTransactionFromIntent(request: TransactionExecuteIntentRequest): Promise<Transaction>;
+    markDepositDone(transactionId: string): Promise<Transaction>;
     getVaults(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<VaultListResponse>;
     getVaultById(vaultId: string): Promise<Vault>;
     createVault(data: CreateVaultRequest): Promise<Vault>;
     getBalances(vaultId: string): Promise<BalanceResponse>;
-    getDetailedBalances(vaultId: string): Promise<DetailedBalanceResponse>;
+    getDetailedBalances(vaultId: string, params?: Record<string, string>): Promise<DetailedBalanceResponse>;
     updateBalances(vaultId: string): Promise<BalanceResponse>;
     getOperationMessageToSign(operationId: string): Promise<any>;
     updateUserAction(operationId: string, isApproved: boolean, signatureHex: string): Promise<any>;
@@ -26,12 +28,10 @@ export declare class APIClient extends BaseAPIClient {
     getContactById(contactId: string): Promise<Contact>;
     createContact(request: CreateContactRequest): Promise<Contact>;
     updateContact(request: UpdateContactRequest): Promise<UpdateContactResponse>;
-    submitContactApprovalAction(entityId: string, action?: ApprovalAction): Promise<ApprovalActionResponse>;
     delegateResource(request: DelegateResourceRequest): Promise<Transaction>;
     stakeResource(request: StakeResourceRequest): Promise<Transaction>;
     getBankAccounts(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<BankAccountListResponse>;
     getBankAccountById(bankAccountId: string): Promise<BankAccount>;
     createBankAccount(request: CreateBankAccountRequest): Promise<BankAccount>;
-    submitBankAccountApprovalAction(entityId: string, action?: ApprovalAction): Promise<ApprovalActionResponse>;
 }
 //# sourceMappingURL=apiClient.d.ts.map

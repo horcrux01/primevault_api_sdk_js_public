@@ -33,14 +33,24 @@ export interface BankDetails {
     currency?: string;
     country?: string;
 }
+export interface DepositInstructions {
+    type?: TransferPartyType | string;
+    currency?: string;
+    paymentRail?: string;
+    bankDetails?: BankDetails;
+    asset?: string;
+    address?: string;
+    chain?: string;
+}
 export interface TransferPartyData {
-    type: TransferPartyType;
+    type: TransferPartyType | string;
     id?: string;
-    value?: string;
     name?: string;
     address?: string;
-    exchange?: string;
-    bank?: BankDetails;
+    provider?: string;
+    bankDetails?: BankDetails;
+    chain?: string;
+    paymentRail?: string;
 }
 export declare enum VaultType {
     EXCHANGE = "EXCHANGE",
@@ -145,6 +155,12 @@ export declare enum TransactionFeeTier {
     MEDIUM = "MEDIUM",
     LOW = "LOW"
 }
+export declare enum TransactionOperationType {
+    DEPOSIT = "DEPOSIT",
+    TRADE = "TRADE",
+    TRANSFER = "TRANSFER",
+    WITHDRAW = "WITHDRAW"
+}
 export interface EVMOutput {
     returnData?: string;
 }
@@ -153,27 +169,96 @@ export interface ICPOutput {
     contentMap?: string;
 }
 export type TransactionOutput = EVMOutput | ICPOutput;
+export interface TransactionSourceData {
+    type?: TransferPartyType | string;
+    id?: string;
+    name?: string;
+    address?: string;
+    provider?: string;
+    bankDetails?: BankDetails;
+    chain?: string;
+    paymentRail?: string;
+}
+export interface TransactionOperationBalanceChange {
+    party: TransferPartyData | null;
+    asset: string;
+    amount: string;
+    chain?: string;
+    paymentRail?: string;
+}
+export interface TransactionOperationBalanceChanges {
+    changes: TransactionOperationBalanceChange[];
+}
+export interface TransactionOperation {
+    source: TransferPartyData | null;
+    destination: TransferPartyData | null;
+    balanceChanges: TransactionOperationBalanceChanges | null;
+    sequence: number;
+    type: TransactionOperationType | string;
+    provider?: string;
+}
+export interface Fees {
+    amount: string;
+    asset: string;
+}
+export interface QuoteResponseItem {
+    quoteId: string;
+    rate?: string;
+    fees?: Fees;
+    finalFromAmount?: string;
+    finalToAmount?: string;
+    sourceName?: string;
+}
+export interface QuoteResponse {
+    quotes: QuoteResponseItem[];
+}
+export interface RouteAccountData {
+    provider: string;
+    id: string;
+}
+export interface TransactionIntentRequest {
+    source?: TransferPartyData;
+    destination?: TransferPartyData;
+    routeAccounts?: RouteAccountData[];
+    fromAsset?: string;
+    fromAmount?: string;
+    fromChain?: string;
+    fromPaymentRail?: string;
+    toAsset?: string;
+    toAmount?: string;
+    toChain?: string;
+    toPaymentRail?: string;
+}
+export interface GetQuoteRequest {
+    intent: TransactionIntentRequest;
+}
+export interface TransactionExecuteIntentRequest {
+    intent?: TransactionIntentRequest | null;
+    quoteId?: string | null;
+    externalId?: string;
+    memo?: string;
+}
 export interface Transaction {
     id: string;
     orgId: string;
     vaultId: string;
-    asset: string;
-    amount: number;
-    blockChain: string;
-    status: TransactionStatus;
-    toAddress: string;
-    toAddressName: string;
-    txHash: string;
-    error: string;
-    toVaultId?: string;
-    externalId?: string;
-    transactionType: TransactionType;
-    category: TransactionCategory;
-    subCategory: TransactionSubCategory;
+    amount: string;
+    status: TransactionStatus | string;
+    transactionType: TransactionType | string;
+    category: TransactionCategory | string;
+    subCategory: TransactionSubCategory | string;
     createdAt: string;
     updatedAt: string;
     isDeleted: boolean;
-    createdById: string;
+    blockChain?: string;
+    toAddress?: string;
+    asset?: string;
+    toAddressName?: string;
+    txHash?: string;
+    error?: string;
+    toVaultId?: string;
+    externalId?: string;
+    createdById?: string;
     gasParams?: {
         finalGasFeeInUSD?: string;
         finalGasFeeInToken?: string;
@@ -187,10 +272,14 @@ export interface Transaction {
     output?: TransactionOutput;
     amountInUSD?: string;
     nonce?: number;
-    source?: TransferPartyData;
-    destination?: TransferPartyData;
-    rampRequestData?: RampQuoteRequest;
-    rampResponseData?: RampQuoteResponseItem;
+    dAppId?: string;
+    operationId?: string;
+    source?: TransactionSourceData;
+    destination?: TransactionSourceData;
+    intent?: TransactionIntentRequest;
+    quoteResponse?: QuoteResponseItem;
+    depositInstructions?: DepositInstructions;
+    operations?: TransactionOperation[];
 }
 export interface TransactionCreationGasParams {
     feeTier?: TransactionFeeTier;
@@ -252,29 +341,9 @@ export interface EstimateFeeRequest {
 }
 export interface CreateVaultRequest {
     vaultName: string;
-    templateId: string;
+    templateId?: string;
     chains?: string[];
     testNetVault?: boolean;
-}
-export interface TradeQuoteRequest {
-    vaultId: string;
-    fromAsset: string;
-    fromAmount: string;
-    toAsset: string;
-    category?: string;
-    paymentMethod?: string;
-    fromChain?: string;
-    toChain?: string;
-    slippage?: string;
-    expectedToAmount?: string;
-    expiryInMinutes?: number;
-}
-export interface CreateTradeTransactionRequest {
-    vaultId: string;
-    tradeRequestData: Record<string, any>;
-    tradeResponseData: Record<string, any>;
-    externalId?: string;
-    memo?: string;
 }
 export declare enum PaymentMethod {
     US_ACH = "US_ACH",
@@ -282,52 +351,6 @@ export declare enum PaymentMethod {
     SEPA = "SEPA",
     SWIFT = "SWIFT",
     BANK_TRANSFER = "BANK_TRANSFER"
-}
-export interface RampQuoteRequestBase {
-    source?: TransferPartyData;
-    destination?: TransferPartyData;
-    fromAsset: string;
-    fromChain?: string;
-    toAsset: string;
-    toChain?: string;
-    category: TransactionCategory.ON_RAMP | TransactionCategory.OFF_RAMP;
-    paymentMethod?: PaymentMethod;
-}
-export type RampQuoteRequest = RampQuoteRequestBase & ({
-    fromAmount: string;
-    toAmount?: string;
-} | {
-    fromAmount?: string;
-    toAmount: string;
-});
-export interface RampQuoteResponseItemBase {
-    quoteId: string;
-    fees: RampExchangeRateFees;
-    quoteResponseDict: Record<string, any>;
-    sourceName: string;
-}
-export type RampQuoteResponseItem = RampQuoteResponseItemBase & ({
-    finalToAmount: string;
-    finalFromAmount?: never;
-} | {
-    finalFromAmount: string;
-    finalToAmount?: never;
-});
-export interface RampQuoteResponse<TQuote extends RampQuoteResponseItem = RampQuoteResponseItem> {
-    quotes: TQuote[];
-}
-export interface CreateOnRampTransactionRequest {
-    destination: TransferPartyData;
-    quoteId: string;
-    externalId?: string;
-    memo?: string;
-}
-export interface CreateOffRampTransactionRequest {
-    source: TransferPartyData;
-    destination: TransferPartyData;
-    quoteId: string;
-    externalId?: string;
-    memo?: string;
 }
 export interface CreateContactRequest {
     name: string;
@@ -362,70 +385,6 @@ export interface EstimatedFeeResponse {
     medium: FeeData;
     low: FeeData;
 }
-export interface TradeQuoteFee {
-    amount?: string;
-    asset?: string;
-}
-export interface TradeQuoteResponseData {
-    finalToAmount: string;
-    quoteResponseDict?: string | Record<string, any>;
-    handler?: string;
-    sourceName?: string;
-    handlerCategory?: string;
-    unitToAssetAmount?: string;
-    approvedFinalToAmount?: string;
-    quotesValidTill?: string;
-    feeInUSD?: string;
-    finalToAmountUSD?: string;
-    stepsData?: any[];
-    sourceLogoURL?: string;
-    estCompletionTimeInSec?: number;
-    autoSlippage?: string;
-    minimumToAmount?: string;
-    fees?: TradeQuoteFee;
-    quoteId?: string;
-    fromAmount?: string;
-    paymentMethod?: string;
-}
-export interface TradeQuoteRequestData {
-    fromAsset: string;
-    fromAmount: string;
-    toAsset: string;
-    slippage?: string;
-    blockChain?: string;
-    toBlockchain?: string;
-    fromAmountUSD?: string;
-    destinationAddress?: string;
-    chainId?: string;
-    fromAssetLogoURL?: string;
-    toAssetLogoURL?: string;
-    expectedToAmountUSD?: string;
-    expiryInMinutes?: number;
-}
-export interface GetTradeQuoteResponse {
-    tradeRequestData: TradeQuoteRequestData;
-    tradeResponseDataList: TradeQuoteResponseData[];
-}
-export interface RampExchangeRatesRequest {
-    amount: string;
-    currency: string;
-    asset: string;
-    category: string;
-    blockChain: string;
-    vaultId: string;
-    paymentMethod?: string;
-}
-export interface RampExchangeRateFees {
-    amount: string;
-    asset: string;
-}
-export interface RampExchangeRateQuote {
-    quoteId: string;
-    convertedAmount: string;
-    fees: RampExchangeRateFees;
-    source: string;
-}
-export type RampExchangeRatesResponse = RampExchangeRateQuote[];
 export interface BalanceResponse {
     [key: string]: {
         [key: string]: string;
@@ -437,6 +396,8 @@ export interface DetailedBalance {
     name?: string;
     chain?: string;
     tokenAddress?: string;
+    balanceInUSD?: string;
+    price?: string;
 }
 export type DetailedBalanceResponse = DetailedBalance[];
 export declare enum ResourceType {
@@ -524,18 +485,24 @@ export interface CreateBankAccountRequest {
 }
 export declare enum ApprovalAction {
     APPROVE = "approve",
-    DECLINE = "decline"
+    REJECT = "reject",
+    DECLINE = "reject"
+}
+export interface GetApprovalRequest {
+    entityId: string;
+    action: ApprovalAction | string;
+    reason?: string | null;
 }
 export interface GetApprovalMessageResponse {
     approvalId: string;
-    changeRequestId: string;
-    entityId: string;
     message: string;
+    changeRequestId?: string;
+    entityId?: string;
 }
 export interface ApprovalActionResponse {
     success: boolean;
-    status: string;
-    id: string;
-    entityId: string;
+    status?: string;
+    id?: string;
+    entityId?: string;
 }
 //# sourceMappingURL=types.d.ts.map

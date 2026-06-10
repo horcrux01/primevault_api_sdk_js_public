@@ -590,3 +590,17 @@ export interface ApprovalActionResponse {
   id?: string;
   entityId?: string;
 }
+
+// ── Webhooks ───────────────────────────────────────────────────────────
+
+export interface WebhookEvent {
+  event:
+    | "TRANSACTION_STATUS_CHANGED"
+    | "TRANSACTION_OPERATION_STATUS_CHANGED";
+  version: "2.0.0";
+  eventId: string;
+  data: {
+    transaction?: Transaction;
+    transactionOperation?: TransactionOperation;
+  };
+}

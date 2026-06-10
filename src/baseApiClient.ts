@@ -1,7 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { AuthTokenService } from "./authTokenService";
 import { getSignatureService } from "./signatureService";
-import { sortObjectKeys } from "./utils";
 
 const SDK_VERSION = require("../package.json").version as string;
 
@@ -64,20 +63,11 @@ export class BaseAPIClient {
       Authorization: `Bearer ${api_token}`,
     };
 
-    let requestData = data;
-    if (data) {
-      requestData = { ...data };
-      const dataSignature = await this.signatureService.sign(
-        JSON.stringify(sortObjectKeys(data)),
-      );
-      requestData["dataSignatureHex"] = dataSignature.toString("hex");
-    }
-
     const axiosConfig: AxiosRequestConfig = {
       headers: requestHeaders,
     };
-    if (requestData && Object.keys(requestData).length > 0) {
-      axiosConfig.data = requestData;
+    if (data && Object.keys(data).length > 0) {
+      axiosConfig.data = data;
     }
     if (params && Object.keys(params).length > 0) {
       axiosConfig.params = params;

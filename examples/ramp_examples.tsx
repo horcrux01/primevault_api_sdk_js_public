@@ -34,7 +34,6 @@ const createFiatToCryptoTransaction = async (
   const selectedQuote = quoteResponse.quotes[0];
 
   const request: TransactionExecuteIntentRequest = {
-    intent,
     quoteId: selectedQuote.quoteId,
     externalId: "fiat-to-crypto-example-1",
     memo: "fiat to crypto example",
@@ -85,7 +84,6 @@ const createCryptoToFiatTransaction = async (
   const selectedQuote = quoteResponse.quotes[0];
 
   const cryptoToFiatTransaction = await apiClient.createTransactionFromIntent({
-    intent,
     quoteId: selectedQuote.quoteId,
     externalId: "crypto-to-fiat-example-1",
     memo: "crypto to fiat example",
@@ -121,7 +119,6 @@ const createFiatToFiatTransaction = async (
   const selectedQuote = quoteResponse.quotes[0];
 
   const fiatToFiatTransaction = await apiClient.createTransactionFromIntent({
-    intent,
     quoteId: selectedQuote.quoteId,
     externalId: "eur-to-usd-example-1",
     memo: "EUR to USD example",

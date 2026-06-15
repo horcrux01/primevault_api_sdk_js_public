@@ -19,6 +19,8 @@ export declare class APIClient extends BaseAPIClient {
     getVaults(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<VaultListResponse>;
     getVaultById(vaultId: string): Promise<Vault>;
     createVault(data: CreateVaultRequest): Promise<Vault>;
+    createVaultApproval(vault: Vault): Promise<Vault>;
+    createVaultWithApproval(request: CreateVaultRequest): Promise<Vault>;
     getBalances(vaultId: string): Promise<BalanceResponse>;
     getDetailedBalances(vaultId: string, params?: Record<string, string>): Promise<DetailedBalanceResponse>;
     updateBalances(vaultId: string): Promise<BalanceResponse>;
@@ -27,11 +29,16 @@ export declare class APIClient extends BaseAPIClient {
     getContacts(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<ContactListResponse>;
     getContactById(contactId: string): Promise<Contact>;
     createContact(request: CreateContactRequest): Promise<Contact>;
+    createContactApproval(contact: Contact | UpdateContactResponse): Promise<Contact>;
+    createContactWithApproval(request: CreateContactRequest): Promise<Contact>;
     updateContact(request: UpdateContactRequest): Promise<UpdateContactResponse>;
+    updateContactWithApproval(request: UpdateContactRequest): Promise<Contact>;
     delegateResource(request: DelegateResourceRequest): Promise<Transaction>;
     stakeResource(request: StakeResourceRequest): Promise<Transaction>;
     getBankAccounts(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<BankAccountListResponse>;
     getBankAccountById(bankAccountId: string): Promise<BankAccount>;
     createBankAccount(request: CreateBankAccountRequest): Promise<BankAccount>;
+    createBankAccountApproval(bankAccount: BankAccount): Promise<BankAccount>;
+    createBankAccountWithApproval(request: CreateBankAccountRequest): Promise<BankAccount>;
 }
 //# sourceMappingURL=apiClient.d.ts.map

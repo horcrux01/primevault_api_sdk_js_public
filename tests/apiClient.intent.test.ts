@@ -8,6 +8,7 @@ import {
   DepositInstructions,
   QuoteResponse,
   Transaction,
+  TransactionOperationStatus,
   TransactionOperationType,
   TransactionStatus,
   TransferPartyType,
@@ -360,6 +361,7 @@ describe("APIClient intent transactions", () => {
           },
           sequence: 1,
           type: TransactionOperationType.WITHDRAW,
+          status: TransactionOperationStatus.COMPLETED,
           provider: "Example Provider",
         },
       ],
@@ -367,6 +369,7 @@ describe("APIClient intent transactions", () => {
 
     const operation = transaction.operations?.[0];
     expect(operation?.type).toBe(TransactionOperationType.WITHDRAW);
+    expect(operation?.status).toBe(TransactionOperationStatus.COMPLETED);
     expect(operation?.source?.chain).toBe("ETHEREUM");
     expect(operation?.source?.paymentRail).toBe("BLOCKCHAIN");
     expect(operation?.destination?.paymentRail).toBe("WIRE");

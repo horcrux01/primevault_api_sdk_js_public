@@ -68,7 +68,7 @@ export interface Vault {
         address?: string;
         publicKey?: string;
     }[];
-    signers: {
+    signers?: {
         id: string;
         firstName: string;
         lastName: string;
@@ -161,6 +161,15 @@ export declare enum TransactionOperationType {
     TRANSFER = "TRANSFER",
     WITHDRAW = "WITHDRAW"
 }
+export declare enum TransactionOperationStatus {
+    PENDING = "PENDING",
+    PROCESSING = "PROCESSING",
+    COMPLETED = "COMPLETED",
+    FAILED = "FAILED",
+    SKIPPED = "SKIPPED",
+    CANCELLED = "CANCELLED",
+    REVERSED = "REVERSED"
+}
 export interface EVMOutput {
     returnData?: string;
 }
@@ -195,6 +204,7 @@ export interface TransactionOperation {
     balanceChanges: TransactionOperationBalanceChanges | null;
     sequence: number;
     type: TransactionOperationType | string;
+    status: TransactionOperationStatus | string;
     provider?: string;
 }
 export interface Fees {
@@ -344,6 +354,7 @@ export interface CreateVaultRequest {
     templateId?: string;
     chains?: string[];
     testNetVault?: boolean;
+    vaultGroupIds?: string[];
 }
 export declare enum PaymentMethod {
     US_ACH = "US_ACH",
@@ -359,10 +370,12 @@ export interface CreateContactRequest {
     tags?: string[];
     externalId?: string;
     assetList?: string[];
+    contactGroupIds?: string[];
 }
 export interface UpdateContactRequest {
     id: string;
     assetList?: string[];
+    contactGroupIds?: string[];
 }
 export interface UpdateContactResponse {
     id: string;

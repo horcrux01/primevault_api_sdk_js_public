@@ -55,7 +55,7 @@ describe("APIClient", () => {
     expect(vaults[0].wallets).toBeDefined();
     expect(vaults[0].wallets.length).toBe(8);
     expect(vaults[0].signers).toBeDefined();
-    expect(vaults[0].signers.length).toBe(9);
+    expect(vaults[0].signers!.length).toBe(9);
     expect(vaults[0].viewers.length).toBe(0);
 
     const blockchains = vaults[0].wallets

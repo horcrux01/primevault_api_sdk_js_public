@@ -303,6 +303,19 @@ export class APIClient extends BaseAPIClient {
     return await this.post("/api/external/vaults/", data);
   }
 
+  async createVaultApproval(vault: Vault): Promise<Vault> {
+    await this.approveChangeRequest({
+      entityId: vault.id,
+      action: ApprovalAction.APPROVE,
+    });
+    return await this.getVaultById(vault.id);
+  }
+
+  async createVaultWithApproval(request: CreateVaultRequest): Promise<Vault> {
+    const vault = await this.createVault(request);
+    return await this.createVaultApproval(vault);
+  }
+
   async getBalances(vaultId: string): Promise<BalanceResponse> {
     return await this.get(`/api/external/vaults/${vaultId}/balances/`);
   }
@@ -368,8 +381,26 @@ export class APIClient extends BaseAPIClient {
       tags: request.tags,
       externalId: request.externalId,
       assetList: request.assetList || [],
+      contactGroupIds: request.contactGroupIds,
     };
     return await this.post("/api/external/contacts/", data);
+  }
+
+  async createContactApproval(
+    contact: Contact | UpdateContactResponse,
+  ): Promise<Contact> {
+    await this.approveChangeRequest({
+      entityId: contact.id,
+      action: ApprovalAction.APPROVE,
+    });
+    return await this.getContactById(contact.id);
+  }
+
+  async createContactWithApproval(
+    request: CreateContactRequest,
+  ): Promise<Contact> {
+    const contact = await this.createContact(request);
+    return await this.createContactApproval(contact);
   }
 
   async updateContact(
@@ -377,8 +408,16 @@ export class APIClient extends BaseAPIClient {
   ): Promise<UpdateContactResponse> {
     const data = {
       assetList: request.assetList || [],
+      contactGroupIds: request.contactGroupIds,
     };
     return await this.put(`/api/external/contacts/${request.id}/`, data);
+  }
+
+  async updateContactWithApproval(
+    request: UpdateContactRequest,
+  ): Promise<Contact> {
+    const updated = await this.updateContact(request);
+    return await this.createContactApproval(updated);
   }
 
   async delegateResource(
@@ -435,5 +474,22 @@ export class APIClient extends BaseAPIClient {
     request: CreateBankAccountRequest,
   ): Promise<BankAccount> {
     return await this.post("/api/external/bank_accounts/", request);
+  }
+
+  async createBankAccountApproval(
+    bankAccount: BankAccount,
+  ): Promise<BankAccount> {
+    await this.approveChangeRequest({
+      entityId: bankAccount.id,
+      action: ApprovalAction.APPROVE,
+    });
+    return await this.getBankAccountById(bankAccount.id);
+  }
+
+  async createBankAccountWithApproval(
+    request: CreateBankAccountRequest,
+  ): Promise<BankAccount> {
+    const bankAccount = await this.createBankAccount(request);
+    return await this.createBankAccountApproval(bankAccount);
   }
 }

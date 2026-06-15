@@ -16,6 +16,7 @@ exports.UnknownError = exports.GatewayTimeoutError = exports.ServiceUnavailableE
 const axios_1 = __importDefault(require("axios"));
 const authTokenService_1 = require("./authTokenService");
 const signatureService_1 = require("./signatureService");
+const utils_1 = require("./utils");
 const SDK_VERSION = require("../package.json").version;
 class BaseAPIClient {
     constructor(apiKey, apiUrl, privateKeyHex, keyId) {
@@ -51,11 +52,17 @@ class BaseAPIClient {
             const full_url = `${this.apiUrl}${urlPath || ""}`;
             const api_token = yield this.authTokenService.generateAuthToken(urlPath || "", data);
             const requestHeaders = Object.assign(Object.assign({}, this.headers), { Authorization: `Bearer ${api_token}` });
+            let requestData = data;
+            if (data) {
+                requestData = Object.assign({}, data);
+                const dataSignature = yield this.signatureService.sign(JSON.stringify((0, utils_1.sortObjectKeys)(data)));
+                requestData["dataSignatureHex"] = dataSignature.toString("hex");
+            }
             const axiosConfig = {
                 headers: requestHeaders,
             };
-            if (data && Object.keys(data).length > 0) {
-                axiosConfig.data = data;
+            if (requestData && Object.keys(requestData).length > 0) {
+                axiosConfig.data = requestData;
             }
             if (params && Object.keys(params).length > 0) {
                 axiosConfig.params = params;

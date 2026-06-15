@@ -4,17 +4,13 @@ import type { BankAccount, BankAccountListResponse, CreateBankAccountRequest } f
 /**
  * Example: Create a bank account and approve it.
  *
- * Flow:
- *  1. Create a bank account with flat top-level fields.
- *  2. List bank accounts to verify creation.
- *  3. Fetch the created bank account by ID.
- *  4. Approve the pending bank account change request.
- *  5. Verify the bank account status after approval.
+ * `createBankAccountWithApproval` creates the bank account and approves the
+ * pending change request, so the returned bank account is already approved. Use
+ * `createBankAccount` / `createBankAccountApproval` to run the steps separately.
  */
 const createAndApproveBankAccount = async (
   apiClient: APIClient,
 ): Promise<BankAccount> => {
-  // Step 1: Create a bank account
   const request: CreateBankAccountRequest = {
     accountNumber: "123456789",
     accountName: "Treasury Account",
@@ -29,39 +25,23 @@ const createAndApproveBankAccount = async (
     country: "US",
   };
 
-  const bankAccount = await apiClient.createBankAccount(request);
+  const bankAccount = await apiClient.createBankAccountWithApproval(request);
 
   // The response contains all fields at the top level:
   //
   //   bankAccount.id
-  //   bankAccount.status          // "PENDING"
+  //   bankAccount.status          // "APPROVED"
   //   bankAccount.accountName     // "Treasury Account"
   //   bankAccount.accountNumber   // "123456789"
   //   bankAccount.routingNumber   // "021000021"
   //   bankAccount.bankName        // "Chase"
   //   bankAccount.currency        // "USD"
   //   bankAccount.city            // "New York"
+  console.log(
+    `Created and approved: ${bankAccount.id} status=${bankAccount.status}`,
+  );
 
-  // Step 2: List bank accounts (optionally filter by status)
-  const listResponse: BankAccountListResponse = await apiClient.getBankAccounts({ status: "PENDING" }, 20);
-
-  for (const account of listResponse.results) {
-    console.log(`  ${account.id} — ${account.accountName} (${account.status})`);
-  }
-
-  // Step 3: Fetch by ID
-  const fetched = await apiClient.getBankAccountById(bankAccount.id);
-
-  // Step 4: Approve the pending change request
-  const approval = await apiClient.approveChangeRequest({
-    entityId: bankAccount.id,
-    action: ApprovalAction.APPROVE,
-  });
-
-  // Step 5: Verify status after approval
-  const verified = await apiClient.getBankAccountById(bankAccount.id);
-
-  return verified;
+  return bankAccount;
 };
 
 /**

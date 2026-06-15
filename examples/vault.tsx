@@ -4,14 +4,17 @@ import {BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError, TooMa
 const createVault = async (apiClient: APIClient) => {
     const data = {
         "vaultName": "Ethereum Vault",                      // Vault name, should be unique
-        "templateId": "b188813e-3137-4b91-8534-f494cb198b8a", // Template to use for this vault
+        "vaultGroupIds": [],                                // Optional: vault group IDs from the UI
         "chains": ["ETHEREUM", "SOLANA"]
     }
     // set "testNetVault": true for creating testnet vaults for testnet supported chains
 
+    // `createVaultWithApproval` creates the vault and approves the pending change
+    // request, then the vault begins generating addresses. Use `createVault` /
+    // `createVaultApproval` if you need the two steps separately.
     let vaultResponse: Vault | null = null;
     try {
-        vaultResponse = await apiClient.createVault(data);
+        vaultResponse = await apiClient.createVaultWithApproval(data);
     } catch (error: any) {
         if (error instanceof BadRequestError) {
             console.error("Invalid vault creation request:", error.message, error.errorCode, error.status);

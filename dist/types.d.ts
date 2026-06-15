@@ -161,6 +161,15 @@ export declare enum TransactionOperationType {
     TRANSFER = "TRANSFER",
     WITHDRAW = "WITHDRAW"
 }
+export declare enum TransactionOperationStatus {
+    PENDING = "PENDING",
+    PROCESSING = "PROCESSING",
+    COMPLETED = "COMPLETED",
+    FAILED = "FAILED",
+    SKIPPED = "SKIPPED",
+    CANCELLED = "CANCELLED",
+    REVERSED = "REVERSED"
+}
 export interface EVMOutput {
     returnData?: string;
 }
@@ -195,6 +204,7 @@ export interface TransactionOperation {
     balanceChanges: TransactionOperationBalanceChanges | null;
     sequence: number;
     type: TransactionOperationType | string;
+    status: TransactionOperationStatus | string;
     provider?: string;
 }
 export interface Fees {
@@ -504,14 +514,5 @@ export interface ApprovalActionResponse {
     status?: string;
     id?: string;
     entityId?: string;
-}
-export interface WebhookEvent {
-    event: "TRANSACTION_STATUS_CHANGED" | "TRANSACTION_OPERATION_STATUS_CHANGED";
-    version: "2.0.0";
-    eventId: string;
-    data: {
-        transaction?: Transaction;
-        transactionOperation?: TransactionOperation;
-    };
 }
 //# sourceMappingURL=types.d.ts.map

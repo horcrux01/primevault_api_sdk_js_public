@@ -233,6 +233,21 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.post("/api/external/vaults/", data);
         });
     }
+    createVaultApproval(vault) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.approveChangeRequest({
+                entityId: vault.id,
+                action: types_1.ApprovalAction.APPROVE,
+            });
+            return yield this.getVaultById(vault.id);
+        });
+    }
+    createVaultWithApproval(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const vault = yield this.createVault(request);
+            return yield this.createVaultApproval(vault);
+        });
+    }
     getBalances(vaultId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.get(`/api/external/vaults/${vaultId}/balances/`);
@@ -287,16 +302,39 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 tags: request.tags,
                 externalId: request.externalId,
                 assetList: request.assetList || [],
+                contactGroupIds: request.contactGroupIds,
             };
             return yield this.post("/api/external/contacts/", data);
+        });
+    }
+    createContactApproval(contact) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.approveChangeRequest({
+                entityId: contact.id,
+                action: types_1.ApprovalAction.APPROVE,
+            });
+            return yield this.getContactById(contact.id);
+        });
+    }
+    createContactWithApproval(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contact = yield this.createContact(request);
+            return yield this.createContactApproval(contact);
         });
     }
     updateContact(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
                 assetList: request.assetList || [],
+                contactGroupIds: request.contactGroupIds,
             };
             return yield this.put(`/api/external/contacts/${request.id}/`, data);
+        });
+    }
+    updateContactWithApproval(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const updated = yield this.updateContact(request);
+            return yield this.createContactApproval(updated);
         });
     }
     delegateResource(request) {
@@ -349,6 +387,21 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
     createBankAccount(request) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.post("/api/external/bank_accounts/", request);
+        });
+    }
+    createBankAccountApproval(bankAccount) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.approveChangeRequest({
+                entityId: bankAccount.id,
+                action: types_1.ApprovalAction.APPROVE,
+            });
+            return yield this.getBankAccountById(bankAccount.id);
+        });
+    }
+    createBankAccountWithApproval(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const bankAccount = yield this.createBankAccount(request);
+            return yield this.createBankAccountApproval(bankAccount);
         });
     }
 }

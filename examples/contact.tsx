@@ -1,40 +1,27 @@
 import { APIClient, ApprovalAction } from "../src";
-import type { Contact, ContactListResponse, UpdateContactResponse } from "../src";
+import type { Contact, ContactListResponse } from "../src";
 
 /**
  * Example: Create a contact with an asset whitelist and approve it.
  *
- * Flow:
- *  1. Create a contact on a given chain with a restricted assetList.
- *  2. Approve the pending contact change request.
- *  3. Verify the contact status after approval.
+ * `createContactWithApproval` creates the contact and approves the pending
+ * contact change request, so the returned contact is already approved. Use
+ * `createContact` / `createContactApproval` to run the steps separately.
  */
 const createAndApproveContact = async (
   apiClient: APIClient,
 ): Promise<Contact> => {
-  // Step 1: Create a contact with an asset whitelist
-  const contact = await apiClient.createContact({
+  const contact = await apiClient.createContactWithApproval({
     name: "Base USDT/USDC Contact",
     address: "0xCa1Dc85B6a8F4Ee45C5C66D887d512355b7D0609",
     chain: "BASE",
     assetList: ["USDT", "USDC"],
+    contactGroupIds: [], // Optional: contact group IDs from the UI
   });
 
-  console.log(`Contact created: ${contact.id} (${contact.status})`);
+  console.log(`Contact created and approved: ${contact.id} (${contact.status})`);
 
-  // Step 2: Approve the contact using its ID as the entityId
-  const approval = await apiClient.approveChangeRequest({
-    entityId: contact.id,
-    action: ApprovalAction.APPROVE,
-  });
-
-  console.log(`Approval result: ${JSON.stringify(approval)}`);
-
-  // Step 3: Fetch the contact again to verify it's approved
-  const verified = await apiClient.getContactById(contact.id);
-  console.log(`Contact status after approval: ${verified.status}`);
-
-  return verified;
+  return contact;
 };
 
 /**
@@ -51,26 +38,24 @@ const declineContactExample = async (
 };
 
 /**
- * Example: Update a contact's asset whitelist.
+ * Example: Update a contact's asset whitelist and approve the change.
  *
- * Adds or replaces the list of assets the contact is allowed to receive.
+ * `updateContactWithApproval` updates the contact and approves the pending
+ * change request. Use `updateContact` if you want to approve separately.
  */
 const updateContactAssetList = async (
   apiClient: APIClient,
   contactId: string,
   assetList: string[],
-): Promise<UpdateContactResponse> => {
-  const updated = await apiClient.updateContact({
+): Promise<Contact> => {
+  const updated = await apiClient.updateContactWithApproval({
     id: contactId,
     assetList,
   });
 
-  console.log(`Contact ${updated.id} asset list updated to: ${updated.assetList}`);
-  const approval = await apiClient.approveChangeRequest({
-    entityId: updated.id,
-    action: ApprovalAction.APPROVE,
-  });
-  console.log(`Update approval result: ${JSON.stringify(approval)}`);
+  console.log(
+    `Contact ${updated.id} asset list updated and approved: ${updated.assetList}`,
+  );
 
   return updated;
 };

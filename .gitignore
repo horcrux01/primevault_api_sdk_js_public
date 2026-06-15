@@ -7,4 +7,3 @@ npm-debug.log
 .env.local
 .idea/workspace.xml
 .env.test
-local_files/

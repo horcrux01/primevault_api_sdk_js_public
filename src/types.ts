@@ -177,6 +177,16 @@ export enum TransactionOperationType {
   WITHDRAW = "WITHDRAW",
 }
 
+export enum TransactionOperationStatus {
+  PENDING = "PENDING",
+  PROCESSING = "PROCESSING",
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
+  SKIPPED = "SKIPPED",
+  CANCELLED = "CANCELLED",
+  REVERSED = "REVERSED",
+}
+
 export interface EVMOutput {
   returnData?: string;
 }
@@ -217,12 +227,14 @@ export interface TransactionOperation {
   balanceChanges: TransactionOperationBalanceChanges | null;
   sequence: number;
   type: TransactionOperationType | string;
+  status: TransactionOperationStatus | string;
   provider?: string;
 }
 
 export interface Fees {
   amount: string;
   asset: string;
+  amountInFiat?: string;
 }
 
 export interface QuoteResponseItem {
@@ -272,7 +284,6 @@ export interface Transaction {
   id: string;
   orgId: string;
   vaultId: string;
-  amount: string;
   status: TransactionStatus | string;
   transactionType: TransactionType | string;
   category: TransactionCategory | string;
@@ -280,36 +291,31 @@ export interface Transaction {
   createdAt: string;
   updatedAt: string;
   isDeleted: boolean;
-  blockChain?: string;
-  toAddress?: string;
-  asset?: string;
-  toAddressName?: string;
   txHash?: string;
   error?: string;
-  toVaultId?: string; // if the transaction is a transfer from one vault to another
   externalId?: string; // set by the external system
   createdById?: string;
-  gasParams?: {
-    finalGasFeeInUSD?: string;
-    finalGasFeeInToken?: string;
-    gasFeeToken?: string;
-    expectedGasFeeInToken?: string;
-  };
+  fees?: Fees;
   memo?: string;
-  sourceAddress?: string;
   txnSignature?: string; // Hex encoded signature of the transaction
   txnSignatureData?: Record<string, any>; // Signature data
   output?: TransactionOutput;
   amountInUSD?: string;
   nonce?: number;
   dAppId?: string;
-  operationId?: string;
   source?: TransactionSourceData;
   destination?: TransactionSourceData;
   intent?: TransactionIntentRequest;
   quoteResponse?: QuoteResponseItem;
   depositInstructions?: DepositInstructions;
   operations?: TransactionOperation[];
+  blockChain?: string;  
+  toAddress?: string; // deprecated, use destination.address instead
+  asset?: string;  
+  toAddressName?: string;  // deprecated, use destination.name instead
+  toVaultId?: string;  // deprecated, use destination.id instead
+  amount: string;
+  sourceAddress?: string; // deprecated, use source.address instead
 }
 
 export interface TransactionCreationGasParams {

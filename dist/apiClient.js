@@ -13,7 +13,7 @@ exports.APIClient = void 0;
 const baseApiClient_1 = require("./baseApiClient");
 const types_1 = require("./types");
 function buildBankDetailsData(bank) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
     if (!bank) {
         return null;
     }
@@ -29,8 +29,7 @@ function buildBankDetailsData(bank) {
         swiftCode: (_j = bank.swiftCode) !== null && _j !== void 0 ? _j : null,
         swiftBic: (_k = bank.swiftBic) !== null && _k !== void 0 ? _k : null,
         iban: (_l = bank.iban) !== null && _l !== void 0 ? _l : null,
-        currency: (_m = bank.currency) !== null && _m !== void 0 ? _m : null,
-        country: (_o = bank.country) !== null && _o !== void 0 ? _o : null,
+        country: (_m = bank.country) !== null && _m !== void 0 ? _m : null,
     };
 }
 function buildTransferPartyData(party) {

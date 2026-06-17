@@ -33,13 +33,11 @@ export interface BankDetails {
   swiftCode?: string;
   swiftBic?: string;
   iban?: string;
-  currency?: string;
   country?: string;
 }
 
 export interface DepositInstructions {
   type?: TransferPartyType | string;
-  currency?: string;
   paymentRail?: string;
   bankDetails?: BankDetails;
   asset?: string;
@@ -321,6 +319,7 @@ export interface Transaction {
   quoteResponse?: QuoteResponseItem;
   depositInstructions?: DepositInstructions;
   operations?: TransactionOperation[];
+  balanceChanges?: TransactionOperationBalanceChanges | null;
 }
 
 export interface TransactionCreationGasParams {
@@ -530,7 +529,6 @@ export interface BankAccount {
   clientBankAccountId?: string;
   paymentMethod?: string;
   bankName?: string;
-  currency?: string;
   streetLine?: string;
   city?: string;
   state?: string;
@@ -569,7 +567,6 @@ export interface CreateBankAccountRequest {
   clientBankAccountId?: string;
   paymentMethod?: string;
   bankName?: string;
-  currency?: string;
   streetLine?: string;
   city?: string;
   state?: string;

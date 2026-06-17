@@ -17,7 +17,6 @@ const createAndApproveBankAccount = async (
     routingNumber: "021000021",
     paymentMethod: "ACH",
     bankName: "Chase",
-    currency: "USD",
     streetLine: "123 Main St",
     city: "New York",
     state: "NY",
@@ -35,7 +34,6 @@ const createAndApproveBankAccount = async (
   //   bankAccount.accountNumber   // "123456789"
   //   bankAccount.routingNumber   // "021000021"
   //   bankAccount.bankName        // "Chase"
-  //   bankAccount.currency        // "USD"
   //   bankAccount.city            // "New York"
   console.log(
     `Created and approved: ${bankAccount.id} status=${bankAccount.status}`,

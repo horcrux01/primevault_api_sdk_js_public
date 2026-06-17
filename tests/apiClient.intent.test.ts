@@ -5,6 +5,10 @@ jest.mock("uuid", () => ({
 import { APIClient } from "../src/apiClient";
 import {
   ApprovalAction,
+  BankAccount,
+  BankAccountStatus,
+  BankDetails,
+  CreateBankAccountRequest,
   DepositInstructions,
   QuoteResponse,
   Transaction,
@@ -330,6 +334,22 @@ describe("APIClient intent transactions", () => {
       createdAt: "2026-05-25T00:00:00Z",
       updatedAt: "2026-05-25T00:00:00Z",
       isDeleted: false,
+      balanceChanges: {
+        changes: [
+          {
+            party: {
+              type: TransferPartyType.VAULT,
+              id: "vault-id",
+              chain: "ETHEREUM",
+              paymentRail: "BLOCKCHAIN",
+            },
+            asset: "USDC",
+            amount: "-100",
+            chain: "ETHEREUM",
+            paymentRail: "BLOCKCHAIN",
+          },
+        ],
+      },
       operations: [
         {
           source: {
@@ -373,19 +393,88 @@ describe("APIClient intent transactions", () => {
     expect(operation?.source?.chain).toBe("ETHEREUM");
     expect(operation?.source?.paymentRail).toBe("BLOCKCHAIN");
     expect(operation?.destination?.paymentRail).toBe("WIRE");
+    expect(transaction.balanceChanges?.changes[0].asset).toBe("USDC");
+    expect(transaction.balanceChanges?.changes[0].amount).toBe("-100");
     expect(operation?.balanceChanges?.changes[0].asset).toBe("USDC");
     expect(operation?.balanceChanges?.changes[0].amount).toBe("-100");
   });
 
-  test("deposit instructions type uses chain", () => {
+  test("bank API types use asset fields instead of currency", () => {
     const depositInstructions = {
       type: TransferPartyType.EXTERNAL_ADDRESS,
       asset: "USDC",
       address: "0x123",
       chain: "ETHEREUM",
+      bankDetails: {
+        bankName: "Example Bank",
+      },
     } satisfies DepositInstructions;
 
     expect(depositInstructions.chain).toBe("ETHEREUM");
+    expect(depositInstructions.bankDetails?.bankName).toBe("Example Bank");
+
+    const bankDetails = {
+      bankName: "Example Bank",
+      accountNumber: "123456789",
+    } satisfies BankDetails;
+    expect(bankDetails.bankName).toBe("Example Bank");
+
+    const bankAccount = {
+      id: "bank-account-id",
+      orgId: "org-id",
+      orgEntityId: "org-entity-id",
+      createdAt: "2026-05-25T00:00:00Z",
+      updatedAt: "2026-05-25T00:00:00Z",
+      isDeleted: false,
+      status: BankAccountStatus.APPROVED,
+      bankName: "Example Bank",
+    } satisfies BankAccount;
+    expect(bankAccount.bankName).toBe("Example Bank");
+
+    const createBankAccountRequest = {
+      bankName: "Example Bank",
+      accountNumber: "123456789",
+    } satisfies CreateBankAccountRequest;
+    expect(createBankAccountRequest.accountNumber).toBe("123456789");
+
+    const topLevelCurrency = {
+      // @ts-expect-error DepositInstructions intentionally omits currency.
+      currency: "USD",
+    } satisfies DepositInstructions;
+    expect(topLevelCurrency.currency).toBe("USD");
+
+    const nestedCurrency = {
+      bankDetails: {
+        // @ts-expect-error BankDetails intentionally omits currency.
+        currency: "USD",
+      },
+    } satisfies DepositInstructions;
+    expect(nestedCurrency.bankDetails.currency).toBe("USD");
+
+    const bankDetailsCurrency = {
+      // @ts-expect-error BankDetails intentionally omits currency.
+      currency: "USD",
+    } satisfies BankDetails;
+    expect(bankDetailsCurrency.currency).toBe("USD");
+
+    const bankAccountCurrency = {
+      id: "bank-account-id",
+      orgId: "org-id",
+      orgEntityId: "org-entity-id",
+      createdAt: "2026-05-25T00:00:00Z",
+      updatedAt: "2026-05-25T00:00:00Z",
+      isDeleted: false,
+      status: BankAccountStatus.APPROVED,
+      // @ts-expect-error BankAccount intentionally omits currency.
+      currency: "USD",
+    } satisfies BankAccount;
+    expect(bankAccountCurrency.currency).toBe("USD");
+
+    const createBankAccountCurrency = {
+      // @ts-expect-error CreateBankAccountRequest intentionally omits currency.
+      currency: "USD",
+    } satisfies CreateBankAccountRequest;
+    expect(createBankAccountCurrency.currency).toBe("USD");
   });
 
 });

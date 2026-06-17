@@ -57,7 +57,6 @@ function buildBankDetailsData(
     swiftCode: bank.swiftCode ?? null,
     swiftBic: bank.swiftBic ?? null,
     iban: bank.iban ?? null,
-    currency: bank.currency ?? null,
     country: bank.country ?? null,
   };
 }

@@ -4,20 +4,6 @@ This guide explains how the SDK surfaces API errors, the error codes returned wh
 transaction (`createTransferTransaction`, `createSwapTransaction`, ramp/FX, contract-call, etc.),
 and whether a failed request is safe to retry.
 
-> **The two questions that matter most**
->
-> 1. **A `400 Bad Request` is safe to retry and cannot cause a double payment.** Every `400` on the
->    create path is raised during _validation_ — before the transaction is persisted and before
->    anything is signed or broadcast on-chain. No funds move on a `400`.
-> 2. **The double-payment risk is not the `400` — it is an _ambiguous_ outcome** (network timeout,
->    dropped connection, `5xx`). A single create call can create → auto-approve → broadcast on-chain
->    before the response returns.
-> 3. **On any failure, retry the same intent with the same `externalId`.** The per-org uniqueness
->    constraint on `externalId` guarantees at most one payment: the retry either creates the
->    transaction (if the first attempt never landed) or is safely rejected as a duplicate
->    (`A record with the same information already exists`). Never retry the same intent with a new
->    `externalId`, and never resend without one.
-
 ## Reading an error
 
 Every non-2xx response is thrown as a typed subclass of `BaseAPIException`

@@ -67,21 +67,9 @@ Codes `4011`–`4013` were recently introduced and previously came through as th
 | `4012`      | `CHAIN_NOT_ENABLED`        | Chain not enabled for the org                                 | `<chain> transactions are not enabled at this time`                               | Yes — after org config change              |
 | `4013`      | `INVALID_TXN_PARAMS`       | Invalid category / unsupported gas param / missing `blockChain` | `Invalid transaction category, should be TRANSFER, SWAP, RAMP, FX or CONTRACT_CALL` | Yes — fix request parameters             |
 
-### Codes without a specific value (match on `message`)
-
-Some validation failures still come through with the generic `errorCode` `"400"` — or `undefined`
-for the duplicate-`externalId` case — so branch on `error.message` for these:
-
-| `errorCode`  | `message` (example)                                    | Meaning                              | Safe to retry?                            |
-| ------------ | ------------------------------------------------------ | ------------------------------------ | ----------------------------------------- |
-| `undefined`  | `A record with the same information already exists`    | Duplicate `externalId` (same org)    | **No** — already created; look it up      |
-| `"400"`      | `quoteId has already been used`                        | Quote reuse (RAMP/FX/TRADE)          | **No** — reconcile with existing txn      |
-| `"400"`      | `Invalid or expired quoteId`                           | Quote expired                        | Yes — re-quote                            |
-| `"400"`      | `source id is required for transfer`                   | Bad/missing source                   | Yes — fix payload                         |
-| `"400"`      | `Contact is required` / `<field> is required`          | Missing required field               | Yes — fix payload                         |
-| `"400"` (`TxnKnownError`) | `Trade on <exchange> failed` / `Withdrawal from <exchange> failed…` | Exchange/provider rejected _after_ the row was created (SWAP/RAMP/FX/CONTRACT_CALL) | **Caution** — a row may exist and funds may have moved; reconcile |
-
-> **Note:** Permission failures are `403` (`ForbiddenError`), not `400`.
+> **Note:** Validation failures that don't map to one of the codes above come through with the
+> generic `errorCode` `"400"` (or `undefined` for the duplicate-`externalId` case), so fall back to
+> `error.message` for those. Permission failures are `403` (`ForbiddenError`), not `400`.
 
 ## Retry & double-payment guidance
 

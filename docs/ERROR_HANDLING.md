@@ -11,31 +11,18 @@ and whether a failed request is safe to retry.
 >    anything is signed or broadcast on-chain. No funds move on a `400`.
 > 2. **The double-payment risk is not the `400` — it is an _ambiguous_ outcome** (network timeout,
 >    dropped connection, `5xx`). A single create call can create → auto-approve → broadcast on-chain
->    before the response returns. On any ambiguous failure, look the transaction up by `externalId`
->    before resending.
+>    before the response returns.
+> 3. **On any failure, retry the same intent with the same `externalId`.** The per-org uniqueness
+>    constraint on `externalId` guarantees at most one payment: the retry either creates the
+>    transaction (if the first attempt never landed) or is safely rejected as a duplicate
+>    (`A record with the same information already exists`). Never retry the same intent with a new
+>    `externalId`, and never resend without one.
 
-## How the SDK throws errors
+## Reading an error
 
-Every non-2xx response is thrown as a typed subclass of `BaseAPIException`:
-
-| HTTP status | Error class            |
-| ----------- | ---------------------- |
-| (no response) | `NetworkError`       |
-| 400         | `BadRequestError`      |
-| 401         | `UnauthorizedError`    |
-| 403         | `ForbiddenError`       |
-| 404         | `NotFoundError`        |
-| 408         | `RequestTimeoutError`  |
-| 409         | `ConflictError`        |
-| 422         | `ValidationError`      |
-| 429         | `TooManyRequestsError` |
-| 500         | `InternalServerError`  |
-| 502         | `BadGatewayError`      |
-| 503         | `ServiceUnavailableError` |
-| 504         | `GatewayTimeoutError`  |
-| other       | `UnknownError`         |
-
-Each error exposes:
+Every non-2xx response is thrown as a typed subclass of `BaseAPIException`
+(`BadRequestError` for `400`, `ForbiddenError` for `403`, `TooManyRequestsError` for `429`, and so
+on). Each error exposes:
 
 | Field          | Type                | Description                                                        |
 | -------------- | ------------------- | ------------------------------------------------------------------ |

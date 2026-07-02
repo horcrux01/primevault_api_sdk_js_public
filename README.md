@@ -69,3 +69,6 @@ const apiClient = new APIClient(apiKey, apiUrl, undefined, keyId)
 
 ### Examples
 Code examples [here](https://github.com/horcrux01/primevault_api_sdk_js_public/tree/main/examples)
+
+### Error handling
+Error classes, transaction-create error codes, and retry guidance: [docs/ERROR_HANDLING.md](docs/ERROR_HANDLING.md)

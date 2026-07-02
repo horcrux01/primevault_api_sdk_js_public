@@ -71,17 +71,7 @@ Codes `4011`–`4013` were recently introduced and previously came through as th
 > generic `errorCode` `"400"` (or `undefined` for the duplicate-`externalId` case), so fall back to
 > `error.message` for those. Permission failures are `403` (`ForbiddenError`), not `400`.
 
-## Retry & double-payment guidance
-
-- **Safe to retry (same payload):** any `400` raised during validation (balance, invalid
-  destination, chain not enabled, invalid parameters, policy block). Nothing was created.
-- **Do not blindly retry:**
-  - **Timeouts / `5xx`** — the request may have succeeded. Reconcile first.
-  - **Duplicate `externalId`** (`A record with the same information already exists`) — the payment
-    already exists; fetch it, don't resend.
-  - **`quoteId has already been used`** — reconcile against the existing transaction.
-
-### Use a stable `externalId` per logical payment
+## Use a stable `externalId` per logical payment
 
 `externalId` has a uniqueness constraint per org, so a duplicate is **rejected** instead of creating
 a second payment. It is dedup-by-rejection, **not** idempotent replay — the API returns a `400`, it

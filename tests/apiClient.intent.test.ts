@@ -28,6 +28,7 @@ describe("APIClient intent transactions", () => {
       quotes: [
         {
           quoteId: "quote-1",
+          subOrgId: "sub-org-id",
           finalFromAmount: "101.25",
           fees: {
             amount: "1.25",
@@ -40,6 +41,7 @@ describe("APIClient intent transactions", () => {
     const postSpy = jest.spyOn(apiClient, "post").mockResolvedValue(response);
 
     const quoteResponse = await apiClient.getQuote({
+      subOrgId: "sub-org-id",
       intent: {
         source: {
           type: TransferPartyType.VAULT,
@@ -102,9 +104,11 @@ describe("APIClient intent transactions", () => {
         toChain: null,
         toPaymentRail: "ACH",
       },
+      subOrgId: "sub-org-id",
     });
     expect(quoteResponse.quotes[0].quoteId).toBe("quote-1");
     expect(quoteResponse.quotes[0].finalFromAmount).toBe("101.25");
+    expect(quoteResponse.quotes[0].subOrgId).toBe("sub-org-id");
   });
 
   test("createTransactionFromIntent serializes quote-only execution", async () => {
@@ -131,6 +135,7 @@ describe("APIClient intent transactions", () => {
       quoteId: "quote-id",
       externalId: "trade-001",
       memo: "trade from quote",
+      subOrgId: "sub-org-id",
     });
 
     expect(response.id).toBe("transaction-id");
@@ -141,6 +146,7 @@ describe("APIClient intent transactions", () => {
         quoteId: "quote-id",
         externalId: "trade-001",
         memo: "trade from quote",
+        subOrgId: "sub-org-id",
       },
     );
     expect(getSpy).not.toHaveBeenCalled();

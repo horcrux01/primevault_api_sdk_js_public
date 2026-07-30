@@ -235,10 +235,10 @@ describe("APIClient", () => {
     expect(transaction.toAddressName).toBe("Compound");
     expect(transaction.sourceAddress).toBe("0x1feDDa0D98c5B4FDEbde9342d3db6Eff284B0d18");
     expect(transaction.memo).toBeNull();
-    expect(transaction.gasParams).toBeDefined();
-    expect(transaction.gasParams).toBeInstanceOf(Object);
-    expect(transaction.gasParams?.expectedGasFeeInToken).toBe("0.00055509");
-    expect(transaction.gasParams?.gasFeeToken).toBe("ETH");
+    expect(transaction.fees).toBeDefined();
+    expect(transaction.fees).toBeInstanceOf(Object);
+    expect(transaction.fees?.amount).toBe("0.00055509");
+    expect(transaction.fees?.asset).toBe("ETH");
   });
 
   test("createContractCallTransaction", async () => {

@@ -257,6 +257,7 @@ export class APIClient extends BaseAPIClient {
 
     return await this.post("/api/external/transactions/quote/", {
       intent,
+      ...(request.subOrgId === undefined ? {} : { subOrgId: request.subOrgId }),
     });
   }
 
@@ -270,6 +271,9 @@ export class APIClient extends BaseAPIClient {
         quoteId: request.quoteId,
         externalId: request.externalId,
         memo: request.memo,
+        ...(request.subOrgId === undefined
+          ? {}
+          : { subOrgId: request.subOrgId }),
       },
     )) as Transaction;
     return await this.approvePendingTransactionChangeRequest(transaction);

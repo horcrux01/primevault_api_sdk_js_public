@@ -189,19 +189,14 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                     id: routeAccount.id,
                 }));
             }
-            return yield this.post("/api/external/transactions/quote/", {
-                intent,
-            });
+            return yield this.post("/api/external/transactions/quote/", Object.assign({ intent }, (request.subOrgId === undefined ? {} : { subOrgId: request.subOrgId })));
         });
     }
     createTransactionFromIntent(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            const transaction = (yield this.post("/api/external/transactions/intent/create/", {
-                intent: buildTransactionIntentData(request.intent),
-                quoteId: request.quoteId,
-                externalId: request.externalId,
-                memo: request.memo,
-            }));
+            const transaction = (yield this.post("/api/external/transactions/intent/create/", Object.assign({ intent: buildTransactionIntentData(request.intent), quoteId: request.quoteId, externalId: request.externalId, memo: request.memo }, (request.subOrgId === undefined
+                ? {}
+                : { subOrgId: request.subOrgId }))));
             return yield this.approvePendingTransactionChangeRequest(transaction);
         });
     }

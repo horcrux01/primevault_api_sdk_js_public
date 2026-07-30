@@ -208,9 +208,11 @@ export interface TransactionOperation {
 export interface Fees {
     amount: string;
     asset: string;
+    amountInFiat?: string;
 }
 export interface QuoteResponseItem {
     quoteId: string;
+    subOrgId?: string;
     rate?: string;
     fees?: Fees;
     finalFromAmount?: string;
@@ -239,18 +241,19 @@ export interface TransactionIntentRequest {
 }
 export interface GetQuoteRequest {
     intent: TransactionIntentRequest;
+    subOrgId?: string;
 }
 export interface TransactionExecuteIntentRequest {
     intent?: TransactionIntentRequest | null;
     quoteId?: string | null;
     externalId?: string;
     memo?: string;
+    subOrgId?: string;
 }
 export interface Transaction {
     id: string;
     orgId: string;
     vaultId: string;
-    amount: string;
     status: TransactionStatus | string;
     transactionType: TransactionType | string;
     category: TransactionCategory | string;
@@ -258,30 +261,18 @@ export interface Transaction {
     createdAt: string;
     updatedAt: string;
     isDeleted: boolean;
-    blockChain?: string;
-    toAddress?: string;
-    asset?: string;
-    toAddressName?: string;
     txHash?: string;
     error?: string;
-    toVaultId?: string;
     externalId?: string;
     createdById?: string;
-    gasParams?: {
-        finalGasFeeInUSD?: string;
-        finalGasFeeInToken?: string;
-        gasFeeToken?: string;
-        expectedGasFeeInToken?: string;
-    };
+    fees?: Fees;
     memo?: string;
-    sourceAddress?: string;
     txnSignature?: string;
     txnSignatureData?: Record<string, any>;
     output?: TransactionOutput;
     amountInUSD?: string;
     nonce?: number;
     dAppId?: string;
-    operationId?: string;
     source?: TransactionSourceData;
     destination?: TransactionSourceData;
     intent?: TransactionIntentRequest;
@@ -289,6 +280,13 @@ export interface Transaction {
     depositInstructions?: DepositInstructions;
     operations?: TransactionOperation[];
     balanceChanges?: TransactionOperationBalanceChanges | null;
+    blockChain?: string;
+    toAddress?: string;
+    asset?: string;
+    toAddressName?: string;
+    toVaultId?: string;
+    amount: string;
+    sourceAddress?: string;
 }
 export interface TransactionCreationGasParams {
     feeTier?: TransactionFeeTier;

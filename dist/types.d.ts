@@ -58,6 +58,7 @@ export declare enum VaultType {
 export interface Vault {
     id: string;
     orgId: string;
+    subOrgId?: string;
     vaultName: string;
     vaultType: VaultType;
     wallets: {
@@ -91,6 +92,7 @@ export declare enum ContactStatus {
 export interface Contact {
     id: string;
     orgId: string;
+    subOrgId?: string;
     name: string;
     blockChain: string;
     address: string;

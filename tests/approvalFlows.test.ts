@@ -1,5 +1,14 @@
+jest.mock("uuid", () => ({
+  v4: () => "test-jti",
+}));
+
 import { APIClient } from "../src/apiClient";
-import { ApprovalAction } from "../src/types";
+import {
+  ApprovalAction,
+  TransactionCategory,
+  TransactionStatus,
+  TransferPartyType,
+} from "../src/types";
 
 /**
  * Unit tests for the create/update *WithApproval convenience flows.
@@ -36,6 +45,7 @@ describe("createVaultWithApproval", () => {
     const vaultResponse = {
       id: "vault-id",
       orgId: "org-id",
+      subOrgId: "sub-org-id",
       vaultName: "Treasury",
       vaultType: "DEFAULT",
       viewers: [],
@@ -53,13 +63,16 @@ describe("createVaultWithApproval", () => {
 
     const vault = await client.createVaultWithApproval({
       vaultName: "Treasury",
+      subOrgId: "sub-org-id",
       vaultGroupIds: ["group-1", "group-2"],
     });
 
     expect(vault.id).toBe("vault-id");
+    expect(vault.subOrgId).toBe("sub-org-id");
     expect(vault.walletsGenerated).toBe(true);
     expect(post).toHaveBeenNthCalledWith(1, "/api/external/vaults/", {
       vaultName: "Treasury",
+      subOrgId: "sub-org-id",
       vaultGroupIds: ["group-1", "group-2"],
     });
     expect(get).toHaveBeenNthCalledWith(1, approvalMessagePath, {
@@ -80,6 +93,7 @@ describe("createContactWithApproval", () => {
     const contactResponse = {
       id: "contact-id",
       orgId: "org-id",
+      subOrgId: "sub-org-id",
       name: "USDT/USDC Contact",
       blockChain: "ETHEREUM",
       address: "0xCa1Dc85B6a8F4Ee45C5C66D887d512355b7D0609",
@@ -98,6 +112,7 @@ describe("createContactWithApproval", () => {
 
     const contact = await client.createContactWithApproval({
       name: "USDT/USDC Contact",
+      subOrgId: "sub-org-id",
       address: "0xCa1Dc85B6a8F4Ee45C5C66D887d512355b7D0609",
       chain: "ETHEREUM",
       assetList: ["USDT", "USDC"],
@@ -105,9 +120,11 @@ describe("createContactWithApproval", () => {
     });
 
     expect(contact.id).toBe("contact-id");
+    expect(contact.subOrgId).toBe("sub-org-id");
     expect(contact.status).toBe("APPROVED");
     expect(post).toHaveBeenNthCalledWith(1, "/api/external/contacts/", {
       name: "USDT/USDC Contact",
+      subOrgId: "sub-org-id",
       address: "0xCa1Dc85B6a8F4Ee45C5C66D887d512355b7D0609",
       blockChain: "ETHEREUM",
       tags: undefined,
@@ -186,7 +203,9 @@ describe("createBankAccountWithApproval", () => {
     const bankAccountResponse = {
       id: "bank-account-id",
       orgId: "org-id",
+      subOrgId: "sub-org-id",
       orgEntityId: "org-entity-id",
+      createdById: "user-id",
       createdAt: "2026-05-25T00:00:00Z",
       updatedAt: "2026-05-25T00:00:00Z",
       isDeleted: false,
@@ -202,6 +221,7 @@ describe("createBankAccountWithApproval", () => {
       .mockResolvedValueOnce({ ...bankAccountResponse, status: "APPROVED" });
 
     const request = {
+      subOrgId: "sub-org-id",
       accountNumber: "123456789",
       accountName: "Treasury Account",
       bankName: "Chase",
@@ -209,6 +229,8 @@ describe("createBankAccountWithApproval", () => {
     const bankAccount = await client.createBankAccountWithApproval(request);
 
     expect(bankAccount.id).toBe("bank-account-id");
+    expect(bankAccount.subOrgId).toBe("sub-org-id");
+    expect(bankAccount.createdById).toBe("user-id");
     expect(bankAccount.status).toBe("APPROVED");
     expect(post).toHaveBeenNthCalledWith(1, "/api/external/bank_accounts/", request);
     expect(get).toHaveBeenNthCalledWith(1, approvalMessagePath, {
@@ -223,5 +245,85 @@ describe("createBankAccountWithApproval", () => {
       2,
       "/api/external/bank_accounts/bank-account-id/",
     );
+  });
+});
+
+describe("createTransactionWithApproval", () => {
+  const transferRequest = {
+    source: { type: TransferPartyType.VAULT, id: "vault-id" },
+    destination: { type: TransferPartyType.CONTACT, id: "contact-id" },
+    amount: "1",
+    asset: "USDC",
+    chain: "ETHEREUM",
+  };
+  const transactionResponse = {
+    id: "transaction-id",
+    orgId: "org-id",
+    vaultId: "vault-id",
+    amount: "1",
+    status: TransactionStatus.PENDING,
+    transactionType: "OUTGOING",
+    category: TransactionCategory.TRANSFER,
+    subCategory: "EXTERNAL_TRANSFER",
+    createdAt: "2026-05-25T00:00:00Z",
+    updatedAt: "2026-05-25T00:00:00Z",
+    isDeleted: false,
+  };
+
+  test("creates the transaction, approves it and re-fetches", async () => {
+    const { client, post, get } = buildClient();
+    post
+      .mockResolvedValueOnce(transactionResponse)
+      .mockResolvedValueOnce({ success: true });
+    get.mockResolvedValueOnce(approvalMessage).mockResolvedValueOnce({
+      ...transactionResponse,
+      status: TransactionStatus.APPROVED,
+    });
+
+    const transaction =
+      await client.createTransactionWithApproval(transferRequest);
+
+    expect(transaction.id).toBe("transaction-id");
+    expect(transaction.status).toBe(TransactionStatus.APPROVED);
+    expect(post).toHaveBeenNthCalledWith(1, "/api/external/transactions/", {
+      source: transferRequest.source,
+      destination: transferRequest.destination,
+      amount: "1",
+      asset: "USDC",
+      blockChain: "ETHEREUM",
+      category: TransactionCategory.TRANSFER,
+      gasParams: undefined,
+      externalId: undefined,
+      memo: undefined,
+      feePayer: undefined,
+    });
+    expect(get).toHaveBeenNthCalledWith(1, approvalMessagePath, {
+      entityId: "transaction-id",
+    });
+    expect(post).toHaveBeenNthCalledWith(2, actionPath, {
+      action: ApprovalAction.APPROVE,
+      signature: "0a0b",
+      reason: "ok",
+    });
+    expect(get).toHaveBeenNthCalledWith(
+      2,
+      "/api/external/transactions/transaction-id/",
+    );
+  });
+
+  test("skips approval when the created transaction is not pending", async () => {
+    const { client, post, get, sign } = buildClient();
+    post.mockResolvedValueOnce({
+      ...transactionResponse,
+      status: TransactionStatus.APPROVED,
+    });
+
+    const transaction =
+      await client.createTransactionWithApproval(transferRequest);
+
+    expect(transaction.status).toBe(TransactionStatus.APPROVED);
+    expect(post).toHaveBeenCalledTimes(1);
+    expect(get).not.toHaveBeenCalled();
+    expect(sign).not.toHaveBeenCalled();
   });
 });

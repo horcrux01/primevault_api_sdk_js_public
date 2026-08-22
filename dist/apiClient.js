@@ -33,19 +33,20 @@ function buildBankDetailsData(bank) {
     };
 }
 function buildTransferPartyData(party) {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e, _f, _g;
     if (!party) {
         return null;
     }
     return {
         type: party.type,
         id: (_a = party.id) !== null && _a !== void 0 ? _a : null,
-        name: (_b = party.name) !== null && _b !== void 0 ? _b : null,
-        address: (_c = party.address) !== null && _c !== void 0 ? _c : null,
-        provider: (_d = party.provider) !== null && _d !== void 0 ? _d : null,
+        subOrgId: (_b = party.subOrgId) !== null && _b !== void 0 ? _b : null,
+        name: (_c = party.name) !== null && _c !== void 0 ? _c : null,
+        address: (_d = party.address) !== null && _d !== void 0 ? _d : null,
+        provider: (_e = party.provider) !== null && _e !== void 0 ? _e : null,
         bankDetails: buildBankDetailsData(party.bankDetails),
-        chain: (_e = party.chain) !== null && _e !== void 0 ? _e : null,
-        paymentRail: (_f = party.paymentRail) !== null && _f !== void 0 ? _f : null,
+        chain: (_f = party.chain) !== null && _f !== void 0 ? _f : null,
+        paymentRail: (_g = party.paymentRail) !== null && _g !== void 0 ? _g : null,
     };
 }
 function buildTransactionIntentData(request) {
@@ -85,6 +86,12 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 url += `&${query}`;
             }
             return (yield this.get(url));
+        });
+    }
+    getActivityEvents() {
+        return __awaiter(this, arguments, void 0, function* (params = {}, limit = 20, cursor = "") {
+            const query = new URLSearchParams(Object.assign({ limit: String(limit), cursor: cursor !== null && cursor !== void 0 ? cursor : "" }, params));
+            return (yield this.get(`/api/external/activity/events/?${query.toString()}`));
         });
     }
     getTransactionById(transactionId) {
@@ -152,12 +159,23 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 category: types_1.TransactionCategory.TRANSFER,
                 gasParams: request.gasParams,
                 externalId: request.externalId,
-                isAutomation: request.isAutomation,
-                executeAt: request.executeAt,
                 memo: request.memo,
                 feePayer: request.feePayer,
             };
             return yield this.post("/api/external/transactions/", data);
+        });
+    }
+    /**
+     * Create a transfer transaction and approve it in one call.
+     *
+     * The transaction is only signed for approval when it lands in PENDING, so
+     * orgs whose policy approves on create get the created transaction back
+     * untouched.
+     */
+    createTransactionWithApproval(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const transaction = yield this.createTransferTransaction(request);
+            return yield this.approvePendingTransactionChangeRequest(transaction);
         });
     }
     createContractCallTransaction(request) {
@@ -252,11 +270,6 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.get(`/api/external/vaults/${vaultId}/detailed_balances/`, params);
         });
     }
-    updateBalances(vaultId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.post(`/api/external/vaults/${vaultId}/update_balances/`);
-        });
-    }
     getOperationMessageToSign(operationId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.get(`/api/external/operations/${operationId}/operation_message_to_sign/`);
@@ -291,6 +304,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
                 name: request.name,
+                subOrgId: request.subOrgId,
                 address: request.address,
                 blockChain: request.chain,
                 tags: request.tags,

@@ -1,9 +1,10 @@
 import { BaseAPIClient } from "./baseApiClient";
-import { ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAccount, BankAccountListResponse, ChainData, Contact, CreateBankAccountRequest, CreateContactRequest, CreateContractCallTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetApprovalRequest, GetApprovalMessageResponse, GetQuoteRequest, QuoteResponse, ReplaceTransactionRequest, Transaction, TransactionExecuteIntentRequest, TransactionListResponse, Vault, DetailedBalanceResponse, DelegateResourceRequest, StakeResourceRequest, UpdateContactRequest, UpdateContactResponse, VaultListResponse, ContactListResponse } from "./types";
+import { ActivityEventListResponse, ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAccount, BankAccountListResponse, ChainData, Contact, CreateBankAccountRequest, CreateContactRequest, CreateContractCallTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetApprovalRequest, GetApprovalMessageResponse, GetQuoteRequest, QuoteResponse, ReplaceTransactionRequest, Transaction, TransactionExecuteIntentRequest, TransactionListResponse, Vault, DetailedBalanceResponse, DelegateResourceRequest, StakeResourceRequest, UpdateContactRequest, UpdateContactResponse, VaultListResponse, ContactListResponse } from "./types";
 export declare class APIClient extends BaseAPIClient {
     getAssetsData(): Promise<Asset[]>;
     getSupportedChains(): Promise<ChainData[]>;
     getTransactions(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<TransactionListResponse>;
+    getActivityEvents(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<ActivityEventListResponse>;
     getTransactionById(transactionId: string): Promise<Transaction>;
     getChangeApprovalMessage(entityId: string): Promise<GetApprovalMessageResponse>;
     submitChangeApprovalAction(approvalId: string, action: ApprovalAction | string, signatureHex: string, reason?: string | null): Promise<ApprovalActionResponse>;
@@ -11,8 +12,16 @@ export declare class APIClient extends BaseAPIClient {
     private approvePendingTransactionChangeRequest;
     estimateFee(request: EstimateFeeRequest): Promise<EstimatedFeeResponse>;
     createTransferTransaction(request: CreateTransferTransactionRequest): Promise<Transaction>;
+    /**
+     * Create a transfer transaction and approve it in one call.
+     *
+     * The transaction is only signed for approval when it lands in PENDING, so
+     * orgs whose policy approves on create get the created transaction back
+     * untouched.
+     */
+    createTransactionWithApproval(request: CreateTransferTransactionRequest): Promise<Transaction>;
     createContractCallTransaction(request: CreateContractCallTransactionRequest): Promise<Transaction>;
-    replaceTransaction(request: ReplaceTransactionRequest): Promise<any>;
+    replaceTransaction(request: ReplaceTransactionRequest): Promise<Transaction>;
     getQuote(request: GetQuoteRequest): Promise<QuoteResponse>;
     createTransactionFromIntent(request: TransactionExecuteIntentRequest): Promise<Transaction>;
     markDepositDone(transactionId: string): Promise<Transaction>;
@@ -23,7 +32,6 @@ export declare class APIClient extends BaseAPIClient {
     createVaultWithApproval(request: CreateVaultRequest): Promise<Vault>;
     getBalances(vaultId: string): Promise<BalanceResponse>;
     getDetailedBalances(vaultId: string, params?: Record<string, string>): Promise<DetailedBalanceResponse>;
-    updateBalances(vaultId: string): Promise<BalanceResponse>;
     getOperationMessageToSign(operationId: string): Promise<any>;
     updateUserAction(operationId: string, isApproved: boolean, signatureHex: string): Promise<any>;
     getContacts(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<ContactListResponse>;

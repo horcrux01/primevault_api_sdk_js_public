@@ -29,7 +29,7 @@ describe("BaseAPIClient", () => {
     mockedAxios.request.mockClear();
   });
 
-  test("sends the SDK version header on all request methods", async () => {
+  test("sends SDK identification headers on all request methods", async () => {
     const client = new BaseAPIClient("api-key", "https://api.example.test");
 
     await client.get("/get-path/", { page: 1 });
@@ -42,6 +42,7 @@ describe("BaseAPIClient", () => {
         expect.objectContaining({
           "Api-Key": "api-key",
           version: sdkVersion,
+          "X-App-Source": "JS_SDK",
           Authorization: "Bearer auth-token",
         }),
       );

@@ -26,6 +26,7 @@ class BaseAPIClient {
             Accept: "application/json",
             "Api-Key": this.apiKey,
             version: SDK_VERSION,
+            "X-App-Source": "JS_SDK",
         };
         this.authTokenService = new authTokenService_1.AuthTokenService(apiKey, privateKeyHex, keyId);
         this.signatureService = (0, signatureService_1.getSignatureService)(privateKeyHex, keyId);

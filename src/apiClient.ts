@@ -1,5 +1,6 @@
 import { BaseAPIClient } from "./baseApiClient";
 import {
+  ActivityEventListResponse,
   ApprovalAction,
   ApprovalActionResponse,
   Asset,
@@ -71,6 +72,7 @@ function buildTransferPartyData(
   return {
     type: party.type,
     id: party.id ?? null,
+    subOrgId: party.subOrgId ?? null,
     name: party.name ?? null,
     address: party.address ?? null,
     provider: party.provider ?? null,
@@ -121,6 +123,21 @@ export class APIClient extends BaseAPIClient {
       url += `&${query}`;
     }
     return (await this.get(url)) as TransactionListResponse;
+  }
+
+  async getActivityEvents(
+    params: Record<string, string> = {},
+    limit: number = 20,
+    cursor: string | null = "",
+  ): Promise<ActivityEventListResponse> {
+    const query = new URLSearchParams({
+      limit: String(limit),
+      cursor: cursor ?? "",
+      ...params,
+    });
+    return (await this.get(
+      `/api/external/activity/events/?${query.toString()}`,
+    )) as ActivityEventListResponse;
   }
 
   async getTransactionById(transactionId: string): Promise<Transaction> {
@@ -213,12 +230,24 @@ export class APIClient extends BaseAPIClient {
       category: TransactionCategory.TRANSFER,
       gasParams: request.gasParams,
       externalId: request.externalId,
-      isAutomation: request.isAutomation,
-      executeAt: request.executeAt,
       memo: request.memo,
       feePayer: request.feePayer,
     };
     return await this.post("/api/external/transactions/", data);
+  }
+
+  /**
+   * Create a transfer transaction and approve it in one call.
+   *
+   * The transaction is only signed for approval when it lands in PENDING, so
+   * orgs whose policy approves on create get the created transaction back
+   * untouched.
+   */
+  async createTransactionWithApproval(
+    request: CreateTransferTransactionRequest,
+  ): Promise<Transaction> {
+    const transaction = await this.createTransferTransaction(request);
+    return await this.approvePendingTransactionChangeRequest(transaction);
   }
 
   async createContractCallTransaction(
@@ -237,7 +266,9 @@ export class APIClient extends BaseAPIClient {
     return await this.post("/api/external/transactions/", data);
   }
 
-  async replaceTransaction(request: ReplaceTransactionRequest) {
+  async replaceTransaction(
+    request: ReplaceTransactionRequest,
+  ): Promise<Transaction> {
     return await this.post(
       "/api/external/transactions/replace_transaction/",
       request,
@@ -333,10 +364,6 @@ export class APIClient extends BaseAPIClient {
     );
   }
 
-  async updateBalances(vaultId: string): Promise<BalanceResponse> {
-    return await this.post(`/api/external/vaults/${vaultId}/update_balances/`);
-  }
-
   async getOperationMessageToSign(operationId: string) {
     return await this.get(
       `/api/external/operations/${operationId}/operation_message_to_sign/`,
@@ -379,6 +406,7 @@ export class APIClient extends BaseAPIClient {
   async createContact(request: CreateContactRequest): Promise<Contact> {
     const data = {
       name: request.name,
+      subOrgId: request.subOrgId,
       address: request.address,
       blockChain: request.chain,
       tags: request.tags,

@@ -9,9 +9,11 @@ import {
   BankAccountStatus,
   BankDetails,
   CreateBankAccountRequest,
+  CreateTransferTransactionRequest,
   DepositInstructions,
   QuoteResponse,
   Transaction,
+  TransactionCategory,
   TransactionOperationStatus,
   TransactionOperationType,
   TransactionStatus,
@@ -46,6 +48,7 @@ describe("APIClient intent transactions", () => {
         source: {
           type: TransferPartyType.VAULT,
           id: "vault-1",
+          subOrgId: "source-sub-org-id",
         },
         destination: {
           type: TransferPartyType.BANK_ACCOUNT,
@@ -72,6 +75,7 @@ describe("APIClient intent transactions", () => {
         source: {
           type: TransferPartyType.VAULT,
           id: "vault-1",
+          subOrgId: "source-sub-org-id",
           name: null,
           address: null,
           provider: null,
@@ -82,6 +86,7 @@ describe("APIClient intent transactions", () => {
         destination: {
           type: TransferPartyType.BANK_ACCOUNT,
           id: "bank-account-1",
+          subOrgId: null,
           name: null,
           address: null,
           provider: null,
@@ -109,6 +114,51 @@ describe("APIClient intent transactions", () => {
     expect(quoteResponse.quotes[0].quoteId).toBe("quote-1");
     expect(quoteResponse.quotes[0].finalFromAmount).toBe("101.25");
     expect(quoteResponse.quotes[0].subOrgId).toBe("sub-org-id");
+  });
+
+  test("createTransferTransaction omits unsupported automation fields", async () => {
+    const apiClient = makeClient();
+    const postSpy = jest
+      .spyOn(apiClient, "post")
+      .mockResolvedValue({ id: "transaction-id" });
+    const request: CreateTransferTransactionRequest & {
+      isAutomation: boolean;
+      executeAt: string;
+    } = {
+      source: {
+        type: TransferPartyType.VAULT,
+        id: "vault-id",
+      },
+      destination: {
+        type: TransferPartyType.CONTACT,
+        id: "contact-id",
+      },
+      amount: "1",
+      asset: "USDC",
+      chain: "ETHEREUM",
+      externalId: "external-id",
+      isAutomation: true,
+      executeAt: "2026-08-04T00:00:00Z",
+      memo: "transfer",
+    };
+
+    await apiClient.createTransferTransaction(request);
+
+    expect(postSpy).toHaveBeenCalledWith("/api/external/transactions/", {
+      source: request.source,
+      destination: request.destination,
+      amount: "1",
+      asset: "USDC",
+      blockChain: "ETHEREUM",
+      category: TransactionCategory.TRANSFER,
+      gasParams: undefined,
+      externalId: "external-id",
+      memo: "transfer",
+      feePayer: undefined,
+    });
+    const payload = postSpy.mock.calls[0][1];
+    expect(payload).not.toHaveProperty("isAutomation");
+    expect(payload).not.toHaveProperty("executeAt");
   });
 
   test("createTransactionFromIntent serializes quote-only execution", async () => {
@@ -361,6 +411,7 @@ describe("APIClient intent transactions", () => {
           source: {
             type: TransferPartyType.VAULT,
             id: "vault-id",
+            subOrgId: "sub-org-id",
             chain: "ETHEREUM",
             paymentRail: "BLOCKCHAIN",
             provider: "Example Provider",
@@ -397,6 +448,7 @@ describe("APIClient intent transactions", () => {
     expect(operation?.type).toBe(TransactionOperationType.WITHDRAW);
     expect(operation?.status).toBe(TransactionOperationStatus.COMPLETED);
     expect(operation?.source?.chain).toBe("ETHEREUM");
+    expect(operation?.source?.subOrgId).toBe("sub-org-id");
     expect(operation?.source?.paymentRail).toBe("BLOCKCHAIN");
     expect(operation?.destination?.paymentRail).toBe("WIRE");
     expect(transaction.balanceChanges?.changes[0].asset).toBe("USDC");
@@ -429,6 +481,7 @@ describe("APIClient intent transactions", () => {
       id: "bank-account-id",
       orgId: "org-id",
       orgEntityId: "org-entity-id",
+      createdById: "user-id",
       createdAt: "2026-05-25T00:00:00Z",
       updatedAt: "2026-05-25T00:00:00Z",
       isDeleted: false,
@@ -467,6 +520,7 @@ describe("APIClient intent transactions", () => {
       id: "bank-account-id",
       orgId: "org-id",
       orgEntityId: "org-entity-id",
+      createdById: "user-id",
       createdAt: "2026-05-25T00:00:00Z",
       updatedAt: "2026-05-25T00:00:00Z",
       isDeleted: false,
@@ -482,5 +536,4 @@ describe("APIClient intent transactions", () => {
     } satisfies CreateBankAccountRequest;
     expect(createBankAccountCurrency.currency).toBe("USD");
   });
-
 });

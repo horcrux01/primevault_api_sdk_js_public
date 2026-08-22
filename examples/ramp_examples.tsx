@@ -36,7 +36,7 @@ const createFiatToCryptoTransaction = async (
   const request: TransactionExecuteIntentRequest = {
     intent,
     quoteId: selectedQuote.quoteId,
-    externalId: "fiat-to-crypto-example-1",
+    externalId: "fiat-to-crypto-example-2",
     memo: "fiat to crypto example",
   };
 

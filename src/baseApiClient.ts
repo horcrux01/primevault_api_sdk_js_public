@@ -30,6 +30,7 @@ export class BaseAPIClient {
       Accept: "application/json",
       "Api-Key": this.apiKey,
       version: SDK_VERSION,
+      "X-App-Source": "JS_SDK",
     };
     this.authTokenService = new AuthTokenService(apiKey, privateKeyHex, keyId);
     this.signatureService = getSignatureService(privateKeyHex, keyId);

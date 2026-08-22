@@ -31,26 +31,23 @@ const createTransfer = async (apiClient: APIClient) => {
             asset.blockChain === "ETHEREUM" && asset.symbol === "ETH",
     )!;
 
-    // Get source and destinations
+    // Source and destination can each be a Core Vault or an Exchange Vault. The destination
+    // can also be an external address: { type: TransferPartyType.EXTERNAL_ADDRESS, address: '0x123456789..' }
     const sourceVaultsResponse = await apiClient.getVaults({
         vaultName: "core-vault-1",
-    }); // Source Vault
+    });
 
     const destinationContactsResponse = await apiClient.getContacts({
         name: "Brandi Taylor",
-    });  // Destination Contact. This could be Core or Exchange Vault or External address.
+    });
 
-    /*
-     To send the transaction to an external non-whitelisted address, change the type and set the address
-     const destination: TransferPartyData = { type: TransferPartyType.EXTERNAL_ADDRESS, address: '0x123456789..'};
-    */
     const source: TransferPartyData = { type: TransferPartyType.VAULT, id: sourceVaultsResponse.results[0].id};
     const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContactsResponse.results[0].id};
 
-    // create and submit transaction and wait for processing
+    // Creates the transfer and approves it as the API user in one call.
     let txnResponse: Transaction | null = null;
     try {
-        txnResponse = await apiClient.createTransferTransaction({
+        txnResponse = await apiClient.createTransactionWithApproval({
             source,
             destination,
             amount: "0.0001",
@@ -79,14 +76,12 @@ const createTransfer = async (apiClient: APIClient) => {
         return; // Exit if transaction creation fails
     }
 
-    // Check if txnResponse exists before proceeding
     if (!txnResponse) {
         console.error("Transfer transaction creation failed, cannot proceed.");
         return;
     }
-    
+
     txnResponse = await pollForTransaction(apiClient, txnResponse.id);
-    console.log(txnResponse)
 }
 
 const feeEstimate = async (apiClient: APIClient) => {
@@ -127,7 +122,7 @@ const createTransferWithFeePayer = async (apiClient: APIClient) => {
     const destination: TransferPartyData = { type: TransferPartyType.CONTACT, id: destinationContactsResponse.results[0].id };
 
     try {
-        const txnResponse: Transaction = await apiClient.createTransferTransaction({
+        const txnResponse: Transaction = await apiClient.createTransactionWithApproval({
             source,
             destination,
             amount: "0.5",
@@ -180,11 +175,10 @@ const delegateResource = async (apiClient: APIClient) => {
         amount: "100",
         resourceType: ResourceType.TRON_ENERGY,
     });
-    // similar error handling as createTransferTransaction
+    // same error handling as createTransfer above
     console.log(txnResponse);
 
     txnResponse = await pollForTransaction(apiClient, txnResponse.id);
-    console.log(txnResponse);
 }
 
 const stakeResource = async (apiClient: APIClient) => {
@@ -196,11 +190,10 @@ const stakeResource = async (apiClient: APIClient) => {
         amount: "100",
         resourceType: ResourceType.TRON_ENERGY,
     });
-    // similar error handling as createTransferTransaction
+    // same error handling as createTransfer above
     console.log(txnResponse);
 
     txnResponse = await pollForTransaction(apiClient, txnResponse.id);
-    console.log(txnResponse);
 }
 
 const getTransactions = async (apiClient: APIClient) => {

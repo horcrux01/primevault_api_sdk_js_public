@@ -2,13 +2,11 @@ export interface Asset {
     name: string;
     symbol: string;
     blockChain: string;
-    logoURL?: number;
     details?: any;
 }
 export interface ChainData {
     value: string;
     label: string;
-    logo: string;
 }
 export declare enum TransferPartyType {
     CONTACT = "CONTACT",
@@ -43,6 +41,7 @@ export interface DepositInstructions {
 export interface TransferPartyData {
     type: TransferPartyType | string;
     id?: string;
+    subOrgId?: string;
     name?: string;
     address?: string;
     provider?: string;
@@ -105,7 +104,6 @@ export interface Contact {
     createdAt: string;
     updatedAt: string;
     isDeleted: boolean;
-    operationId?: string;
     assetList?: string[];
 }
 export declare enum TransactionType {
@@ -181,6 +179,7 @@ export type TransactionOutput = EVMOutput | ICPOutput;
 export interface TransactionSourceData {
     type?: TransferPartyType | string;
     id?: string;
+    subOrgId?: string;
     name?: string;
     address?: string;
     provider?: string;
@@ -307,8 +306,6 @@ export interface CreateTransferTransactionRequest {
     chain: string;
     gasParams?: TransactionCreationGasParams;
     externalId?: string;
-    isAutomation?: boolean;
-    executeAt?: string;
     memo?: string;
     feePayer?: FeePayer;
 }
@@ -350,6 +347,7 @@ export interface EstimateFeeRequest {
 }
 export interface CreateVaultRequest {
     vaultName: string;
+    subOrgId?: string;
     templateId?: string;
     chains?: string[];
     testNetVault?: boolean;
@@ -364,6 +362,7 @@ export declare enum PaymentMethod {
 }
 export interface CreateContactRequest {
     name: string;
+    subOrgId?: string;
     address: string;
     chain: string;
     tags?: string[];
@@ -408,8 +407,6 @@ export interface DetailedBalance {
     name?: string;
     chain?: string;
     tokenAddress?: string;
-    balanceInUSD?: string;
-    price?: string;
 }
 export type DetailedBalanceResponse = DetailedBalance[];
 export declare enum ResourceType {
@@ -443,7 +440,9 @@ export declare enum BankAccountStatus {
 export interface BankAccount {
     id: string;
     orgId: string;
+    subOrgId?: string;
     orgEntityId: string;
+    createdById: string;
     createdAt: string;
     updatedAt: string;
     isDeleted: boolean;
@@ -465,6 +464,29 @@ export interface TransactionListResponse {
     nextCursor?: string | null;
     hasNext?: boolean;
 }
+export interface ActivityEventMetaData {
+    platform?: string | null;
+    sourceIp?: string | null;
+    userAgent?: string | null;
+}
+export interface ActivityEvent {
+    id: string;
+    action: string;
+    outcome?: string | null;
+    activityLabel?: string | null;
+    createdAt?: string | null;
+    entityType?: string | null;
+    entityId?: string | null;
+    entityName?: string | null;
+    actorId?: string | null;
+    metaData?: ActivityEventMetaData | null;
+    schemaVersion?: string | null;
+}
+export interface ActivityEventListResponse {
+    results: ActivityEvent[];
+    nextCursor?: string | null;
+    hasNext?: boolean;
+}
 export interface VaultListResponse {
     results: Vault[];
     nextCursor?: string | null;
@@ -481,6 +503,7 @@ export interface BankAccountListResponse {
     hasNext?: boolean;
 }
 export interface CreateBankAccountRequest {
+    subOrgId?: string;
     accountNumber?: string;
     accountName?: string;
     routingNumber?: string;

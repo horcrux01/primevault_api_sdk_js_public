@@ -18,6 +18,7 @@ export declare enum TransferPartyType {
 export interface BankDetails {
     bankAccountId?: string;
     bankName?: string;
+    bankCode?: string;
     beneficiaryName?: string;
     accountName?: string;
     accountNumber?: string;
@@ -37,6 +38,7 @@ export interface DepositInstructions {
     asset?: string;
     address?: string;
     chain?: string;
+    memo?: string;
 }
 export interface TransferPartyData {
     type: TransferPartyType | string;
@@ -219,6 +221,7 @@ export interface QuoteResponseItem {
     finalFromAmount?: string;
     finalToAmount?: string;
     sourceName?: string;
+    depositInstructions?: DepositInstructions;
 }
 export interface QuoteResponse {
     quotes: QuoteResponseItem[];

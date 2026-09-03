@@ -21,6 +21,7 @@ export enum TransferPartyType {
 export interface BankDetails {
   bankAccountId?: string;
   bankName?: string;
+  bankCode?: string;
   beneficiaryName?: string;
   accountName?: string;
   accountNumber?: string;
@@ -41,6 +42,9 @@ export interface DepositInstructions {
   asset?: string;
   address?: string;
   chain?: string;
+  // Reference the provider matches an incoming fiat payment on. Wire, ACH and
+  // SEPA deposits sent without it arrive unattributed.
+  memo?: string;
 }
 
 export interface TransferPartyData {
@@ -244,6 +248,7 @@ export interface QuoteResponseItem {
   finalFromAmount?: string;
   finalToAmount?: string;
   sourceName?: string;
+  depositInstructions?: DepositInstructions;
 }
 
 export interface QuoteResponse {

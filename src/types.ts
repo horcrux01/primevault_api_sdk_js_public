@@ -29,6 +29,7 @@ export interface BankDetails {
   routingNumber?: string;
   paymentRail?: string;
   bankAddress?: string;
+  beneficiaryAddress?: string;
   swiftCode?: string;
   swiftBic?: string;
   iban?: string;

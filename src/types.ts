@@ -153,6 +153,14 @@ export enum TransactionSubCategory {
   CLAIM = "CLAIM",
   ON_RAMP = "ON_RAMP",
   OFF_RAMP = "OFF_RAMP",
+  // Ramp transactions report the legs the provider runs rather than the
+  // direction; the direction is on TransactionCategory.
+  DEPOSIT = "DEPOSIT",
+  TRADE = "TRADE",
+  WITHDRAW = "WITHDRAW",
+  DEPOSIT_TRADE = "DEPOSIT_TRADE",
+  TRADE_WITHDRAW = "TRADE_WITHDRAW",
+  DEPOSIT_TRADE_WITHDRAW = "DEPOSIT_TRADE_WITHDRAW",
 }
 
 export enum TransactionStatus {
@@ -512,6 +520,8 @@ export interface StakeResourceRequest {
 
 // ── Bank Accounts ──────────────────────────────────────────────────────
 
+export type PaymentRail = "ach" | "wire" | "sepa" | "swift";
+
 export enum BankAccountStatus {
   PENDING = "PENDING",
   APPROVED = "APPROVED",
@@ -532,8 +542,17 @@ export interface BankAccount {
   accountName?: string;
   routingNumber?: string;
   clientBankAccountId?: string;
+  paymentRails?: PaymentRail[];
   paymentMethod?: string;
   bankName?: string;
+  currency?: string;
+  accountType?: string;
+  accountHolderName?: string;
+  iban?: string;
+  bic?: string;
+  pixKey?: string;
+  pixKeyType?: string;
+  relationship?: string;
   streetLine?: string;
   city?: string;
   state?: string;
@@ -597,8 +616,19 @@ export interface CreateBankAccountRequest {
   accountName?: string;
   routingNumber?: string;
   clientBankAccountId?: string;
+  // Every rail the account may be paid over. paymentMethod remains accepted as
+  // a single-rail alias, and sending both is rejected unless they agree.
+  paymentRails?: PaymentRail[];
   paymentMethod?: string;
   bankName?: string;
+  currency?: string;
+  accountType?: string;
+  accountHolderName?: string;
+  iban?: string;
+  bic?: string;
+  pixKey?: string;
+  pixKeyType?: string;
+  relationship?: string;
   streetLine?: string;
   city?: string;
   state?: string;

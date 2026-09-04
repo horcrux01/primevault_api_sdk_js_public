@@ -138,7 +138,13 @@ export declare enum TransactionSubCategory {
     UNSTAKE = "UNSTAKE",
     CLAIM = "CLAIM",
     ON_RAMP = "ON_RAMP",
-    OFF_RAMP = "OFF_RAMP"
+    OFF_RAMP = "OFF_RAMP",
+    DEPOSIT = "DEPOSIT",
+    TRADE = "TRADE",
+    WITHDRAW = "WITHDRAW",
+    DEPOSIT_TRADE = "DEPOSIT_TRADE",
+    TRADE_WITHDRAW = "TRADE_WITHDRAW",
+    DEPOSIT_TRADE_WITHDRAW = "DEPOSIT_TRADE_WITHDRAW"
 }
 export declare enum TransactionStatus {
     DRAFT = "DRAFT",
@@ -436,6 +442,7 @@ export interface StakeResourceRequest {
     externalId?: string;
     memo?: string;
 }
+export type PaymentRail = "ach" | "wire" | "sepa" | "swift";
 export declare enum BankAccountStatus {
     PENDING = "PENDING",
     APPROVED = "APPROVED",
@@ -455,8 +462,17 @@ export interface BankAccount {
     accountName?: string;
     routingNumber?: string;
     clientBankAccountId?: string;
+    paymentRails?: PaymentRail[];
     paymentMethod?: string;
     bankName?: string;
+    currency?: string;
+    accountType?: string;
+    accountHolderName?: string;
+    iban?: string;
+    bic?: string;
+    pixKey?: string;
+    pixKeyType?: string;
+    relationship?: string;
     streetLine?: string;
     city?: string;
     state?: string;
@@ -512,8 +528,17 @@ export interface CreateBankAccountRequest {
     accountName?: string;
     routingNumber?: string;
     clientBankAccountId?: string;
+    paymentRails?: PaymentRail[];
     paymentMethod?: string;
     bankName?: string;
+    currency?: string;
+    accountType?: string;
+    accountHolderName?: string;
+    iban?: string;
+    bic?: string;
+    pixKey?: string;
+    pixKeyType?: string;
+    relationship?: string;
     streetLine?: string;
     city?: string;
     state?: string;

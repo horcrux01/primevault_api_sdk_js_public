@@ -54,6 +54,14 @@ var TransactionSubCategory;
     TransactionSubCategory["CLAIM"] = "CLAIM";
     TransactionSubCategory["ON_RAMP"] = "ON_RAMP";
     TransactionSubCategory["OFF_RAMP"] = "OFF_RAMP";
+    // Ramp transactions report the legs the provider runs rather than the
+    // direction; the direction is on TransactionCategory.
+    TransactionSubCategory["DEPOSIT"] = "DEPOSIT";
+    TransactionSubCategory["TRADE"] = "TRADE";
+    TransactionSubCategory["WITHDRAW"] = "WITHDRAW";
+    TransactionSubCategory["DEPOSIT_TRADE"] = "DEPOSIT_TRADE";
+    TransactionSubCategory["TRADE_WITHDRAW"] = "TRADE_WITHDRAW";
+    TransactionSubCategory["DEPOSIT_TRADE_WITHDRAW"] = "DEPOSIT_TRADE_WITHDRAW";
 })(TransactionSubCategory || (exports.TransactionSubCategory = TransactionSubCategory = {}));
 var TransactionStatus;
 (function (TransactionStatus) {
@@ -103,7 +111,6 @@ var ResourceType;
     ResourceType["TRON_ENERGY"] = "TRON_ENERGY";
     ResourceType["TRON_BANDWIDTH"] = "TRON_BANDWIDTH";
 })(ResourceType || (exports.ResourceType = ResourceType = {}));
-// ── Bank Accounts ──────────────────────────────────────────────────────
 var BankAccountStatus;
 (function (BankAccountStatus) {
     BankAccountStatus["PENDING"] = "PENDING";

@@ -520,7 +520,7 @@ export interface StakeResourceRequest {
 
 // ── Bank Accounts ──────────────────────────────────────────────────────
 
-export type PaymentRail = "ach" | "wire" | "sepa" | "swift";
+export type PaymentRail = "ACH" | "WIRE" | "SEPA" | "SWIFT";
 
 export enum BankAccountStatus {
   PENDING = "PENDING",

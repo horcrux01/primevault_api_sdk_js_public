@@ -442,7 +442,7 @@ export interface StakeResourceRequest {
     externalId?: string;
     memo?: string;
 }
-export type PaymentRail = "ach" | "wire" | "sepa" | "swift";
+export type PaymentRail = "ACH" | "WIRE" | "SEPA" | "SWIFT";
 export declare enum BankAccountStatus {
     PENDING = "PENDING",
     APPROVED = "APPROVED",

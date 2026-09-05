@@ -472,7 +472,6 @@ export interface BankAccount {
     bic?: string;
     pixKey?: string;
     pixKeyType?: string;
-    relationship?: string;
     streetLine?: string;
     city?: string;
     state?: string;
@@ -538,7 +537,6 @@ export interface CreateBankAccountRequest {
     bic?: string;
     pixKey?: string;
     pixKeyType?: string;
-    relationship?: string;
     streetLine?: string;
     city?: string;
     state?: string;

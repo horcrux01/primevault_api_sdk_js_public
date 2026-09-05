@@ -21,6 +21,7 @@ export enum TransferPartyType {
 export interface BankDetails {
   bankAccountId?: string;
   bankName?: string;
+  bankCode?: string;
   beneficiaryName?: string;
   accountName?: string;
   accountNumber?: string;
@@ -28,6 +29,7 @@ export interface BankDetails {
   routingNumber?: string;
   paymentRail?: string;
   bankAddress?: string;
+  beneficiaryAddress?: string;
   swiftCode?: string;
   swiftBic?: string;
   iban?: string;
@@ -41,6 +43,9 @@ export interface DepositInstructions {
   asset?: string;
   address?: string;
   chain?: string;
+  // Reference the provider matches an incoming fiat payment on. Wire, ACH and
+  // SEPA deposits sent without it arrive unattributed.
+  memo?: string;
 }
 
 export interface TransferPartyData {
@@ -148,6 +153,14 @@ export enum TransactionSubCategory {
   CLAIM = "CLAIM",
   ON_RAMP = "ON_RAMP",
   OFF_RAMP = "OFF_RAMP",
+  // Ramp transactions report the legs the provider runs rather than the
+  // direction; the direction is on TransactionCategory.
+  DEPOSIT = "DEPOSIT",
+  TRADE = "TRADE",
+  WITHDRAW = "WITHDRAW",
+  DEPOSIT_TRADE = "DEPOSIT_TRADE",
+  TRADE_WITHDRAW = "TRADE_WITHDRAW",
+  DEPOSIT_TRADE_WITHDRAW = "DEPOSIT_TRADE_WITHDRAW",
 }
 
 export enum TransactionStatus {
@@ -244,6 +257,7 @@ export interface QuoteResponseItem {
   finalFromAmount?: string;
   finalToAmount?: string;
   sourceName?: string;
+  depositInstructions?: DepositInstructions;
 }
 
 export interface QuoteResponse {
@@ -506,6 +520,8 @@ export interface StakeResourceRequest {
 
 // ── Bank Accounts ──────────────────────────────────────────────────────
 
+export type PaymentRail = "ACH" | "WIRE" | "SEPA" | "SWIFT";
+
 export enum BankAccountStatus {
   PENDING = "PENDING",
   APPROVED = "APPROVED",
@@ -526,8 +542,16 @@ export interface BankAccount {
   accountName?: string;
   routingNumber?: string;
   clientBankAccountId?: string;
+  paymentRails?: PaymentRail[];
   paymentMethod?: string;
   bankName?: string;
+  currency?: string;
+  accountType?: string;
+  accountHolderName?: string;
+  iban?: string;
+  bic?: string;
+  pixKey?: string;
+  pixKeyType?: string;
   streetLine?: string;
   city?: string;
   state?: string;
@@ -591,8 +615,18 @@ export interface CreateBankAccountRequest {
   accountName?: string;
   routingNumber?: string;
   clientBankAccountId?: string;
+  // Every rail the account may be paid over. paymentMethod remains accepted as
+  // a single-rail alias, and sending both is rejected unless they agree.
+  paymentRails?: PaymentRail[];
   paymentMethod?: string;
   bankName?: string;
+  currency?: string;
+  accountType?: string;
+  accountHolderName?: string;
+  iban?: string;
+  bic?: string;
+  pixKey?: string;
+  pixKeyType?: string;
   streetLine?: string;
   city?: string;
   state?: string;

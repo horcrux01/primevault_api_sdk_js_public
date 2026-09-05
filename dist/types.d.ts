@@ -18,6 +18,7 @@ export declare enum TransferPartyType {
 export interface BankDetails {
     bankAccountId?: string;
     bankName?: string;
+    bankCode?: string;
     beneficiaryName?: string;
     accountName?: string;
     accountNumber?: string;
@@ -25,6 +26,7 @@ export interface BankDetails {
     routingNumber?: string;
     paymentRail?: string;
     bankAddress?: string;
+    beneficiaryAddress?: string;
     swiftCode?: string;
     swiftBic?: string;
     iban?: string;
@@ -37,6 +39,7 @@ export interface DepositInstructions {
     asset?: string;
     address?: string;
     chain?: string;
+    memo?: string;
 }
 export interface TransferPartyData {
     type: TransferPartyType | string;
@@ -135,7 +138,13 @@ export declare enum TransactionSubCategory {
     UNSTAKE = "UNSTAKE",
     CLAIM = "CLAIM",
     ON_RAMP = "ON_RAMP",
-    OFF_RAMP = "OFF_RAMP"
+    OFF_RAMP = "OFF_RAMP",
+    DEPOSIT = "DEPOSIT",
+    TRADE = "TRADE",
+    WITHDRAW = "WITHDRAW",
+    DEPOSIT_TRADE = "DEPOSIT_TRADE",
+    TRADE_WITHDRAW = "TRADE_WITHDRAW",
+    DEPOSIT_TRADE_WITHDRAW = "DEPOSIT_TRADE_WITHDRAW"
 }
 export declare enum TransactionStatus {
     DRAFT = "DRAFT",
@@ -219,6 +228,7 @@ export interface QuoteResponseItem {
     finalFromAmount?: string;
     finalToAmount?: string;
     sourceName?: string;
+    depositInstructions?: DepositInstructions;
 }
 export interface QuoteResponse {
     quotes: QuoteResponseItem[];
@@ -432,6 +442,7 @@ export interface StakeResourceRequest {
     externalId?: string;
     memo?: string;
 }
+export type PaymentRail = "ACH" | "WIRE" | "SEPA" | "SWIFT";
 export declare enum BankAccountStatus {
     PENDING = "PENDING",
     APPROVED = "APPROVED",
@@ -451,8 +462,16 @@ export interface BankAccount {
     accountName?: string;
     routingNumber?: string;
     clientBankAccountId?: string;
+    paymentRails?: PaymentRail[];
     paymentMethod?: string;
     bankName?: string;
+    currency?: string;
+    accountType?: string;
+    accountHolderName?: string;
+    iban?: string;
+    bic?: string;
+    pixKey?: string;
+    pixKeyType?: string;
     streetLine?: string;
     city?: string;
     state?: string;
@@ -508,8 +527,16 @@ export interface CreateBankAccountRequest {
     accountName?: string;
     routingNumber?: string;
     clientBankAccountId?: string;
+    paymentRails?: PaymentRail[];
     paymentMethod?: string;
     bankName?: string;
+    currency?: string;
+    accountType?: string;
+    accountHolderName?: string;
+    iban?: string;
+    bic?: string;
+    pixKey?: string;
+    pixKeyType?: string;
     streetLine?: string;
     city?: string;
     state?: string;

@@ -33,6 +33,12 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
             return yield this.get(url);
         });
     }
+    getActivityEvents() {
+        return __awaiter(this, arguments, void 0, function* (params = {}, limit = 20, cursor = "") {
+            const query = new URLSearchParams(Object.assign({ limit: String(limit), cursor: cursor !== null && cursor !== void 0 ? cursor : "" }, params));
+            return (yield this.get(`/api/external/activity/events/?${query.toString()}`));
+        });
+    }
     getTransactionById(transactionId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.get(`/api/external/transactions/${transactionId}/`);

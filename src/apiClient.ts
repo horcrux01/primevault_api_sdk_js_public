@@ -1,5 +1,6 @@
 import { BaseAPIClient } from "./baseApiClient";
 import {
+  ActivityEventListResponse,
   ApprovalAction,
   ApprovalActionResponse,
   Asset,
@@ -57,6 +58,21 @@ export class APIClient extends BaseAPIClient {
       url += `&${query}`;
     }
     return await this.get(url) as TransactionListResponse;
+  }
+
+  async getActivityEvents(
+    params: Record<string, string> = {},
+    limit: number = 20,
+    cursor: string | null = "",
+  ): Promise<ActivityEventListResponse> {
+    const query = new URLSearchParams({
+      limit: String(limit),
+      cursor: cursor ?? "",
+      ...params,
+    });
+    return (await this.get(
+      `/api/external/activity/events/?${query.toString()}`,
+    )) as ActivityEventListResponse;
   }
 
   async getTransactionById(transactionId: string): Promise<Transaction> {

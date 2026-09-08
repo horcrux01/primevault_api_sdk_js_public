@@ -538,4 +538,27 @@ export interface ApprovalActionResponse {
     id: string;
     entityId: string;
 }
+export interface ActivityEventMetaData {
+    platform?: string | null;
+    sourceIp?: string | null;
+    userAgent?: string | null;
+}
+export interface ActivityEvent {
+    id: string;
+    action: string;
+    outcome?: string | null;
+    activityLabel?: string | null;
+    createdAt?: string | null;
+    entityType?: string | null;
+    entityId?: string | null;
+    entityName?: string | null;
+    actorId?: string | null;
+    metaData?: ActivityEventMetaData | null;
+    schemaVersion?: string | null;
+}
+export interface ActivityEventListResponse {
+    results: ActivityEvent[];
+    nextCursor?: string | null;
+    hasNext?: boolean;
+}
 //# sourceMappingURL=types.d.ts.map

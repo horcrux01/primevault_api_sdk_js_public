@@ -1,9 +1,10 @@
 import { BaseAPIClient } from "./baseApiClient";
-import { ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAccount, BankAccountListResponse, ChainData, Contact, CreateBankAccountRequest, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, RampQuoteRequest, RampQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, TransactionListResponse, Vault, DetailedBalanceResponse, CreateOnRampTransactionRequest, CreateOffRampTransactionRequest, DelegateResourceRequest, StakeResourceRequest, UpdateContactRequest, UpdateContactResponse, VaultListResponse, ContactListResponse } from "./types";
+import { ActivityEventListResponse, ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAccount, BankAccountListResponse, ChainData, Contact, CreateBankAccountRequest, CreateContactRequest, CreateContractCallTransactionRequest, CreateTradeTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetTradeQuoteResponse, RampQuoteRequest, RampQuoteResponse, ReplaceTransactionRequest, TradeQuoteRequest, Transaction, TransactionListResponse, Vault, DetailedBalanceResponse, CreateOnRampTransactionRequest, CreateOffRampTransactionRequest, DelegateResourceRequest, StakeResourceRequest, UpdateContactRequest, UpdateContactResponse, VaultListResponse, ContactListResponse } from "./types";
 export declare class APIClient extends BaseAPIClient {
     getAssetsData(): Promise<Asset[]>;
     getSupportedChains(): Promise<ChainData[]>;
     getTransactions(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<TransactionListResponse>;
+    getActivityEvents(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<ActivityEventListResponse>;
     getTransactionById(transactionId: string): Promise<Transaction>;
     estimateFee(request: EstimateFeeRequest): Promise<EstimatedFeeResponse>;
     createTransferTransaction(request: CreateTransferTransactionRequest): Promise<Transaction>;

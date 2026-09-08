@@ -36,4 +36,7 @@ jobs:
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --provenance --access public
+        # 1.0.x backport: 2.0.x is already the highest published version, so npm
+        # will not implicitly apply the `latest` tag. Set it explicitly so 1.0.41
+        # becomes `latest` (same end result as the bare publish used for 1.0.40).
+        run: npm publish --provenance --access public --tag latest

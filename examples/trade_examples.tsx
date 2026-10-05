@@ -40,7 +40,6 @@ const createDeposit = async (apiClient: APIClient): Promise<Transaction> => {
     externalId: "deposit-001",
     memo: "USD deposit from quote",
   });
-  // Send funds to these instructions, then call markDepositDone.
   console.log("Deposit instructions:", deposit.depositInstructions);
   return deposit;
 };
@@ -65,17 +64,4 @@ const createWithdraw = async (apiClient: APIClient): Promise<Transaction> => {
   });
 };
 
-const markDepositDone = async (
-  apiClient: APIClient,
-  transactionId: string,
-): Promise<Transaction> => {
-  return await apiClient.markDepositDone(transactionId);
-};
-
-export {
-  createDeposit,
-  createTrade,
-  createWithdraw,
-  getTradeQuote,
-  markDepositDone,
-};
+export { createDeposit, createTrade, createWithdraw, getTradeQuote };

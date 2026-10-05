@@ -1,4 +1,4 @@
-import {APIClient, TransactionFeeTier, TransactionStatus} from "../src"; // Import the APIClient and types from the SDK @primevault/js-api-sdk
+import {APIClient, TransactionStatus} from "../src"; // Import the APIClient and types from the SDK @primevault/js-api-sdk
 
 const createContractCall = async (apiClient: APIClient) => {
     /*
@@ -8,7 +8,7 @@ const createContractCall = async (apiClient: APIClient) => {
         vaultName: "core-vault-1",
     })).results;
 
-    const vaultId = vaults.results[0].id;
+    const vaultId = vaults[0].id;
 
     // callData is `data` field in EVM transaction object
     let txnResponse = await apiClient.createContractCallTransaction({
@@ -19,9 +19,6 @@ const createContractCall = async (apiClient: APIClient) => {
            "callData": "0x095ea7b3000000000000000000000000c36442b4a4522e871399cd717abdd847ab11fe88ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
            "toAddress": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",        // Address of smart contract
         },
-        gasParams : {                                                        // Optional gas params
-            feeTier: TransactionFeeTier.HIGH
-        }
     });
 
     while (true) {
@@ -42,7 +39,7 @@ const rawMessageSignatureForEVM = async (apiClient: APIClient) => {
         vaultName: "core-vault-1",
     })).results;
 
-    const vaultId = vaults.results[0].id;
+    const vaultId = vaults[0].id;
 
     // Signing a raw message on ETHEREUM
     let txnResponse = await apiClient.createContractCallTransaction({

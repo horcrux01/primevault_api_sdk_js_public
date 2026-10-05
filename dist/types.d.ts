@@ -18,6 +18,7 @@ export declare enum TransferPartyType {
 export interface BankDetails {
     bankAccountId?: string;
     bankName?: string;
+    bankCode?: string;
     beneficiaryName?: string;
     accountName?: string;
     accountNumber?: string;
@@ -25,6 +26,7 @@ export interface BankDetails {
     routingNumber?: string;
     paymentRail?: string;
     bankAddress?: string;
+    beneficiaryAddress?: string;
     swiftCode?: string;
     swiftBic?: string;
     iban?: string;
@@ -37,11 +39,11 @@ export interface DepositInstructions {
     asset?: string;
     address?: string;
     chain?: string;
+    memo?: string;
 }
 export interface TransferPartyData {
     type: TransferPartyType | string;
     id?: string;
-    subOrgId?: string;
     name?: string;
     address?: string;
     provider?: string;
@@ -60,28 +62,34 @@ export interface Vault {
     subOrgId?: string;
     vaultName: string;
     vaultType: VaultType;
+    asset?: string | null;
     wallets: {
         id: string;
         blockchain: string;
         address?: string;
         publicKey?: string;
     }[];
-    signers?: {
-        id: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-    }[];
-    viewers: {
-        id: string;
-        firstName?: string;
-        lastName?: string;
-        email?: string;
-    }[];
     walletsGenerated: boolean;
     createdAt: string;
     updatedAt: string;
     isDeleted: boolean;
+}
+export declare enum SubOrgControlMode {
+    MANAGED = "MANAGED",
+    INDEPENDENT = "INDEPENDENT"
+}
+export interface SubOrg {
+    id: string;
+    orgId: string;
+    name: string;
+    controlMode: SubOrgControlMode | null;
+    createdAt: string;
+    updatedAt: string;
+    isDeleted: boolean;
+    version: number | null;
+}
+export interface CreateSubOrgRequest {
+    name: string;
 }
 export declare enum ContactStatus {
     PENDING = "PENDING",
@@ -112,12 +120,15 @@ export declare enum TransactionType {
 }
 export declare enum TransactionCategory {
     TRANSFER = "TRANSFER",
+    TRADE = "TRADE",
     SWAP = "SWAP",
     TOKEN_TRANSFER = "TOKEN_TRANSFER",
     TOKEN_APPROVAL = "TOKEN_APPROVAL",
     CONTRACT_CALL = "CONTRACT_CALL",
     STAKE = "STAKE",
     REVOKE_TOKEN_ALLOWANCE = "REVOKE_TOKEN_ALLOWANCE",
+    RAMP = "RAMP",
+    FX = "FX",
     ON_RAMP = "ON_RAMP",
     OFF_RAMP = "OFF_RAMP",
     DELEGATE_RESOURCE = "DELEGATE_RESOURCE"
@@ -134,6 +145,12 @@ export declare enum TransactionSubCategory {
     STAKE = "STAKE",
     UNSTAKE = "UNSTAKE",
     CLAIM = "CLAIM",
+    DEPOSIT = "DEPOSIT",
+    TRADE = "TRADE",
+    WITHDRAW = "WITHDRAW",
+    DEPOSIT_TRADE = "DEPOSIT_TRADE",
+    TRADE_WITHDRAW = "TRADE_WITHDRAW",
+    DEPOSIT_TRADE_WITHDRAW = "DEPOSIT_TRADE_WITHDRAW",
     ON_RAMP = "ON_RAMP",
     OFF_RAMP = "OFF_RAMP"
 }
@@ -213,43 +230,36 @@ export interface Fees {
 }
 export interface QuoteResponseItem {
     quoteId: string;
-    subOrgId?: string;
-    rate?: string;
-    fees?: Fees;
-    finalFromAmount?: string;
-    finalToAmount?: string;
-    sourceName?: string;
+    rate?: string | null;
+    fees?: Fees | null;
+    input?: IntentAsset;
+    output?: IntentAsset;
+    source?: TransferPartyData;
+    destination?: TransferPartyData;
+    expiresAt?: string;
 }
 export interface QuoteResponse {
     quotes: QuoteResponseItem[];
 }
-export interface RouteAccountData {
-    provider: string;
-    id: string;
+export interface IntentAsset {
+    asset: string;
+    amount?: string | null;
+    vaultId?: string;
 }
 export interface TransactionIntentRequest {
+    input: IntentAsset;
+    output: IntentAsset;
     source?: TransferPartyData;
     destination?: TransferPartyData;
-    routeAccounts?: RouteAccountData[];
-    fromAsset?: string;
-    fromAmount?: string;
-    fromChain?: string;
-    fromPaymentRail?: string;
-    toAsset?: string;
-    toAmount?: string;
-    toChain?: string;
-    toPaymentRail?: string;
 }
 export interface GetQuoteRequest {
     intent: TransactionIntentRequest;
-    subOrgId?: string;
 }
 export interface TransactionExecuteIntentRequest {
     intent?: TransactionIntentRequest | null;
     quoteId?: string | null;
     externalId?: string;
     memo?: string;
-    subOrgId?: string;
 }
 export interface Transaction {
     id: string;
@@ -276,7 +286,6 @@ export interface Transaction {
     dAppId?: string;
     source?: TransactionSourceData;
     destination?: TransactionSourceData;
-    intent?: TransactionIntentRequest;
     quoteResponse?: QuoteResponseItem;
     depositInstructions?: DepositInstructions;
     operations?: TransactionOperation[];
@@ -353,9 +362,18 @@ export interface CreateVaultRequest {
     testNetVault?: boolean;
     vaultGroupIds?: string[];
 }
+export type GetVaultDepositInstructionsRequest = {
+    asset: string;
+} & ({
+    chain: string;
+    paymentRail?: never;
+} | {
+    chain?: never;
+    paymentRail: string;
+});
 export declare enum PaymentMethod {
-    US_ACH = "US_ACH",
-    US_WIRE = "US_WIRE",
+    ACH = "ACH",
+    WIRE = "WIRE",
     SEPA = "SEPA",
     SWIFT = "SWIFT",
     BANK_TRANSFER = "BANK_TRANSFER"
@@ -458,6 +476,7 @@ export interface BankAccount {
     state?: string;
     postalCode?: string;
     country?: string;
+    tags?: string[];
 }
 export interface TransactionListResponse {
     results: Transaction[];
@@ -492,6 +511,14 @@ export interface VaultListResponse {
     nextCursor?: string | null;
     hasNext?: boolean;
 }
+export interface VaultDepositInstructionsResponse {
+    results: DepositInstructions[];
+}
+export interface SubOrgListResponse {
+    results: SubOrg[];
+    nextCursor: string | null;
+    hasNext: boolean;
+}
 export interface ContactListResponse {
     results: Contact[];
     nextCursor?: string | null;
@@ -515,6 +542,7 @@ export interface CreateBankAccountRequest {
     state?: string;
     postalCode?: string;
     country?: string;
+    tags?: string[];
 }
 export declare enum ApprovalAction {
     APPROVE = "approve",

@@ -1,329 +1,291 @@
-jest.mock("uuid", () => ({
-  v4: () => "test-jti",
-}));
-
-import { APIClient } from "../src/apiClient";
 import {
   ApprovalAction,
+  BankAccount,
+  BankAccountStatus,
+  CreateBankAccountRequest,
+  CreateTransferTransactionRequest,
   TransactionCategory,
   TransactionStatus,
   TransferPartyType,
-} from "../src/types";
-
-/**
- * Unit tests for the create/update *WithApproval convenience flows.
- *
- * The client is instantiated without running the constructor (so no real
- * credentials or signature service are required); `post`, `get`, `put` and the
- * signature service are mocked.
- */
-const buildClient = () => {
-  const client = Object.create(APIClient.prototype) as APIClient;
-  const post = jest.fn();
-  const get = jest.fn();
-  const put = jest.fn();
-  const sign = jest.fn().mockResolvedValue("0a0b");
-  (client as any).post = post;
-  (client as any).get = get;
-  (client as any).put = put;
-  (client as any).signatureService = { sign };
-  return { client, post, get, put, sign };
-};
+} from "../src";
+import { createMockClient, transaction, vault } from "./helpers";
 
 const approvalMessage = {
   approvalId: "approval-id",
   message: "approval-message",
 };
-
-const actionPath = "/api/external/change_requests/approvals/approval-id/action/";
 const approvalMessagePath =
   "/api/external/change_requests/approvals/approval_message/";
+const actionPath =
+  "/api/external/change_requests/approvals/approval-id/action/";
 
-describe("createVaultWithApproval", () => {
-  test("creates the vault, approves it and re-fetches", async () => {
-    const { client, post, get } = buildClient();
-    const vaultResponse = {
-      id: "vault-id",
-      orgId: "org-id",
-      subOrgId: "sub-org-id",
-      vaultName: "Treasury",
-      vaultType: "DEFAULT",
-      viewers: [],
-      walletsGenerated: false,
-      createdAt: "2026-05-25T00:00:00Z",
-      updatedAt: "2026-05-25T00:00:00Z",
-      isDeleted: false,
-    };
-    post
-      .mockResolvedValueOnce(vaultResponse)
-      .mockResolvedValueOnce({ success: true });
-    get
-      .mockResolvedValueOnce(approvalMessage)
-      .mockResolvedValueOnce({ ...vaultResponse, walletsGenerated: true });
+const arrangeApproval = <T extends { id: string }>(
+  created: T,
+  refetched: object,
+  method: "post" | "put" = "post",
+) => {
+  const mocks = createMockClient();
+  mocks[method].mockResolvedValueOnce(created);
+  mocks.post.mockResolvedValueOnce({ success: true });
+  mocks.get
+    .mockResolvedValueOnce(approvalMessage)
+    .mockResolvedValueOnce(refetched);
+  return mocks;
+};
 
-    const vault = await client.createVaultWithApproval({
-      vaultName: "Treasury",
-      subOrgId: "sub-org-id",
-      vaultGroupIds: ["group-1", "group-2"],
-    });
-
-    expect(vault.id).toBe("vault-id");
-    expect(vault.subOrgId).toBe("sub-org-id");
-    expect(vault.walletsGenerated).toBe(true);
-    expect(post).toHaveBeenNthCalledWith(1, "/api/external/vaults/", {
-      vaultName: "Treasury",
-      subOrgId: "sub-org-id",
-      vaultGroupIds: ["group-1", "group-2"],
-    });
-    expect(get).toHaveBeenNthCalledWith(1, approvalMessagePath, {
-      entityId: "vault-id",
-    });
-    expect(post).toHaveBeenNthCalledWith(2, actionPath, {
-      action: ApprovalAction.APPROVE,
-      signature: "0a0b",
-      reason: "ok",
-    });
-    expect(get).toHaveBeenNthCalledWith(2, "/api/external/vaults/vault-id/");
+const expectApproval = (
+  mocks: ReturnType<typeof createMockClient>,
+  entityId: string,
+  detailPath: string,
+  method: "post" | "put" = "post",
+) => {
+  expect(mocks.get.mock.calls).toEqual([
+    [approvalMessagePath, { entityId }],
+    [detailPath],
+  ]);
+  expect(mocks.sign).toHaveBeenCalledTimes(1);
+  expect(mocks.sign).toHaveBeenCalledWith(approvalMessage.message);
+  expect(mocks.post).toHaveBeenCalledTimes(method === "post" ? 2 : 1);
+  expect(mocks.post).toHaveBeenLastCalledWith(actionPath, {
+    action: ApprovalAction.APPROVE,
+    signature: "0a0b",
+    reason: "ok",
   });
-});
+};
 
-describe("createContactWithApproval", () => {
-  test("creates the contact, approves it and re-fetches", async () => {
-    const { client, post, get } = buildClient();
-    const contactResponse = {
-      id: "contact-id",
-      orgId: "org-id",
-      subOrgId: "sub-org-id",
-      name: "USDT/USDC Contact",
-      blockChain: "ETHEREUM",
-      address: "0xCa1Dc85B6a8F4Ee45C5C66D887d512355b7D0609",
-      status: "PENDING",
-      createdAt: "2026-05-25T00:00:00Z",
-      updatedAt: "2026-05-25T00:00:00Z",
-      isDeleted: false,
-      assetList: ["USDT", "USDC"],
+const transferRequest: CreateTransferTransactionRequest & {
+  isAutomation: boolean;
+  executeAt: string;
+} = {
+  source: { type: TransferPartyType.VAULT, id: vault.id },
+  destination: { type: TransferPartyType.CONTACT, id: "contact-id" },
+  amount: transaction.amount,
+  asset: "USDC",
+  chain: "ETHEREUM",
+  externalId: "external-id",
+  memo: "transfer",
+  isAutomation: true,
+  executeAt: "2026-08-04T00:00:00Z",
+};
+
+describe("approval flows", () => {
+  test("creates, approves and refetches a vault", async () => {
+    const mocks = arrangeApproval({ ...vault, walletsGenerated: false }, vault);
+    const request = {
+      vaultName: vault.vaultName,
+      subOrgId: vault.subOrgId,
+      vaultGroupIds: ["group-1", "group-2"],
     };
-    post
-      .mockResolvedValueOnce(contactResponse)
-      .mockResolvedValueOnce({ success: true });
-    get
-      .mockResolvedValueOnce(approvalMessage)
-      .mockResolvedValueOnce({ ...contactResponse, status: "APPROVED" });
 
-    const contact = await client.createContactWithApproval({
+    expect(await mocks.client.createVaultWithApproval(request)).toBe(vault);
+    expect(mocks.post).toHaveBeenNthCalledWith(
+      1,
+      "/api/external/vaults/",
+      request,
+    );
+    expectApproval(mocks, vault.id, "/api/external/vaults/vault-id/");
+  });
+
+  test("creates, approves and refetches a contact", async () => {
+    const request = {
       name: "USDT/USDC Contact",
       subOrgId: "sub-org-id",
-      address: "0xCa1Dc85B6a8F4Ee45C5C66D887d512355b7D0609",
+      address: "0x123",
       chain: "ETHEREUM",
       assetList: ["USDT", "USDC"],
       contactGroupIds: ["contact-group-1"],
-    });
+    };
+    const refetched = { id: "contact-id", status: "APPROVED" };
+    const mocks = arrangeApproval(
+      { ...refetched, status: "PENDING" },
+      refetched,
+    );
 
-    expect(contact.id).toBe("contact-id");
-    expect(contact.subOrgId).toBe("sub-org-id");
-    expect(contact.status).toBe("APPROVED");
-    expect(post).toHaveBeenNthCalledWith(1, "/api/external/contacts/", {
-      name: "USDT/USDC Contact",
-      subOrgId: "sub-org-id",
-      address: "0xCa1Dc85B6a8F4Ee45C5C66D887d512355b7D0609",
+    expect(await mocks.client.createContactWithApproval(request)).toBe(
+      refetched,
+    );
+    expect(mocks.post).toHaveBeenNthCalledWith(1, "/api/external/contacts/", {
+      name: request.name,
+      subOrgId: request.subOrgId,
+      address: request.address,
       blockChain: "ETHEREUM",
       tags: undefined,
       externalId: undefined,
-      assetList: ["USDT", "USDC"],
-      contactGroupIds: ["contact-group-1"],
+      assetList: request.assetList,
+      contactGroupIds: request.contactGroupIds,
     });
-    expect(get).toHaveBeenNthCalledWith(1, approvalMessagePath, {
-      entityId: "contact-id",
-    });
-    expect(post).toHaveBeenNthCalledWith(2, actionPath, {
-      action: ApprovalAction.APPROVE,
-      signature: "0a0b",
-      reason: "ok",
-    });
-    expect(get).toHaveBeenNthCalledWith(2, "/api/external/contacts/contact-id/");
+    expectApproval(mocks, "contact-id", "/api/external/contacts/contact-id/");
   });
-});
 
-describe("updateContactWithApproval", () => {
-  test("updates the contact, approves it and re-fetches", async () => {
-    const { client, post, get, put } = buildClient();
-    const updateResponse = {
+  test("updates, approves and refetches a contact", async () => {
+    const request = {
       id: "contact-id",
-      name: "USDT/USDC Contact",
-      address: "0xCa1Dc85B6a8F4Ee45C5C66D887d512355b7D0609",
-      blockChain: "ETHEREUM",
       assetList: ["USDT"],
+      contactGroupIds: [],
     };
-    const refetchedContact = {
-      id: "contact-id",
-      orgId: "org-id",
-      name: "USDT/USDC Contact",
-      blockChain: "ETHEREUM",
-      address: "0xCa1Dc85B6a8F4Ee45C5C66D887d512355b7D0609",
+    const refetched = {
+      id: request.id,
       status: "APPROVED",
-      createdAt: "2026-05-25T00:00:00Z",
-      updatedAt: "2026-05-25T00:00:00Z",
-      isDeleted: false,
-      assetList: ["USDT"],
+      assetList: request.assetList,
     };
-    put.mockResolvedValueOnce(updateResponse);
-    post.mockResolvedValueOnce({ success: true });
-    get
-      .mockResolvedValueOnce(approvalMessage)
-      .mockResolvedValueOnce(refetchedContact);
+    const mocks = arrangeApproval(request, refetched, "put");
 
-    const updated = await client.updateContactWithApproval({
-      id: "contact-id",
-      assetList: ["USDT"],
-      contactGroupIds: [],
-    });
-
-    expect(updated.id).toBe("contact-id");
-    expect(updated.status).toBe("APPROVED");
-    expect(updated.assetList).toEqual(["USDT"]);
-    expect(put).toHaveBeenNthCalledWith(1, "/api/external/contacts/contact-id/", {
-      assetList: ["USDT"],
-      contactGroupIds: [],
-    });
-    expect(get).toHaveBeenNthCalledWith(1, approvalMessagePath, {
-      entityId: "contact-id",
-    });
-    expect(post).toHaveBeenNthCalledWith(1, actionPath, {
-      action: ApprovalAction.APPROVE,
-      signature: "0a0b",
-      reason: "ok",
-    });
-    expect(get).toHaveBeenNthCalledWith(2, "/api/external/contacts/contact-id/");
+    expect(await mocks.client.updateContactWithApproval(request)).toBe(
+      refetched,
+    );
+    expect(mocks.put).toHaveBeenCalledTimes(1);
+    expect(mocks.put).toHaveBeenCalledWith(
+      "/api/external/contacts/contact-id/",
+      {
+        assetList: request.assetList,
+        contactGroupIds: [],
+      },
+    );
+    expectApproval(
+      mocks,
+      request.id,
+      "/api/external/contacts/contact-id/",
+      "put",
+    );
   });
-});
 
-describe("createBankAccountWithApproval", () => {
-  test("creates the bank account, approves it and re-fetches", async () => {
-    const { client, post, get } = buildClient();
-    const bankAccountResponse = {
+  test("preserves bank account tags through creation, approval and listing", async () => {
+    const request: CreateBankAccountRequest = {
+      subOrgId: "sub-org-id",
+      accountNumber: "123456789",
+      accountName: "Treasury Account",
+      bankName: "Chase",
+      tags: ["treasury", "payroll", "treasury"],
+    };
+    const refetched: BankAccount = {
+      ...request,
       id: "bank-account-id",
       orgId: "org-id",
-      subOrgId: "sub-org-id",
       orgEntityId: "org-entity-id",
       createdById: "user-id",
       createdAt: "2026-05-25T00:00:00Z",
       updatedAt: "2026-05-25T00:00:00Z",
       isDeleted: false,
-      status: "PENDING",
-      accountName: "Treasury Account",
-      bankName: "Chase",
+      status: BankAccountStatus.APPROVED,
     };
-    post
-      .mockResolvedValueOnce(bankAccountResponse)
-      .mockResolvedValueOnce({ success: true });
-    get
-      .mockResolvedValueOnce(approvalMessage)
-      .mockResolvedValueOnce({ ...bankAccountResponse, status: "APPROVED" });
+    const mocks = arrangeApproval(
+      { ...refetched, status: BankAccountStatus.PENDING },
+      refetched,
+    );
 
-    const request = {
-      subOrgId: "sub-org-id",
-      accountNumber: "123456789",
-      accountName: "Treasury Account",
-      bankName: "Chase",
-    };
-    const bankAccount = await client.createBankAccountWithApproval(request);
-
-    expect(bankAccount.id).toBe("bank-account-id");
-    expect(bankAccount.subOrgId).toBe("sub-org-id");
-    expect(bankAccount.createdById).toBe("user-id");
-    expect(bankAccount.status).toBe("APPROVED");
-    expect(post).toHaveBeenNthCalledWith(1, "/api/external/bank_accounts/", request);
-    expect(get).toHaveBeenNthCalledWith(1, approvalMessagePath, {
-      entityId: "bank-account-id",
-    });
-    expect(post).toHaveBeenNthCalledWith(2, actionPath, {
-      action: ApprovalAction.APPROVE,
-      signature: "0a0b",
-      reason: "ok",
-    });
-    expect(get).toHaveBeenNthCalledWith(
-      2,
+    expect(await mocks.client.createBankAccountWithApproval(request)).toBe(
+      refetched,
+    );
+    expect(mocks.post).toHaveBeenNthCalledWith(
+      1,
+      "/api/external/bank_accounts/",
+      request,
+    );
+    expectApproval(
+      mocks,
+      refetched.id,
       "/api/external/bank_accounts/bank-account-id/",
     );
+
+    const page = { results: [refetched], nextCursor: null, hasNext: false };
+    mocks.get.mockResolvedValueOnce(page);
+    expect(await mocks.client.getBankAccounts()).toBe(page);
+    expect(mocks.get).toHaveBeenLastCalledWith(
+      "/api/external/bank_accounts/?limit=20&cursor=",
+    );
   });
-});
 
-describe("createTransactionWithApproval", () => {
-  const transferRequest = {
-    source: { type: TransferPartyType.VAULT, id: "vault-id" },
-    destination: { type: TransferPartyType.CONTACT, id: "contact-id" },
-    amount: "1",
-    asset: "USDC",
-    chain: "ETHEREUM",
-  };
-  const transactionResponse = {
-    id: "transaction-id",
-    orgId: "org-id",
-    vaultId: "vault-id",
-    amount: "1",
-    status: TransactionStatus.PENDING,
-    transactionType: "OUTGOING",
-    category: TransactionCategory.TRANSFER,
-    subCategory: "EXTERNAL_TRANSFER",
-    createdAt: "2026-05-25T00:00:00Z",
-    updatedAt: "2026-05-25T00:00:00Z",
-    isDeleted: false,
-  };
+  test("serializes a transfer without automation fields, approves and refetches it", async () => {
+    const mocks = arrangeApproval(
+      { ...transaction, status: TransactionStatus.PENDING },
+      transaction,
+    );
 
-  test("creates the transaction, approves it and re-fetches", async () => {
-    const { client, post, get } = buildClient();
-    post
-      .mockResolvedValueOnce(transactionResponse)
-      .mockResolvedValueOnce({ success: true });
-    get.mockResolvedValueOnce(approvalMessage).mockResolvedValueOnce({
-      ...transactionResponse,
-      status: TransactionStatus.APPROVED,
-    });
-
-    const transaction =
-      await client.createTransactionWithApproval(transferRequest);
-
-    expect(transaction.id).toBe("transaction-id");
-    expect(transaction.status).toBe(TransactionStatus.APPROVED);
-    expect(post).toHaveBeenNthCalledWith(1, "/api/external/transactions/", {
-      source: transferRequest.source,
-      destination: transferRequest.destination,
-      amount: "1",
-      asset: "USDC",
-      blockChain: "ETHEREUM",
-      category: TransactionCategory.TRANSFER,
-      gasParams: undefined,
-      externalId: undefined,
-      memo: undefined,
-      feePayer: undefined,
-    });
-    expect(get).toHaveBeenNthCalledWith(1, approvalMessagePath, {
-      entityId: "transaction-id",
-    });
-    expect(post).toHaveBeenNthCalledWith(2, actionPath, {
-      action: ApprovalAction.APPROVE,
-      signature: "0a0b",
-      reason: "ok",
-    });
-    expect(get).toHaveBeenNthCalledWith(
-      2,
+    expect(
+      await mocks.client.createTransactionWithApproval(transferRequest),
+    ).toBe(transaction);
+    expect(mocks.post).toHaveBeenNthCalledWith(
+      1,
+      "/api/external/transactions/",
+      {
+        source: transferRequest.source,
+        destination: transferRequest.destination,
+        amount: transferRequest.amount,
+        asset: "USDC",
+        blockChain: "ETHEREUM",
+        category: TransactionCategory.TRANSFER,
+        gasParams: undefined,
+        externalId: transferRequest.externalId,
+        memo: transferRequest.memo,
+        feePayer: undefined,
+      },
+    );
+    expectApproval(
+      mocks,
+      transaction.id,
       "/api/external/transactions/transaction-id/",
     );
   });
 
-  test("skips approval when the created transaction is not pending", async () => {
-    const { client, post, get, sign } = buildClient();
-    post.mockResolvedValueOnce({
-      ...transactionResponse,
-      status: TransactionStatus.APPROVED,
-    });
+  test("approves and refetches a pending intent transaction", async () => {
+    const mocks = arrangeApproval(
+      { ...transaction, status: TransactionStatus.PENDING },
+      transaction,
+    );
 
-    const transaction =
-      await client.createTransactionWithApproval(transferRequest);
+    expect(
+      await mocks.client.createTransactionFromIntent({ quoteId: "quote-id" }),
+    ).toBe(transaction);
+    expect(mocks.post).toHaveBeenNthCalledWith(
+      1,
+      "/api/external/transactions/intent/create/",
+      {
+        intent: null,
+        quoteId: "quote-id",
+        externalId: undefined,
+        memo: undefined,
+      },
+    );
+    expectApproval(
+      mocks,
+      transaction.id,
+      "/api/external/transactions/transaction-id/",
+    );
+  });
 
-    expect(transaction.status).toBe(TransactionStatus.APPROVED);
+  test("skips approval when a transfer is already approved", async () => {
+    const { client, post, get, sign } = createMockClient();
+    post.mockResolvedValue(transaction);
+
+    expect(await client.createTransactionWithApproval(transferRequest)).toBe(
+      transaction,
+    );
     expect(post).toHaveBeenCalledTimes(1);
     expect(get).not.toHaveBeenCalled();
     expect(sign).not.toHaveBeenCalled();
+  });
+
+  test("signs a generic change rejection with the supplied reason", async () => {
+    const { client, get, post, sign } = createMockClient();
+    get.mockResolvedValue(approvalMessage);
+    const response = { success: true };
+    post.mockResolvedValue(response);
+
+    expect(
+      await client.approveChangeRequest({
+        entityId: "entity-id",
+        action: ApprovalAction.REJECT,
+        reason: "not valid",
+      }),
+    ).toBe(response);
+    expect(get).toHaveBeenCalledWith(approvalMessagePath, {
+      entityId: "entity-id",
+    });
+    expect(sign).toHaveBeenCalledWith(approvalMessage.message);
+    expect(post).toHaveBeenCalledWith(actionPath, {
+      action: ApprovalAction.REJECT,
+      signature: "0a0b",
+      reason: "not valid",
+    });
   });
 });

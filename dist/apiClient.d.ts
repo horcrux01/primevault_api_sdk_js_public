@@ -1,5 +1,5 @@
 import { BaseAPIClient } from "./baseApiClient";
-import { ActivityEventListResponse, ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAccount, BankAccountListResponse, ChainData, Contact, CreateBankAccountRequest, CreateContactRequest, CreateContractCallTransactionRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetApprovalRequest, GetApprovalMessageResponse, GetQuoteRequest, QuoteResponse, ReplaceTransactionRequest, Transaction, TransactionExecuteIntentRequest, TransactionListResponse, Vault, DetailedBalanceResponse, DelegateResourceRequest, StakeResourceRequest, UpdateContactRequest, UpdateContactResponse, VaultListResponse, ContactListResponse } from "./types";
+import { ActivityEventListResponse, ApprovalAction, ApprovalActionResponse, Asset, BalanceResponse, BankAccount, BankAccountListResponse, ChainData, Contact, CreateBankAccountRequest, CreateContactRequest, CreateContractCallTransactionRequest, CreateSubOrgRequest, CreateTransferTransactionRequest, CreateVaultRequest, EstimatedFeeResponse, EstimateFeeRequest, GetApprovalRequest, GetApprovalMessageResponse, GetQuoteRequest, GetVaultDepositInstructionsRequest, QuoteResponse, ReplaceTransactionRequest, Transaction, TransactionExecuteIntentRequest, TransactionListResponse, Vault, DetailedBalanceResponse, DelegateResourceRequest, StakeResourceRequest, SubOrg, SubOrgListResponse, UpdateContactRequest, UpdateContactResponse, VaultListResponse, VaultDepositInstructionsResponse, ContactListResponse } from "./types";
 export declare class APIClient extends BaseAPIClient {
     getAssetsData(): Promise<Asset[]>;
     getSupportedChains(): Promise<ChainData[]>;
@@ -27,6 +27,7 @@ export declare class APIClient extends BaseAPIClient {
     markDepositDone(transactionId: string): Promise<Transaction>;
     getVaults(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<VaultListResponse>;
     getVaultById(vaultId: string): Promise<Vault>;
+    getVaultDepositInstructions(vaultId: string, request: GetVaultDepositInstructionsRequest): Promise<VaultDepositInstructionsResponse>;
     createVault(data: CreateVaultRequest): Promise<Vault>;
     createVaultApproval(vault: Vault): Promise<Vault>;
     createVaultWithApproval(request: CreateVaultRequest): Promise<Vault>;
@@ -34,6 +35,8 @@ export declare class APIClient extends BaseAPIClient {
     getDetailedBalances(vaultId: string, params?: Record<string, string>): Promise<DetailedBalanceResponse>;
     getOperationMessageToSign(operationId: string): Promise<any>;
     updateUserAction(operationId: string, isApproved: boolean, signatureHex: string): Promise<any>;
+    getSubOrgs(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<SubOrgListResponse>;
+    createSubOrg(request: CreateSubOrgRequest): Promise<SubOrg>;
     getContacts(params?: Record<string, string>, limit?: number, cursor?: string | null): Promise<ContactListResponse>;
     getContactById(contactId: string): Promise<Contact>;
     createContact(request: CreateContactRequest): Promise<Contact>;

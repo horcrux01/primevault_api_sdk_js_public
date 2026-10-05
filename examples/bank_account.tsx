@@ -22,6 +22,7 @@ const createAndApproveBankAccount = async (
     state: "NY",
     postalCode: "10001",
     country: "US",
+    tags: ["treasury", "payroll"],
   };
 
   const bankAccount = await apiClient.createBankAccountWithApproval(request);

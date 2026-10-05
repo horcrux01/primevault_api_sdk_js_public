@@ -1,3 +1,5 @@
+import * as crypto from "node:crypto";
+
 /**
  * Sorts the keys of an object recursively. 
  * 
@@ -10,7 +12,7 @@ function sortObjectKeysRecursively(obj: any) {
   }
 
   const sortedKeys = Object.keys(obj).sort();
-  const sortedObj = {};
+  const sortedObj: Record<string, any> = {};
 
   for (const key of sortedKeys) {
     sortedObj[key] = sortObjectKeysRecursively(obj[key]); // Recurse for nested objects

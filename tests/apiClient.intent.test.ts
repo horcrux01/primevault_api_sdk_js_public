@@ -1,539 +1,263 @@
-jest.mock("uuid", () => ({
-  v4: () => "test-jti",
-}));
-
-import { APIClient } from "../src/apiClient";
 import {
-  ApprovalAction,
   BankAccount,
-  BankAccountStatus,
   BankDetails,
   CreateBankAccountRequest,
-  CreateTransferTransactionRequest,
   DepositInstructions,
   QuoteResponse,
   Transaction,
   TransactionCategory,
-  TransactionOperationStatus,
-  TransactionOperationType,
+  TransactionIntentRequest,
   TransactionStatus,
+  TransactionSubCategory,
+  TransferPartyData,
   TransferPartyType,
-} from "../src/types";
-
-const makeClient = (): APIClient =>
-  Object.create(APIClient.prototype) as APIClient;
+} from "../src";
+import { createMockClient, transaction } from "./helpers";
 
 describe("APIClient intent transactions", () => {
-  test("getQuote posts the backend intent payload and returns generic quotes", async () => {
-    const apiClient = makeClient();
+  test("quotes preserve supplied intent fields and omit removed JavaScript fields", async () => {
+    const { client, post } = createMockClient();
+    const source: TransferPartyData = {
+      type: TransferPartyType.EXTERNAL_BANK_ACCOUNT,
+      paymentRail: "WIRE",
+      bankDetails: {
+        bankName: "Example Bank",
+        bankCode: "001",
+        accountNumber: "000123456789",
+        beneficiaryAddress: "123 Example Street",
+      },
+    };
+    const intent: TransactionIntentRequest = {
+      input: { asset: "USD", vaultId: "fiat-vault-id" },
+      output: { asset: "USDC", amount: "100", vaultId: "crypto-vault-id" },
+      source,
+      destination: {
+        type: TransferPartyType.VAULT,
+        id: "crypto-vault-id",
+        chain: "ETHEREUM",
+      },
+    };
     const response: QuoteResponse = {
       quotes: [
         {
-          quoteId: "quote-1",
-          subOrgId: "sub-org-id",
-          finalFromAmount: "101.25",
-          fees: {
-            amount: "1.25",
-            asset: "USDC",
-          },
-          sourceName: "provider",
+          quoteId: "quote-id",
+          rate: null,
+          fees: null,
+          input: { ...intent.input, amount: "101.25" },
+          output: intent.output,
         },
       ],
     };
-    const postSpy = jest.spyOn(apiClient, "post").mockResolvedValue(response);
+    post.mockResolvedValue(response);
 
-    const quoteResponse = await apiClient.getQuote({
-      subOrgId: "sub-org-id",
+    const request = {
+      subOrgId: "removed-sub-org",
+      category: "RAMP",
       intent: {
+        ...intent,
+        routeAccounts: [{ provider: "removed-provider" }],
         source: {
-          type: TransferPartyType.VAULT,
-          id: "vault-1",
-          subOrgId: "source-sub-org-id",
-        },
-        destination: {
-          type: TransferPartyType.BANK_ACCOUNT,
-          id: "bank-account-1",
-        },
-        routeAccounts: [
-          {
-            provider: "provider-key",
-            id: "provider-linked-vault-id",
+          ...source,
+          subOrgId: "removed-party-sub-org",
+          bankDetails: {
+            ...source.bankDetails,
+            accountNumberMasked: "****6789",
+            swiftBic: "EXAMPLEXXX",
           },
-        ],
-        fromAsset: "USDC",
-        fromAmount: "100",
-        fromChain: "ETHEREUM",
-        fromPaymentRail: "BLOCKCHAIN",
-        toAsset: "USD",
-        toAmount: "99",
-        toPaymentRail: "ACH",
+        },
       },
-    });
+    };
+    const result = await client.getQuote(request);
 
-    expect(postSpy).toHaveBeenCalledWith("/api/external/transactions/quote/", {
-      intent: {
-        source: {
-          type: TransferPartyType.VAULT,
-          id: "vault-1",
-          subOrgId: "source-sub-org-id",
-          name: null,
-          address: null,
-          provider: null,
-          bankDetails: null,
-          chain: null,
-          paymentRail: null,
-        },
-        destination: {
-          type: TransferPartyType.BANK_ACCOUNT,
-          id: "bank-account-1",
-          subOrgId: null,
-          name: null,
-          address: null,
-          provider: null,
-          bankDetails: null,
-          chain: null,
-          paymentRail: null,
-        },
-        routeAccounts: [
-          {
-            provider: "provider-key",
-            id: "provider-linked-vault-id",
-          },
-        ],
-        fromAsset: "USDC",
-        toAsset: "USD",
-        fromAmount: "100",
-        fromChain: "ETHEREUM",
-        fromPaymentRail: "BLOCKCHAIN",
-        toAmount: "99",
-        toChain: null,
-        toPaymentRail: "ACH",
-      },
-      subOrgId: "sub-org-id",
+    expect(post).toHaveBeenCalledTimes(1);
+    expect(post).toHaveBeenCalledWith("/api/external/transactions/v2/quote/", {
+      intent,
     });
-    expect(quoteResponse.quotes[0].quoteId).toBe("quote-1");
-    expect(quoteResponse.quotes[0].finalFromAmount).toBe("101.25");
-    expect(quoteResponse.quotes[0].subOrgId).toBe("sub-org-id");
+    expect(result).toBe(response);
   });
 
-  test("createTransferTransaction omits unsupported automation fields", async () => {
-    const apiClient = makeClient();
-    const postSpy = jest
-      .spyOn(apiClient, "post")
-      .mockResolvedValue({ id: "transaction-id" });
-    const request: CreateTransferTransactionRequest & {
-      isAutomation: boolean;
-      executeAt: string;
-    } = {
+  test("a best quote names neither party and returns the parties it priced", async () => {
+    const { client, post } = createMockClient();
+    const lpVault = { type: TransferPartyType.VAULT, id: "lp-vault-id" };
+    const response: QuoteResponse = {
+      quotes: [
+        {
+          quoteId: "quote-id",
+          rate: "1.00030009",
+          fees: { amount: "0", asset: "USDT" },
+          input: { asset: "USDT", amount: "10000" },
+          output: { asset: "USD", amount: "10003" },
+          source: lpVault,
+          destination: lpVault,
+          expiresAt: "2026-09-30T10:00:30+00:00",
+        },
+      ],
+    };
+    post.mockResolvedValue(response);
+
+    const result = await client.getQuote({
+      intent: {
+        input: { asset: "USDT", amount: "10000" },
+        output: { asset: "USD" },
+      },
+    });
+
+    expect(post).toHaveBeenCalledWith("/api/external/transactions/v2/quote/", {
+      intent: {
+        input: { asset: "USDT", amount: "10000" },
+        output: { asset: "USD" },
+      },
+    });
+    expect(result).toBe(response);
+  });
+
+  test("executes an intent with partial bank details without a quote ID", async () => {
+    const { client, post, get, sign } = createMockClient();
+    const intent: TransactionIntentRequest = {
+      input: { asset: "USDC", amount: "100.123456" },
+      output: { asset: "USD", vaultId: "fiat-vault-id" },
       source: {
         type: TransferPartyType.VAULT,
-        id: "vault-id",
+        id: "crypto-vault-id",
+        chain: "ETHEREUM",
       },
       destination: {
-        type: TransferPartyType.CONTACT,
-        id: "contact-id",
+        type: TransferPartyType.EXTERNAL_BANK_ACCOUNT,
+        paymentRail: "ACH",
+        bankDetails: {
+          bankName: "Example Bank",
+          accountNumber: "000123456789",
+        },
       },
-      amount: "1",
-      asset: "USDC",
-      chain: "ETHEREUM",
-      externalId: "external-id",
-      isAutomation: true,
-      executeAt: "2026-08-04T00:00:00Z",
-      memo: "transfer",
     };
+    post.mockResolvedValue(transaction);
 
-    await apiClient.createTransferTransaction(request);
-
-    expect(postSpy).toHaveBeenCalledWith("/api/external/transactions/", {
-      source: request.source,
-      destination: request.destination,
-      amount: "1",
-      asset: "USDC",
-      blockChain: "ETHEREUM",
-      category: TransactionCategory.TRANSFER,
-      gasParams: undefined,
-      externalId: "external-id",
-      memo: "transfer",
-      feePayer: undefined,
-    });
-    const payload = postSpy.mock.calls[0][1];
-    expect(payload).not.toHaveProperty("isAutomation");
-    expect(payload).not.toHaveProperty("executeAt");
+    expect(await client.createTransactionFromIntent({ intent })).toBe(
+      transaction,
+    );
+    expect(post).toHaveBeenCalledTimes(1);
+    expect(post).toHaveBeenCalledWith(
+      "/api/external/transactions/intent/create/",
+      { intent, quoteId: undefined, externalId: undefined, memo: undefined },
+    );
+    expect(get).not.toHaveBeenCalled();
+    expect(sign).not.toHaveBeenCalled();
   });
 
-  test("createTransactionFromIntent serializes quote-only execution", async () => {
-    const apiClient = makeClient();
-    const transaction = {
-      id: "transaction-id",
-      orgId: "org-id",
-      vaultId: "vault-id",
-      amount: "1",
-      status: TransactionStatus.APPROVED,
-      transactionType: "OUTGOING",
-      category: "SWAP",
-      subCategory: "MARKET_TRADE",
-      createdAt: "2026-05-25T00:00:00Z",
-      updatedAt: "2026-05-25T00:00:00Z",
-      isDeleted: false,
-    } satisfies Transaction;
-    const postSpy = jest
-      .spyOn(apiClient, "post")
-      .mockResolvedValue(transaction);
-    const getSpy = jest.spyOn(apiClient, "get");
+  test("executes a quote and preserves transaction response details", async () => {
+    const { client, post, get, sign } = createMockClient();
+    const source = {
+      type: TransferPartyType.VAULT,
+      id: "vault-id",
+      chain: "ETHEREUM",
+    };
+    const destination = {
+      type: TransferPartyType.BANK_ACCOUNT,
+      id: "bank-account-id",
+      paymentRail: "ACH",
+    };
+    const response: Transaction = {
+      ...transaction,
+      category: TransactionCategory.RAMP,
+      subCategory: TransactionSubCategory.TRADE_WITHDRAW,
+      asset: "USDC",
+      source: { ...source, name: "USDC Treasury" },
+      destination: { ...destination, name: "USD Payroll" },
+      depositInstructions: {
+        type: TransferPartyType.EXTERNAL_ADDRESS,
+        asset: "USDC",
+        chain: "ETHEREUM",
+        address: "0x123",
+      },
+      balanceChanges: {
+        changes: [
+          {
+            party: source,
+            asset: "USDC",
+            amount: "-10000.00",
+            chain: "ETHEREUM",
+          },
+          {
+            party: destination,
+            asset: "USD",
+            amount: "9975.00",
+            paymentRail: "ACH",
+          },
+        ],
+      },
+      quoteResponse: {
+        quoteId: "quote-id",
+        rate: "1",
+        fees: { amount: "25.00", asset: "USDC" },
+        input: { asset: "USDC", amount: "10000.00" },
+        output: { asset: "USD", amount: "9975.00", vaultId: "usd-vault-id" },
+        source,
+        destination,
+        expiresAt: "2026-05-25T00:00:30+00:00",
+      },
+    };
+    post.mockResolvedValue(response);
 
-    const response = await apiClient.createTransactionFromIntent({
+    const result = await client.createTransactionFromIntent({
       quoteId: "quote-id",
       externalId: "trade-001",
       memo: "trade from quote",
-      subOrgId: "sub-org-id",
     });
 
-    expect(response.id).toBe("transaction-id");
-    expect(postSpy).toHaveBeenCalledWith(
+    expect(result).toBe(response);
+    expect(post).toHaveBeenCalledTimes(1);
+    expect(post).toHaveBeenCalledWith(
       "/api/external/transactions/intent/create/",
       {
         intent: null,
         quoteId: "quote-id",
         externalId: "trade-001",
         memo: "trade from quote",
-        subOrgId: "sub-org-id",
       },
     );
-    expect(getSpy).not.toHaveBeenCalled();
+    expect(get).not.toHaveBeenCalled();
+    expect(sign).not.toHaveBeenCalled();
   });
 
-  test("createTransactionFromIntent approves and refetches pending transactions", async () => {
-    const apiClient = makeClient();
-    const pendingTransaction = {
-      id: "transaction-id",
-      orgId: "org-id",
-      vaultId: "vault-id",
-      amount: "1",
-      status: TransactionStatus.PENDING,
-      transactionType: "OUTGOING",
-      category: "TRANSFER",
-      subCategory: "EXTERNAL_TRANSFER",
-      createdAt: "2026-05-25T00:00:00Z",
-      updatedAt: "2026-05-25T00:00:00Z",
-      isDeleted: false,
-    } satisfies Transaction;
-    const approvedTransaction = {
-      ...pendingTransaction,
-      status: TransactionStatus.APPROVED,
-    } satisfies Transaction;
-    const postSpy = jest
-      .spyOn(apiClient, "post")
-      .mockResolvedValueOnce(pendingTransaction)
-      .mockResolvedValueOnce({ success: true });
-    const getSpy = jest
-      .spyOn(apiClient, "get")
-      .mockResolvedValueOnce({
-        message: "approval-message",
-        approvalId: "approval-id",
-      })
-      .mockResolvedValueOnce(approvedTransaction);
-    (apiClient as any).signatureService = {
-      sign: jest.fn().mockResolvedValue("0a0b"),
+  test("marks a settlement deposit done by its transaction ID", async () => {
+    const { client, post, get, sign } = createMockClient();
+    const response: Transaction = {
+      ...transaction,
+      id: "deposit-id",
+      status: TransactionStatus.SUBMITTED,
+      category: TransactionCategory.TRANSFER,
+      subCategory: TransactionSubCategory.DEPOSIT,
+      asset: "USD",
     };
+    post.mockResolvedValue(response);
 
-    const transaction = await apiClient.createTransactionFromIntent({
-      intent: {
-        routeAccounts: [
-          {
-            provider: "provider-key",
-            id: "provider-linked-vault-id",
-          },
-        ],
-      },
-      quoteId: "quote-id",
-      externalId: "external-id",
-      memo: "memo",
-    });
+    const result = await client.markDepositDone("deposit-id");
 
-    expect(transaction.status).toBe(TransactionStatus.APPROVED);
-    expect(postSpy).toHaveBeenNthCalledWith(
-      1,
-      "/api/external/transactions/intent/create/",
-      {
-        intent: {
-          source: null,
-          destination: null,
-          fromAsset: null,
-          toAsset: null,
-          fromAmount: null,
-          fromChain: null,
-          fromPaymentRail: null,
-          toAmount: null,
-          toChain: null,
-          toPaymentRail: null,
-        },
-        quoteId: "quote-id",
-        externalId: "external-id",
-        memo: "memo",
-      },
+    expect(result).toBe(response);
+    expect(post).toHaveBeenCalledWith(
+      "/api/external/transactions/mark_deposit_done/",
+      { transactionId: "deposit-id" },
     );
-    expect(
-      (postSpy.mock.calls[0][1] as any).intent.routeAccounts,
-    ).toBeUndefined();
-    expect(getSpy).toHaveBeenNthCalledWith(
-      1,
-      "/api/external/change_requests/approvals/approval_message/",
-      { entityId: "transaction-id" },
-    );
-    expect(postSpy).toHaveBeenNthCalledWith(
-      2,
-      "/api/external/change_requests/approvals/approval-id/action/",
-      {
-        action: ApprovalAction.APPROVE,
-        signature: "0a0b",
-        reason: "ok",
-      },
-    );
-    expect(getSpy).toHaveBeenNthCalledWith(
-      2,
-      "/api/external/transactions/transaction-id/",
-    );
-  });
-
-  test("approval helpers support the explicit message then sign and submit flow", async () => {
-    const apiClient = makeClient();
-    const getSpy = jest.spyOn(apiClient, "get").mockResolvedValue({
-      message: "message-to-sign",
-      approvalId: "approval-id",
-    });
-    const postSpy = jest.spyOn(apiClient, "post").mockResolvedValue({
-      success: true,
-    });
-    (apiClient as any).signatureService = {
-      sign: jest.fn().mockResolvedValue("deadbeef"),
-    };
-
-    const response = await apiClient.approveChangeRequest({
-      entityId: "entity-id",
-      action: ApprovalAction.REJECT,
-      reason: "not valid",
-    });
-
-    expect(response.success).toBe(true);
-    expect(getSpy).toHaveBeenCalledWith(
-      "/api/external/change_requests/approvals/approval_message/",
-      { entityId: "entity-id" },
-    );
-    expect(postSpy).toHaveBeenCalledWith(
-      "/api/external/change_requests/approvals/approval-id/action/",
-      {
-        action: ApprovalAction.REJECT,
-        signature: "deadbeef",
-        reason: "not valid",
-      },
-    );
-  });
-
-  test("change approvals use the same flow for contact, bank, and transaction entities", async () => {
-    const apiClient = makeClient();
-    const getSpy = jest
-      .spyOn(apiClient, "get")
-      .mockImplementation(
-        async (_path: string, params?: Record<string, string>) => ({
-          message: `message-for-${params?.entityId}`,
-          approvalId: `approval-for-${params?.entityId}`,
-        }),
-      );
-    const postSpy = jest.spyOn(apiClient, "post").mockResolvedValue({
-      success: true,
-    });
-    (apiClient as any).signatureService = {
-      sign: jest.fn(async (message: string) => `signature:${message}`),
-    };
-
-    for (const entityId of [
-      "contact-id",
-      "bank-account-id",
-      "transaction-id",
-    ]) {
-      await apiClient.approveChangeRequest({
-        entityId,
-        action: ApprovalAction.APPROVE,
-      });
-    }
-
-    for (const entityId of [
-      "contact-id",
-      "bank-account-id",
-      "transaction-id",
-    ]) {
-      expect(getSpy).toHaveBeenCalledWith(
-        "/api/external/change_requests/approvals/approval_message/",
-        { entityId },
-      );
-      expect(postSpy).toHaveBeenCalledWith(
-        `/api/external/change_requests/approvals/approval-for-${entityId}/action/`,
-        {
-          action: ApprovalAction.APPROVE,
-          signature: `signature:message-for-${entityId}`,
-          reason: "ok",
-        },
-      );
-    }
-  });
-
-  test("transaction response type carries operation details", () => {
-    const transaction = {
-      id: "transaction-id",
-      orgId: "org-id",
-      vaultId: "vault-id",
-      amount: "100",
-      status: TransactionStatus.APPROVED,
-      transactionType: "OUTGOING",
-      category: "OFF_RAMP",
-      subCategory: "WITHDRAW",
-      createdAt: "2026-05-25T00:00:00Z",
-      updatedAt: "2026-05-25T00:00:00Z",
-      isDeleted: false,
-      balanceChanges: {
-        changes: [
-          {
-            party: {
-              type: TransferPartyType.VAULT,
-              id: "vault-id",
-              chain: "ETHEREUM",
-              paymentRail: "BLOCKCHAIN",
-            },
-            asset: "USDC",
-            amount: "-100",
-            chain: "ETHEREUM",
-            paymentRail: "BLOCKCHAIN",
-          },
-        ],
-      },
-      operations: [
-        {
-          source: {
-            type: TransferPartyType.VAULT,
-            id: "vault-id",
-            subOrgId: "sub-org-id",
-            chain: "ETHEREUM",
-            paymentRail: "BLOCKCHAIN",
-            provider: "Example Provider",
-          },
-          destination: {
-            type: TransferPartyType.EXTERNAL_BANK_ACCOUNT,
-            paymentRail: "WIRE",
-          },
-          balanceChanges: {
-            changes: [
-              {
-                party: {
-                  type: TransferPartyType.VAULT,
-                  id: "vault-id",
-                  chain: "ETHEREUM",
-                  paymentRail: "BLOCKCHAIN",
-                },
-                asset: "USDC",
-                amount: "-100",
-                chain: "ETHEREUM",
-                paymentRail: "BLOCKCHAIN",
-              },
-            ],
-          },
-          sequence: 1,
-          type: TransactionOperationType.WITHDRAW,
-          status: TransactionOperationStatus.COMPLETED,
-          provider: "Example Provider",
-        },
-      ],
-    } satisfies Transaction;
-
-    const operation = transaction.operations?.[0];
-    expect(operation?.type).toBe(TransactionOperationType.WITHDRAW);
-    expect(operation?.status).toBe(TransactionOperationStatus.COMPLETED);
-    expect(operation?.source?.chain).toBe("ETHEREUM");
-    expect(operation?.source?.subOrgId).toBe("sub-org-id");
-    expect(operation?.source?.paymentRail).toBe("BLOCKCHAIN");
-    expect(operation?.destination?.paymentRail).toBe("WIRE");
-    expect(transaction.balanceChanges?.changes[0].asset).toBe("USDC");
-    expect(transaction.balanceChanges?.changes[0].amount).toBe("-100");
-    expect(operation?.balanceChanges?.changes[0].asset).toBe("USDC");
-    expect(operation?.balanceChanges?.changes[0].amount).toBe("-100");
-  });
-
-  test("bank API types use asset fields instead of currency", () => {
-    const depositInstructions = {
-      type: TransferPartyType.EXTERNAL_ADDRESS,
-      asset: "USDC",
-      address: "0x123",
-      chain: "ETHEREUM",
-      bankDetails: {
-        bankName: "Example Bank",
-      },
-    } satisfies DepositInstructions;
-
-    expect(depositInstructions.chain).toBe("ETHEREUM");
-    expect(depositInstructions.bankDetails?.bankName).toBe("Example Bank");
-
-    const bankDetails = {
-      bankName: "Example Bank",
-      accountNumber: "123456789",
-    } satisfies BankDetails;
-    expect(bankDetails.bankName).toBe("Example Bank");
-
-    const bankAccount = {
-      id: "bank-account-id",
-      orgId: "org-id",
-      orgEntityId: "org-entity-id",
-      createdById: "user-id",
-      createdAt: "2026-05-25T00:00:00Z",
-      updatedAt: "2026-05-25T00:00:00Z",
-      isDeleted: false,
-      status: BankAccountStatus.APPROVED,
-      bankName: "Example Bank",
-    } satisfies BankAccount;
-    expect(bankAccount.bankName).toBe("Example Bank");
-
-    const createBankAccountRequest = {
-      bankName: "Example Bank",
-      accountNumber: "123456789",
-    } satisfies CreateBankAccountRequest;
-    expect(createBankAccountRequest.accountNumber).toBe("123456789");
-
-    const topLevelCurrency = {
-      // @ts-expect-error DepositInstructions intentionally omits currency.
-      currency: "USD",
-    } satisfies DepositInstructions;
-    expect(topLevelCurrency.currency).toBe("USD");
-
-    const nestedCurrency = {
-      bankDetails: {
-        // @ts-expect-error BankDetails intentionally omits currency.
-        currency: "USD",
-      },
-    } satisfies DepositInstructions;
-    expect(nestedCurrency.bankDetails.currency).toBe("USD");
-
-    const bankDetailsCurrency = {
-      // @ts-expect-error BankDetails intentionally omits currency.
-      currency: "USD",
-    } satisfies BankDetails;
-    expect(bankDetailsCurrency.currency).toBe("USD");
-
-    const bankAccountCurrency = {
-      id: "bank-account-id",
-      orgId: "org-id",
-      orgEntityId: "org-entity-id",
-      createdById: "user-id",
-      createdAt: "2026-05-25T00:00:00Z",
-      updatedAt: "2026-05-25T00:00:00Z",
-      isDeleted: false,
-      status: BankAccountStatus.APPROVED,
-      // @ts-expect-error BankAccount intentionally omits currency.
-      currency: "USD",
-    } satisfies BankAccount;
-    expect(bankAccountCurrency.currency).toBe("USD");
-
-    const createBankAccountCurrency = {
-      // @ts-expect-error CreateBankAccountRequest intentionally omits currency.
-      currency: "USD",
-    } satisfies CreateBankAccountRequest;
-    expect(createBankAccountCurrency.currency).toBe("USD");
+    expect(get).not.toHaveBeenCalled();
+    expect(sign).not.toHaveBeenCalled();
   });
 });
+
+// Compile-time guards for removed public fields; no runtime fixture assertions.
+function checkRemovedCurrencyFields(
+  instructions: DepositInstructions,
+  bank: BankDetails,
+  account: BankAccount,
+  request: CreateBankAccountRequest,
+) {
+  // @ts-expect-error DepositInstructions uses asset, not currency.
+  instructions.currency;
+  // @ts-expect-error BankDetails does not expose currency.
+  bank.currency;
+  // @ts-expect-error Nested deposit bank details do not expose currency.
+  instructions.bankDetails?.currency;
+  // @ts-expect-error BankAccount does not expose currency.
+  account.currency;
+  // @ts-expect-error CreateBankAccountRequest does not accept currency.
+  request.currency;
+}

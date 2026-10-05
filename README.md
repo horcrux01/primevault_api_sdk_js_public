@@ -68,4 +68,16 @@ const apiClient = new APIClient(apiKey, apiUrl, undefined, keyId)
 ```
 
 ### Examples
+
+SubOrg creation and cursor-based listing are available through `createSubOrg` and
+`getSubOrgs`; see [the SubOrg example](examples/sub_org.tsx). Creation requires
+only `name` and creates an end-user SubOrg with `MANAGED` control mode.
+Supplying `controlMode` in a create request is rejected by the API.
+The API user must be ADMIN or OWNER to create or list SubOrgs. Creation requires
+organization-wide access; end-user admins and owners can list only their own
+SubOrg. The response includes `id`,
+`orgId`, `name`, `controlMode`, `createdAt`, `updatedAt`, `isDeleted`, and `version`.
+The optional `name` filter uses case-insensitive SQL patterns (`%Acme%` for a
+substring match). List responses include `results`, `nextCursor`, and `hasNext`.
+
 Code examples [here](https://github.com/horcrux01/primevault_api_sdk_js_public/tree/main/examples)

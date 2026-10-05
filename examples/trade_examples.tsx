@@ -1,19 +1,12 @@
 import { APIClient, Transaction, TransferPartyType } from "../src";
 import type { QuoteResponseItem, TransactionIntentRequest } from "../src";
 
-const VAULT_ID = "vault_id";
+const TRADE_VAULT_ID = "vault_id";
 
+// A trade quote names only the assets. The Trade Vault with the best quote is selected.
 const tradeIntent = (): TransactionIntentRequest => ({
-  source: {
-    type: TransferPartyType.VAULT,
-    id: VAULT_ID,
-  },
-  destination: {
-    type: TransferPartyType.VAULT,
-    id: VAULT_ID,
-  },
-  input: { asset: "USDT", amount: "100" },
-  output: { asset: "USD" },
+  input: { asset: "USD", amount: "100" },
+  output: { asset: "USDT" },
 });
 
 const getTradeQuote = async (
@@ -24,57 +17,51 @@ const getTradeQuote = async (
 };
 
 const createTrade = async (apiClient: APIClient): Promise<Transaction> => {
-  const quoteResponse = await getTradeQuote(apiClient);
-  console.log(
-    "Quoted selections:",
-    quoteResponse.input,
-    quoteResponse.output,
-  );
+  const quote = await getTradeQuote(apiClient);
+  console.log("Quoted selections:", quote.input, quote.output);
   return await apiClient.createTransactionFromIntent({
-    quoteId: quoteResponse.quoteId,
+    quoteId: quote.quoteId,
     externalId: "trade-001",
-    memo: "USDT to USD trade from quote",
+    memo: "USD to USDT trade from quote",
   });
 };
 
 const createDeposit = async (apiClient: APIClient): Promise<Transaction> => {
-  return await apiClient.createTransactionFromIntent({
+  const quoteResponse = await apiClient.getQuote({
     intent: {
-      input: { asset: "USDT", amount: "500" },
-      output: { asset: "USDT" },
-      source: {
-        type: TransferPartyType.CONTACT,
-        id: "contact-id",
-        chain: "ETHEREUM",
-      },
-      destination: { type: TransferPartyType.VAULT, id: VAULT_ID },
+      input: { asset: "USD", amount: "100" },
+      output: { asset: "USD" },
+      source: { type: TransferPartyType.CONTACT, id: "contact-id" },
+      destination: { type: TransferPartyType.VAULT, id: TRADE_VAULT_ID },
     },
-    externalId: "deposit-001",
-    memo: "USDT deposit from Circle",
   });
+  const deposit = await apiClient.createTransactionFromIntent({
+    quoteId: quoteResponse.quotes[0].quoteId,
+    externalId: "deposit-001",
+    memo: "USD deposit from quote",
+  });
+  console.log("Deposit instructions:", deposit.depositInstructions);
+  return deposit;
 };
 
 const createWithdraw = async (apiClient: APIClient): Promise<Transaction> => {
-  return await apiClient.createTransactionFromIntent({
+  const quoteResponse = await apiClient.getQuote({
     intent: {
-      input: { asset: "USD", amount: "250" },
-      output: { asset: "USD" },
-      source: { type: TransferPartyType.VAULT, id: VAULT_ID },
+      input: { asset: "USD" },
+      output: { asset: "USD", amount: "50" },
+      source: { type: TransferPartyType.VAULT, id: TRADE_VAULT_ID },
       destination: {
         type: TransferPartyType.BANK_ACCOUNT,
         id: "bank-account-id",
+        paymentRail: "WIRE",
       },
     },
+  });
+  return await apiClient.createTransactionFromIntent({
+    quoteId: quoteResponse.quotes[0].quoteId,
     externalId: "withdraw-001",
-    memo: "USD withdrawal to bank",
+    memo: "USD withdrawal from quote",
   });
 };
 
-const markDepositDone = async (
-  apiClient: APIClient,
-  transactionId: string,
-): Promise<Transaction> => {
-  return await apiClient.markDepositDone(transactionId);
-};
-
-export { createDeposit, createTrade, createWithdraw, getTradeQuote, markDepositDone };
+export { createDeposit, createTrade, createWithdraw, getTradeQuote };

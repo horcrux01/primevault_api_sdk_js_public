@@ -11,7 +11,7 @@ import {
   MimeType,
 } from '@aptos-labs/ts-sdk';
 
-import { TransactionStatus, APIClient } from '@primevault/js-api-sdk';
+import { TransactionStatus, APIClient } from '../src';
 
 async function aptosTransfer(apiClient: APIClient) {
   // Step 1: Initialize the Aptos client with Testnet network configuration

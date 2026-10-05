@@ -80,7 +80,27 @@ const getVaultsFiltered = async (apiClient: APIClient) => {
     const response = await apiClient.getVaults({ vaultName: "core-vault-1" }, 10);
     for (const vault of response.results) {
         console.log(`  ${vault.id} — ${vault.vaultName} (${vault.vaultType})`);
+        console.log("Bound asset:", vault.asset);
     }
+}
+
+const getVaultDepositInstructions = async (
+    apiClient: APIClient,
+    fiatVaultId: string,
+    cryptoVaultId: string,
+) => {
+    // Supply exactly one payment rail for bank deposits or one chain for crypto.
+    const bank = await apiClient.getVaultDepositInstructions(fiatVaultId, {
+        asset: "USD",
+        paymentRail: "WIRE",
+    });
+    console.log("Bank deposit instructions:", bank.results);
+
+    const crypto = await apiClient.getVaultDepositInstructions(cryptoVaultId, {
+        asset: "USDC",
+        chain: "ETHEREUM",
+    });
+    console.log("Crypto deposit instructions:", crypto.results);
 }
 
 const getDetailedBalance = async (apiClient: APIClient) => {

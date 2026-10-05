@@ -13,6 +13,7 @@ import {
   CreateBankAccountRequest,
   CreateContactRequest,
   CreateContractCallTransactionRequest,
+  CreateSubOrgRequest,
   CreateTransferTransactionRequest,
   CreateVaultRequest,
   EstimatedFeeResponse,
@@ -20,6 +21,8 @@ import {
   GetApprovalRequest,
   GetApprovalMessageResponse,
   GetQuoteRequest,
+  GetVaultDepositInstructionsRequest,
+  IntentAsset,
   QuoteResponse,
   ReplaceTransactionRequest,
   Transaction,
@@ -33,52 +36,59 @@ import {
   DetailedBalanceResponse,
   DelegateResourceRequest,
   StakeResourceRequest,
+  SubOrg,
+  SubOrgListResponse,
   UpdateContactRequest,
   UpdateContactResponse,
   VaultListResponse,
+  VaultDepositInstructionsResponse,
   ContactListResponse,
 } from "./types";
 
-function buildBankDetailsData(
-  bank?: BankDetails | null,
-): Record<string, any> | null {
-  if (!bank) {
-    return null;
-  }
-
+// accountNumberMasked and swiftBic only appear in deposit instructions; the
+// backend BankDetails request contract has no such fields.
+function buildBankDetailsData(bank: BankDetails): Record<string, any> {
   return {
-    bankAccountId: bank.bankAccountId ?? null,
-    bankName: bank.bankName ?? null,
-    beneficiaryName: bank.beneficiaryName ?? null,
-    accountName: bank.accountName ?? null,
-    accountNumber: bank.accountNumber ?? null,
-    routingNumber: bank.routingNumber ?? null,
-    paymentRail: bank.paymentRail ?? null,
-    bankAddress: bank.bankAddress ?? null,
-    swiftCode: bank.swiftCode ?? null,
-    swiftBic: bank.swiftBic ?? null,
-    iban: bank.iban ?? null,
-    country: bank.country ?? null,
+    ...(bank.bankAccountId === undefined ? {} : { bankAccountId: bank.bankAccountId }),
+    ...(bank.bankName === undefined ? {} : { bankName: bank.bankName }),
+    ...(bank.bankCode === undefined ? {} : { bankCode: bank.bankCode }),
+    ...(bank.beneficiaryName === undefined
+      ? {}
+      : { beneficiaryName: bank.beneficiaryName }),
+    ...(bank.accountName === undefined ? {} : { accountName: bank.accountName }),
+    ...(bank.accountNumber === undefined ? {} : { accountNumber: bank.accountNumber }),
+    ...(bank.routingNumber === undefined ? {} : { routingNumber: bank.routingNumber }),
+    ...(bank.paymentRail === undefined ? {} : { paymentRail: bank.paymentRail }),
+    ...(bank.bankAddress === undefined ? {} : { bankAddress: bank.bankAddress }),
+    ...(bank.beneficiaryAddress === undefined
+      ? {}
+      : { beneficiaryAddress: bank.beneficiaryAddress }),
+    ...(bank.swiftCode === undefined ? {} : { swiftCode: bank.swiftCode }),
+    ...(bank.iban === undefined ? {} : { iban: bank.iban }),
+    ...(bank.country === undefined ? {} : { country: bank.country }),
   };
 }
 
-function buildTransferPartyData(
-  party?: TransferPartyData | null,
-): Record<string, any> | null {
-  if (!party) {
-    return null;
-  }
-
+function buildTransferPartyData(party: TransferPartyData): Record<string, any> {
   return {
     type: party.type,
-    id: party.id ?? null,
-    subOrgId: party.subOrgId ?? null,
-    name: party.name ?? null,
-    address: party.address ?? null,
-    provider: party.provider ?? null,
-    bankDetails: buildBankDetailsData(party.bankDetails),
-    chain: party.chain ?? null,
-    paymentRail: party.paymentRail ?? null,
+    ...(party.id === undefined ? {} : { id: party.id }),
+    ...(party.name === undefined ? {} : { name: party.name }),
+    ...(party.address === undefined ? {} : { address: party.address }),
+    ...(party.provider === undefined ? {} : { provider: party.provider }),
+    ...(party.bankDetails === undefined
+      ? {}
+      : { bankDetails: buildBankDetailsData(party.bankDetails) }),
+    ...(party.chain === undefined ? {} : { chain: party.chain }),
+    ...(party.paymentRail === undefined ? {} : { paymentRail: party.paymentRail }),
+  };
+}
+
+function buildIntentAssetData(asset: IntentAsset): Record<string, any> {
+  return {
+    asset: asset.asset,
+    ...(asset.amount === undefined ? {} : { amount: asset.amount }),
+    ...(asset.vaultId === undefined ? {} : { vaultId: asset.vaultId }),
   };
 }
 
@@ -90,16 +100,14 @@ function buildTransactionIntentData(
   }
 
   return {
-    source: buildTransferPartyData(request.source),
-    destination: buildTransferPartyData(request.destination),
-    fromAsset: request.fromAsset ?? null,
-    toAsset: request.toAsset ?? null,
-    fromAmount: request.fromAmount ?? null,
-    fromChain: request.fromChain ?? null,
-    fromPaymentRail: request.fromPaymentRail ?? null,
-    toAmount: request.toAmount ?? null,
-    toChain: request.toChain ?? null,
-    toPaymentRail: request.toPaymentRail ?? null,
+    input: buildIntentAssetData(request.input),
+    output: buildIntentAssetData(request.output),
+    ...(request.source === undefined
+      ? {}
+      : { source: buildTransferPartyData(request.source) }),
+    ...(request.destination === undefined
+      ? {}
+      : { destination: buildTransferPartyData(request.destination) }),
   };
 }
 
@@ -276,19 +284,8 @@ export class APIClient extends BaseAPIClient {
   }
 
   async getQuote(request: GetQuoteRequest): Promise<QuoteResponse> {
-    const intent = buildTransactionIntentData(request.intent);
-    if (intent && request.intent.routeAccounts) {
-      intent.routeAccounts = request.intent.routeAccounts.map(
-        (routeAccount) => ({
-          provider: routeAccount.provider,
-          id: routeAccount.id,
-        }),
-      );
-    }
-
-    return await this.post("/api/external/transactions/quote/", {
-      intent,
-      ...(request.subOrgId === undefined ? {} : { subOrgId: request.subOrgId }),
+    return await this.post("/api/external/transactions/v2/quote/", {
+      intent: buildTransactionIntentData(request.intent),
     });
   }
 
@@ -302,9 +299,6 @@ export class APIClient extends BaseAPIClient {
         quoteId: request.quoteId,
         externalId: request.externalId,
         memo: request.memo,
-        ...(request.subOrgId === undefined
-          ? {}
-          : { subOrgId: request.subOrgId }),
       },
     )) as Transaction;
     return await this.approvePendingTransactionChangeRequest(transaction);
@@ -331,6 +325,16 @@ export class APIClient extends BaseAPIClient {
 
   async getVaultById(vaultId: string): Promise<Vault> {
     return await this.get(`/api/external/vaults/${vaultId}/`);
+  }
+
+  async getVaultDepositInstructions(
+    vaultId: string,
+    request: GetVaultDepositInstructionsRequest,
+  ): Promise<VaultDepositInstructionsResponse> {
+    return await this.get(
+      `/api/external/vaults/${vaultId}/deposit_instructions/`,
+      request,
+    );
   }
 
   async createVault(data: CreateVaultRequest): Promise<Vault> {
@@ -384,6 +388,25 @@ export class APIClient extends BaseAPIClient {
       `/api/external/operations/${operationId}/update_user_action/`,
       data,
     );
+  }
+
+  async getSubOrgs(
+    params: Record<string, string> = {},
+    limit: number = 20,
+    cursor?: string | null,
+  ): Promise<SubOrgListResponse> {
+    const query = new URLSearchParams({
+      limit: String(limit),
+      cursor: cursor ?? "",
+      ...params,
+    });
+    return (await this.get(
+      `/api/external/sub_orgs/?${query}`,
+    )) as SubOrgListResponse;
+  }
+
+  async createSubOrg(request: CreateSubOrgRequest): Promise<SubOrg> {
+    return await this.post("/api/external/sub_orgs/", request);
   }
 
   async getContacts(

@@ -54,7 +54,6 @@ const createTransfer = async (apiClient: APIClient) => {
             asset: ethereumAsset.symbol,
             chain: ethereumAsset.blockChain,
             externalId: "externalId-1",               // Optional externalId to track transactions, should be unique
-            gasParams: {},                            // Optional gasParams. Example: {'feeTier': 'MEDIUM'} for medium fee tier. Default is HIGH.
         });
     } catch (error: any) {
         if (error instanceof BadRequestError) {
@@ -82,20 +81,6 @@ const createTransfer = async (apiClient: APIClient) => {
     }
 
     txnResponse = await pollForTransaction(apiClient, txnResponse.id);
-}
-
-const feeEstimate = async (apiClient: APIClient) => {
-    const source = {id: "7ad54443-21d2-4075-abef-83758c9dceb7", type: TransferPartyType.VAULT}
-    const destination = {id: "ee177fd8-d00e-4c55-9966-36fcbfdce123", type: TransferPartyType.VAULT}
-
-    const response = await apiClient.estimateFee({
-        chain: "SOLANA",
-        source: source,
-        destination: destination,
-        amount: "0.0001",
-        asset: "USDT"
-    });
-    console.log(response);
 }
 
 const createTransferWithFeePayer = async (apiClient: APIClient) => {
@@ -128,7 +113,6 @@ const createTransferWithFeePayer = async (apiClient: APIClient) => {
             amount: "0.5",
             asset: solUsdt.symbol,
             chain: solUsdt.blockChain,
-            gasParams: {},
             feePayer: { id: feePayerVaultsResponse.results[0].id },   // Use GAS vault as fee payer
             memo: "Transfer with FeePayer vault example",
         });
@@ -220,4 +204,18 @@ const getTransactions = async (apiClient: APIClient) => {
     }
 
     console.log(`Total transactions: ${allTransactions.length}`);
+}
+
+const feeEstimate = async (apiClient: APIClient) => {
+    const source = {id: "7ad54443-21d2-4075-abef-83758c9dceb7", type: TransferPartyType.VAULT}
+    const destination = {id: "ee177fd8-d00e-4c55-9966-36fcbfdce123", type: TransferPartyType.VAULT}
+
+    const response = await apiClient.estimateFee({
+        chain: "SOLANA",
+        source: source,
+        destination: destination,
+        amount: "0.0001",
+        asset: "USDT"
+    });
+    console.log(response);
 }

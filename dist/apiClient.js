@@ -12,60 +12,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.APIClient = void 0;
 const baseApiClient_1 = require("./baseApiClient");
 const types_1 = require("./types");
+// accountNumberMasked and swiftBic only appear in deposit instructions; the
+// backend BankDetails request contract has no such fields.
 function buildBankDetailsData(bank) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
-    if (!bank) {
-        return null;
-    }
-    return {
-        bankAccountId: (_a = bank.bankAccountId) !== null && _a !== void 0 ? _a : null,
-        bankName: (_b = bank.bankName) !== null && _b !== void 0 ? _b : null,
-        beneficiaryName: (_c = bank.beneficiaryName) !== null && _c !== void 0 ? _c : null,
-        accountName: (_d = bank.accountName) !== null && _d !== void 0 ? _d : null,
-        accountNumber: (_e = bank.accountNumber) !== null && _e !== void 0 ? _e : null,
-        routingNumber: (_f = bank.routingNumber) !== null && _f !== void 0 ? _f : null,
-        paymentRail: (_g = bank.paymentRail) !== null && _g !== void 0 ? _g : null,
-        bankAddress: (_h = bank.bankAddress) !== null && _h !== void 0 ? _h : null,
-        swiftCode: (_j = bank.swiftCode) !== null && _j !== void 0 ? _j : null,
-        swiftBic: (_k = bank.swiftBic) !== null && _k !== void 0 ? _k : null,
-        iban: (_l = bank.iban) !== null && _l !== void 0 ? _l : null,
-        country: (_m = bank.country) !== null && _m !== void 0 ? _m : null,
-    };
+    return Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (bank.bankAccountId === undefined ? {} : { bankAccountId: bank.bankAccountId })), (bank.bankName === undefined ? {} : { bankName: bank.bankName })), (bank.bankCode === undefined ? {} : { bankCode: bank.bankCode })), (bank.beneficiaryName === undefined
+        ? {}
+        : { beneficiaryName: bank.beneficiaryName })), (bank.accountName === undefined ? {} : { accountName: bank.accountName })), (bank.accountNumber === undefined ? {} : { accountNumber: bank.accountNumber })), (bank.routingNumber === undefined ? {} : { routingNumber: bank.routingNumber })), (bank.paymentRail === undefined ? {} : { paymentRail: bank.paymentRail })), (bank.bankAddress === undefined ? {} : { bankAddress: bank.bankAddress })), (bank.beneficiaryAddress === undefined
+        ? {}
+        : { beneficiaryAddress: bank.beneficiaryAddress })), (bank.swiftCode === undefined ? {} : { swiftCode: bank.swiftCode })), (bank.iban === undefined ? {} : { iban: bank.iban })), (bank.country === undefined ? {} : { country: bank.country }));
 }
 function buildTransferPartyData(party) {
-    var _a, _b, _c, _d, _e, _f, _g;
-    if (!party) {
-        return null;
-    }
-    return {
-        type: party.type,
-        id: (_a = party.id) !== null && _a !== void 0 ? _a : null,
-        subOrgId: (_b = party.subOrgId) !== null && _b !== void 0 ? _b : null,
-        name: (_c = party.name) !== null && _c !== void 0 ? _c : null,
-        address: (_d = party.address) !== null && _d !== void 0 ? _d : null,
-        provider: (_e = party.provider) !== null && _e !== void 0 ? _e : null,
-        bankDetails: buildBankDetailsData(party.bankDetails),
-        chain: (_f = party.chain) !== null && _f !== void 0 ? _f : null,
-        paymentRail: (_g = party.paymentRail) !== null && _g !== void 0 ? _g : null,
-    };
+    return Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ type: party.type }, (party.id === undefined ? {} : { id: party.id })), (party.name === undefined ? {} : { name: party.name })), (party.address === undefined ? {} : { address: party.address })), (party.provider === undefined ? {} : { provider: party.provider })), (party.bankDetails === undefined
+        ? {}
+        : { bankDetails: buildBankDetailsData(party.bankDetails) })), (party.chain === undefined ? {} : { chain: party.chain })), (party.paymentRail === undefined ? {} : { paymentRail: party.paymentRail }));
+}
+function buildIntentAssetData(asset) {
+    return Object.assign(Object.assign({ asset: asset.asset }, (asset.amount === undefined ? {} : { amount: asset.amount })), (asset.vaultId === undefined ? {} : { vaultId: asset.vaultId }));
 }
 function buildTransactionIntentData(request) {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
     if (!request) {
         return null;
     }
-    return {
-        source: buildTransferPartyData(request.source),
-        destination: buildTransferPartyData(request.destination),
-        fromAsset: (_a = request.fromAsset) !== null && _a !== void 0 ? _a : null,
-        toAsset: (_b = request.toAsset) !== null && _b !== void 0 ? _b : null,
-        fromAmount: (_c = request.fromAmount) !== null && _c !== void 0 ? _c : null,
-        fromChain: (_d = request.fromChain) !== null && _d !== void 0 ? _d : null,
-        fromPaymentRail: (_e = request.fromPaymentRail) !== null && _e !== void 0 ? _e : null,
-        toAmount: (_f = request.toAmount) !== null && _f !== void 0 ? _f : null,
-        toChain: (_g = request.toChain) !== null && _g !== void 0 ? _g : null,
-        toPaymentRail: (_h = request.toPaymentRail) !== null && _h !== void 0 ? _h : null,
-    };
+    return Object.assign(Object.assign({ input: buildIntentAssetData(request.input), output: buildIntentAssetData(request.output) }, (request.source === undefined
+        ? {}
+        : { source: buildTransferPartyData(request.source) })), (request.destination === undefined
+        ? {}
+        : { destination: buildTransferPartyData(request.destination) }));
 }
 class APIClient extends baseApiClient_1.BaseAPIClient {
     getAssetsData() {
@@ -200,21 +172,19 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
     }
     getQuote(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            const intent = buildTransactionIntentData(request.intent);
-            if (intent && request.intent.routeAccounts) {
-                intent.routeAccounts = request.intent.routeAccounts.map((routeAccount) => ({
-                    provider: routeAccount.provider,
-                    id: routeAccount.id,
-                }));
-            }
-            return yield this.post("/api/external/transactions/quote/", Object.assign({ intent }, (request.subOrgId === undefined ? {} : { subOrgId: request.subOrgId })));
+            return yield this.post("/api/external/transactions/v2/quote/", {
+                intent: buildTransactionIntentData(request.intent),
+            });
         });
     }
     createTransactionFromIntent(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            const transaction = (yield this.post("/api/external/transactions/intent/create/", Object.assign({ intent: buildTransactionIntentData(request.intent), quoteId: request.quoteId, externalId: request.externalId, memo: request.memo }, (request.subOrgId === undefined
-                ? {}
-                : { subOrgId: request.subOrgId }))));
+            const transaction = (yield this.post("/api/external/transactions/intent/create/", {
+                intent: buildTransactionIntentData(request.intent),
+                quoteId: request.quoteId,
+                externalId: request.externalId,
+                memo: request.memo,
+            }));
             return yield this.approvePendingTransactionChangeRequest(transaction);
         });
     }
@@ -238,6 +208,11 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
     getVaultById(vaultId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.get(`/api/external/vaults/${vaultId}/`);
+        });
+    }
+    getVaultDepositInstructions(vaultId, request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.get(`/api/external/vaults/${vaultId}/deposit_instructions/`, request);
         });
     }
     createVault(data) {
@@ -283,6 +258,17 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 operationId,
             };
             return yield this.post(`/api/external/operations/${operationId}/update_user_action/`, data);
+        });
+    }
+    getSubOrgs() {
+        return __awaiter(this, arguments, void 0, function* (params = {}, limit = 20, cursor) {
+            const query = new URLSearchParams(Object.assign({ limit: String(limit), cursor: cursor !== null && cursor !== void 0 ? cursor : "" }, params));
+            return (yield this.get(`/api/external/sub_orgs/?${query}`));
+        });
+    }
+    createSubOrg(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.post("/api/external/sub_orgs/", request);
         });
     }
     getContacts() {

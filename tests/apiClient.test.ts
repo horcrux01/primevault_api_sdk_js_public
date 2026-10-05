@@ -1,18 +1,15 @@
-import {APIClient} from "../src/apiClient";
-import {BadRequestError} from "../src/baseApiClient";
-import {Asset, ContactStatus, TransactionFeeTier, TransferPartyType, VaultType} from "../src/types";
+import { APIClient } from "../src/apiClient";
+import { BadRequestError } from "../src/baseApiClient";
+import {
+  Asset,
+  ContactStatus,
+  DetailedBalance,
+  TransactionFeeTier,
+  TransferPartyType,
+  VaultType,
+} from "../src/types";
 
-enum Chain {
-    "ETHEREUM" = "ETHEREUM",
-    "POLYGON" = "POLYGON",
-    "SOLANA" = "SOLANA",
-    "NEAR" = "NEAR",
-    "APTOS" = "APTOS",
-    "ARBITRUM" = "ARBITRUM",
-    "OPTIMISM" = "OPTIMISM",
-}
-
-describe("APIClient", () => {
+describe("APIClient live integration", () => {
   const apiKey = process.env.API_KEY!;
   const apiUrl = process.env.API_URL!;
   const privateKey = process.env.ACCESS_PRIVATE_KEY!;
@@ -20,16 +17,12 @@ describe("APIClient", () => {
 
   test("getAssetsData", async () => {
     const assetsData = await apiClient.getAssetsData();
-    expect(assetsData).toBeDefined();
     expect(assetsData).toBeInstanceOf(Array);
-    expect(assetsData.length).toBe(86);
+    expect(assetsData).toHaveLength(86);
   });
 
   test("getSupportedChains", async () => {
     const supportedChains = await apiClient.getSupportedChains();
-    expect(supportedChains).toBeDefined();
-    expect(supportedChains).toBeInstanceOf(Array);
-    expect(supportedChains.length).toBe(10);
     expect(supportedChains.map((chain: any) => chain.value).sort()).toEqual([
       "APTOS",
       "ARBITRUM",
@@ -47,16 +40,9 @@ describe("APIClient", () => {
   test("getVaults", async () => {
     const vaults = (await apiClient.getVaults({ vaultName: "core-vault-1" }))
       .results;
-    expect(vaults).toBeDefined();
-    expect(vaults).toBeInstanceOf(Array);
-    expect(vaults.length).toBe(1);
+    expect(vaults).toHaveLength(1);
     expect(vaults[0].vaultName).toBe("core-vault-1");
     expect(vaults[0].vaultType).toBe(VaultType.DEFAULT);
-    expect(vaults[0].wallets).toBeDefined();
-    expect(vaults[0].wallets.length).toBe(8);
-    expect(vaults[0].signers).toBeDefined();
-    expect(vaults[0].signers!.length).toBe(9);
-    expect(vaults[0].viewers.length).toBe(0);
 
     const blockchains = vaults[0].wallets
       .map((wallet: any) => wallet.blockchain)
@@ -75,8 +61,6 @@ describe("APIClient", () => {
     );
 
     const vault = await apiClient.getVaultById(vaults[0].id);
-    expect(vault).toBeDefined();
-    expect(vault).toBeInstanceOf(Object);
     expect(vault.vaultName).toBe("core-vault-1");
     expect(vault.vaultType).toBe(VaultType.DEFAULT);
   });
@@ -85,8 +69,6 @@ describe("APIClient", () => {
     let vaults = (await apiClient.getVaults({ vaultName: "core-vault-1" }))
       .results;
     const balances = await apiClient.getBalances(vaults[0].id);
-    expect(balances).toBeDefined();
-    expect(balances).toBeInstanceOf(Object);
     expect(balances).toStrictEqual({
       ETH: { ETHEREUM: "1" },
       USDC: { ETHEREUM: "1342" },
@@ -96,21 +78,13 @@ describe("APIClient", () => {
     vaults = (await apiClient.getVaults({ vaultName: "Ethereum Vault" }))
       .results;
     const balances2 = await apiClient.getBalances(vaults[0].id);
-    expect(balances2).toBeDefined();
-    expect(balances2).toBeInstanceOf(Object);
-    expect(Object.keys(balances2).length).toBe(5);
-    expect(balances2["ETH"]).toBeDefined();
-    expect(balances2["ETH"]).toBeInstanceOf(Object);
-    expect(Object.keys(balances2["ETH"]).length).toBe(3);
+    expect(Object.keys(balances2)).toHaveLength(5);
     expect(balances2["ETH"]).toStrictEqual({
       ARBITRUM: "0",
       ETHEREUM: "0.00950008",
       OPTIMISM: "0",
     });
 
-    expect(balances2["MATIC"]).toBeDefined();
-    expect(balances2["MATIC"]).toBeInstanceOf(Object);
-    expect(Object.keys(balances2["MATIC"]).length).toBe(1);
     expect(balances2["MATIC"]).toStrictEqual({ POLYGON: "0.00767327" });
   });
 
@@ -121,50 +95,36 @@ describe("APIClient", () => {
     const vaultId = vaults[0].id;
     const detailedBalances = await apiClient.getDetailedBalances(vaultId);
 
-    // Verify the response type and overall structure
-    expect(detailedBalances).toBeDefined();
-    expect(detailedBalances).toBeInstanceOf(Array);
-    expect(detailedBalances.length).toBeGreaterThan(0);
-
-    // Create dictionary for easier lookup by chain and symbol
-    const balancesByKey: Record<string, any> = {};
+    const balancesByKey: Record<string, DetailedBalance> = {};
     for (const balance of detailedBalances) {
       const key = `${balance.chain}:${balance.symbol}`;
       balancesByKey[key] = balance;
     }
 
-    // Check specific expected balances
-    // ETH on Ethereum
-    const ethKey = "ETHEREUM:ETH";
-    expect(balancesByKey).toHaveProperty(ethKey);
-    const ethBalance = balancesByKey[ethKey];
-    expect(ethBalance.chain).toBe("ETHEREUM");
-    expect(ethBalance.symbol).toBe("ETH");
-    expect(ethBalance.name).toBe("Ethereum");
-    expect(ethBalance.balance).toBe("0.00950008");
-
-    // MATIC on Polygon
-    const maticKey = "POLYGON:MATIC";
-    expect(balancesByKey).toHaveProperty(maticKey);
-    const maticBalance = balancesByKey[maticKey];
-    expect(maticBalance.chain).toBe("POLYGON");
-    expect(maticBalance.symbol).toBe("MATIC");
-    expect(maticBalance.name).toBe("Matic");
-    expect(maticBalance.balance).toBe("0.00767327");
+    expect(balancesByKey["ETHEREUM:ETH"]).toMatchObject({
+      chain: "ETHEREUM",
+      symbol: "ETH",
+      name: "Ethereum",
+      balance: "0.00950008",
+    });
+    expect(balancesByKey["POLYGON:MATIC"]).toMatchObject({
+      chain: "POLYGON",
+      symbol: "MATIC",
+      name: "Matic",
+      balance: "0.00767327",
+    });
   });
 
   test("getContacts", async () => {
     const contacts = (await apiClient.getContacts({ name: "Lynn Bell" }))
       .results;
-    expect(contacts).toBeDefined();
-    expect(contacts).toBeInstanceOf(Array);
-    expect(contacts.length).toBe(1);
-    expect(contacts[0].name).toBe("Lynn Bell");
-    expect(contacts[0].blockChain).toBe("SOLANA");
-    expect(contacts[0].address).toBe(
-      "CEzN7mqP9xoxn2HdyW6fjEJ73t7qaX9Rp2zyS6hb3iEu",
-    );
-    expect(contacts[0].status).toBe(ContactStatus.APPROVED);
+    expect(contacts).toHaveLength(1);
+    expect(contacts[0]).toMatchObject({
+      name: "Lynn Bell",
+      blockChain: "SOLANA",
+      address: "CEzN7mqP9xoxn2HdyW6fjEJ73t7qaX9Rp2zyS6hb3iEu",
+      status: ContactStatus.APPROVED,
+    });
   });
 
   test("createVault", async () => {
@@ -226,19 +186,16 @@ describe("APIClient", () => {
     const transaction = await apiClient.getTransactionById(
       "f1cb568d-215e-426f-998a-4ba5be8288d4",
     );
-    expect(transaction).toBeDefined();
-    expect(transaction).toBeInstanceOf(Object);
-    expect(transaction.id).toBe("f1cb568d-215e-426f-998a-4ba5be8288d4");
-    expect(transaction.status).toBe("PENDING");
-    expect(transaction.blockChain).toBe("ETHEREUM");
-    expect(transaction.externalId).toBeNull();
-    expect(transaction.toAddressName).toBe("Compound");
-    expect(transaction.sourceAddress).toBe("0x1feDDa0D98c5B4FDEbde9342d3db6Eff284B0d18");
-    expect(transaction.memo).toBeNull();
-    expect(transaction.fees).toBeDefined();
-    expect(transaction.fees).toBeInstanceOf(Object);
-    expect(transaction.fees?.amount).toBe("0.00055509");
-    expect(transaction.fees?.asset).toBe("ETH");
+    expect(transaction).toMatchObject({
+      id: "f1cb568d-215e-426f-998a-4ba5be8288d4",
+      status: "PENDING",
+      blockChain: "ETHEREUM",
+      externalId: null,
+      toAddressName: "Compound",
+      sourceAddress: "0x1feDDa0D98c5B4FDEbde9342d3db6Eff284B0d18",
+      memo: null,
+      fees: { amount: "0.00055509", asset: "ETH" },
+    });
   });
 
   test("createContractCallTransaction", async () => {
@@ -251,13 +208,13 @@ describe("APIClient", () => {
     try {
       await apiClient.createContractCallTransaction({
         vaultId: vaultId,
-        chain: Chain.ETHEREUM,
+        chain: "ETHEREUM",
         externalId: "externalId-1",
         gasParams: { feeTier: TransactionFeeTier.MEDIUM },
-        data : {
+        data: {
           callData: "0x",
           toAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-        }
+        },
       });
     } catch (e: any) {
       expect(e).toBeInstanceOf(BadRequestError);

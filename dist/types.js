@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ApprovalAction = exports.BankAccountStatus = exports.ResourceType = exports.PaymentMethod = exports.TransactionOperationStatus = exports.TransactionOperationType = exports.TransactionFeeTier = exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.VaultType = exports.TransferPartyType = void 0;
+exports.ApprovalAction = exports.BankAccountStatus = exports.ResourceType = exports.PaymentMethod = exports.TransactionOperationStatus = exports.TransactionOperationType = exports.TransactionFeeTier = exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.SubOrgControlMode = exports.VaultType = exports.TransferPartyType = void 0;
 var TransferPartyType;
 (function (TransferPartyType) {
     TransferPartyType["CONTACT"] = "CONTACT";
@@ -15,6 +15,11 @@ var VaultType;
     VaultType["DEFAULT"] = "DEFAULT";
     VaultType["GAS"] = "GAS";
 })(VaultType || (exports.VaultType = VaultType = {}));
+var SubOrgControlMode;
+(function (SubOrgControlMode) {
+    SubOrgControlMode["MANAGED"] = "MANAGED";
+    SubOrgControlMode["INDEPENDENT"] = "INDEPENDENT";
+})(SubOrgControlMode || (exports.SubOrgControlMode = SubOrgControlMode = {}));
 var ContactStatus;
 (function (ContactStatus) {
     ContactStatus["PENDING"] = "PENDING";
@@ -29,12 +34,15 @@ var TransactionType;
 var TransactionCategory;
 (function (TransactionCategory) {
     TransactionCategory["TRANSFER"] = "TRANSFER";
+    TransactionCategory["TRADE"] = "TRADE";
     TransactionCategory["SWAP"] = "SWAP";
     TransactionCategory["TOKEN_TRANSFER"] = "TOKEN_TRANSFER";
     TransactionCategory["TOKEN_APPROVAL"] = "TOKEN_APPROVAL";
     TransactionCategory["CONTRACT_CALL"] = "CONTRACT_CALL";
     TransactionCategory["STAKE"] = "STAKE";
     TransactionCategory["REVOKE_TOKEN_ALLOWANCE"] = "REVOKE_TOKEN_ALLOWANCE";
+    TransactionCategory["RAMP"] = "RAMP";
+    TransactionCategory["FX"] = "FX";
     TransactionCategory["ON_RAMP"] = "ON_RAMP";
     TransactionCategory["OFF_RAMP"] = "OFF_RAMP";
     TransactionCategory["DELEGATE_RESOURCE"] = "DELEGATE_RESOURCE";
@@ -52,6 +60,12 @@ var TransactionSubCategory;
     TransactionSubCategory["STAKE"] = "STAKE";
     TransactionSubCategory["UNSTAKE"] = "UNSTAKE";
     TransactionSubCategory["CLAIM"] = "CLAIM";
+    TransactionSubCategory["DEPOSIT"] = "DEPOSIT";
+    TransactionSubCategory["TRADE"] = "TRADE";
+    TransactionSubCategory["WITHDRAW"] = "WITHDRAW";
+    TransactionSubCategory["DEPOSIT_TRADE"] = "DEPOSIT_TRADE";
+    TransactionSubCategory["TRADE_WITHDRAW"] = "TRADE_WITHDRAW";
+    TransactionSubCategory["DEPOSIT_TRADE_WITHDRAW"] = "DEPOSIT_TRADE_WITHDRAW";
     TransactionSubCategory["ON_RAMP"] = "ON_RAMP";
     TransactionSubCategory["OFF_RAMP"] = "OFF_RAMP";
 })(TransactionSubCategory || (exports.TransactionSubCategory = TransactionSubCategory = {}));
@@ -92,8 +106,8 @@ var TransactionOperationStatus;
 })(TransactionOperationStatus || (exports.TransactionOperationStatus = TransactionOperationStatus = {}));
 var PaymentMethod;
 (function (PaymentMethod) {
-    PaymentMethod["US_ACH"] = "US_ACH";
-    PaymentMethod["US_WIRE"] = "US_WIRE";
+    PaymentMethod["ACH"] = "ACH";
+    PaymentMethod["WIRE"] = "WIRE";
     PaymentMethod["SEPA"] = "SEPA";
     PaymentMethod["SWIFT"] = "SWIFT";
     PaymentMethod["BANK_TRANSFER"] = "BANK_TRANSFER";

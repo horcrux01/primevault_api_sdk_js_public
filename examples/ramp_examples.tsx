@@ -18,23 +18,22 @@ const createFiatToCryptoTransaction = async (
   const destination: TransferPartyData = {
     type: TransferPartyType.VAULT,
     id: vaultId,
+    chain: "ETHEREUM",
   };
 
   const intent: TransactionIntentRequest = {
     source,
     destination,
-    fromAsset: "NGN",
-    toAmount: "5",
-    toAsset: "USDT",
-    toChain: "ETHEREUM",
+    input: { asset: "NGN", vaultId: rampVaultId },
+    output: { asset: "USDT", amount: "5" },
   };
 
   const quoteResponse = await apiClient.getQuote({ intent });
   console.log("Quotes:", quoteResponse.quotes);
   const selectedQuote = quoteResponse.quotes[0];
+  console.log("Quoted selections:", selectedQuote.input, selectedQuote.output);
 
   const request: TransactionExecuteIntentRequest = {
-    intent,
     quoteId: selectedQuote.quoteId,
     externalId: "fiat-to-crypto-example-2",
     memo: "fiat to crypto example",
@@ -64,6 +63,7 @@ const createCryptoToFiatTransaction = async (
   const source: TransferPartyData = {
     type: TransferPartyType.VAULT,
     id: vaultId,
+    chain: "ETHEREUM",
   };
 
   const destination: TransferPartyData = {
@@ -74,18 +74,16 @@ const createCryptoToFiatTransaction = async (
   const intent: TransactionIntentRequest = {
     source,
     destination,
-    fromAsset: "USDC",
-    fromAmount: "100",
-    fromChain: "ETHEREUM",
-    toAsset: "USD",
+    input: { asset: "USDC", amount: "100" },
+    output: { asset: "USD" },
   };
 
   const quoteResponse = await apiClient.getQuote({ intent });
   console.log("Quotes:", quoteResponse.quotes);
   const selectedQuote = quoteResponse.quotes[0];
+  console.log("Quoted selections:", selectedQuote.input, selectedQuote.output);
 
   const cryptoToFiatTransaction = await apiClient.createTransactionFromIntent({
-    intent,
     quoteId: selectedQuote.quoteId,
     externalId: "crypto-to-fiat-example-1",
     memo: "crypto to fiat example",
@@ -111,29 +109,24 @@ const createFiatToFiatTransaction = async (
   const intent: TransactionIntentRequest = {
     source,
     destination,
-    fromAsset: "EUR",
-    fromAmount: "1000",
-    toAsset: "USD",
+    input: { asset: "NGN", vaultId: "your-ngn-fiat-vault-id" },
+    output: { asset: "USD", amount: "100", vaultId: "your-usd-fiat-vault-id" },
   };
 
   const quoteResponse = await apiClient.getQuote({ intent });
   console.log("Quotes:", quoteResponse.quotes);
   const selectedQuote = quoteResponse.quotes[0];
+  console.log("Quoted selections:", selectedQuote.input, selectedQuote.output);
 
   const fiatToFiatTransaction = await apiClient.createTransactionFromIntent({
-    intent,
     quoteId: selectedQuote.quoteId,
-    externalId: "eur-to-usd-example-1",
-    memo: "EUR to USD example",
+    externalId: "ngn-to-usd-example-1",
+    memo: "NGN to USD example",
   });
-  console.log("EUR to USD transaction:", fiatToFiatTransaction);
+  console.log("NGN to USD transaction:", fiatToFiatTransaction);
 
-  const operations = fiatToFiatTransaction.operations ?? [];
-  for (const operation of operations) {
-    console.log(
-      `Transfer operation sequence: ${operation.sequence}:`,
-      operation,
-    );
+  for (const change of fiatToFiatTransaction.balanceChanges?.changes ?? []) {
+    console.log(`${change.asset} ${change.amount}:`, change.party);
   }
 
   return fiatToFiatTransaction;

@@ -1,9 +1,12 @@
 import {
   ApprovalAction,
   BankAccount,
+  BankAccountBeneficiary,
+  BankAccountBeneficiaryAddress,
   BankAccountStatus,
   CreateBankAccountRequest,
   CreateTransferTransactionRequest,
+  PaymentRail,
   TransactionCategory,
   TransactionStatus,
   TransferPartyType,
@@ -152,13 +155,32 @@ describe("approval flows", () => {
   test("preserves bank account tags through creation, approval and listing", async () => {
     const request: CreateBankAccountRequest = {
       subOrgId: "sub-org-id",
-      accountNumber: "123456789",
       accountName: "Treasury Account",
-      bankName: "Chase",
+      bankAccountInfo: {
+        accountNumber: "123456789",
+        bankName: "Chase",
+        country: "US",
+        bankAddress: "270 Park Avenue, New York",
+        bic: "CHASUS33",
+      },
+      paymentRails: [PaymentRail.SWIFT],
+      beneficiary: {
+        entityType: "BUSINESS",
+        business: { legalName: "Treasury Holdings Ltd" },
+        address: {
+          streetLine1: "1 Main St",
+          city: "London",
+          zip: "EC1A 1BB",
+          country: "GB",
+        },
+      },
+      currency: "USD",
+      externalId: "treasury-usd-001",
       tags: ["treasury", "payroll", "treasury"],
     };
     const refetched: BankAccount = {
       ...request,
+      externalId: "treasury-usd-001",
       id: "bank-account-id",
       orgId: "org-id",
       orgEntityId: "org-entity-id",
@@ -181,6 +203,8 @@ describe("approval flows", () => {
       "/api/external/bank_accounts/",
       request,
     );
+    expect(refetched.bankAccountInfo?.country).toBe("US");
+    expect(refetched).not.toHaveProperty("country");
     expectApproval(
       mocks,
       refetched.id,
@@ -289,3 +313,24 @@ describe("approval flows", () => {
     });
   });
 });
+
+// Compile-time guards for the beneficiary union; no runtime assertions.
+function checkBeneficiaryTypes(
+  address: BankAccountBeneficiaryAddress,
+): BankAccountBeneficiary[] {
+  return [
+    {
+      entityType: "INDIVIDUAL",
+      individual: { firstName: "Ada", lastName: "Lovelace" },
+      address,
+      identifications: [{ type: "PASSPORT", value: "123456789" }],
+    },
+    // @ts-expect-error A passport identifies an individual, not a business.
+    {
+      entityType: "BUSINESS",
+      business: { legalName: "Acme Ltd" },
+      address,
+      identifications: [{ type: "PASSPORT", value: "123456789" }],
+    },
+  ];
+}

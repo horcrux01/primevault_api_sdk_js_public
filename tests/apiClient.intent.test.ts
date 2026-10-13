@@ -1,12 +1,11 @@
 import {
-  BankAccount,
   BankDetails,
-  CreateBankAccountRequest,
   DepositInstructions,
   QuoteResponse,
   Transaction,
   TransactionCategory,
   TransactionIntentRequest,
+  TransactionListResponse,
   TransactionStatus,
   TransactionSubCategory,
   TransferPartyData,
@@ -18,14 +17,9 @@ describe("APIClient intent transactions", () => {
   test("quotes preserve supplied intent fields and omit removed JavaScript fields", async () => {
     const { client, post } = createMockClient();
     const source: TransferPartyData = {
-      type: TransferPartyType.EXTERNAL_BANK_ACCOUNT,
+      type: TransferPartyType.BANK_ACCOUNT,
+      id: "bank-account-id",
       paymentRail: "WIRE",
-      bankDetails: {
-        bankName: "Example Bank",
-        bankCode: "001",
-        accountNumber: "000123456789",
-        beneficiaryAddress: "123 Example Street",
-      },
     };
     const intent: TransactionIntentRequest = {
       input: { asset: "USD", vaultId: "fiat-vault-id" },
@@ -59,11 +53,9 @@ describe("APIClient intent transactions", () => {
         source: {
           ...source,
           subOrgId: "removed-party-sub-org",
-          bankDetails: {
-            ...source.bankDetails,
-            accountNumberMasked: "****6789",
-            swiftBic: "EXAMPLEXXX",
-          },
+          provider: "removed-party-provider",
+          bank: { accountNumber: "000123456789" },
+          bankDetails: { accountNumber: "000123456789" },
         },
       },
     };
@@ -111,7 +103,91 @@ describe("APIClient intent transactions", () => {
     expect(result).toBe(response);
   });
 
-  test("executes an intent with partial bank details without a quote ID", async () => {
+  test("preserves crypto swap slippage when quoting and executing an intent", async () => {
+    const { client, post } = createMockClient();
+    const intent: TransactionIntentRequest = {
+      input: { asset: "USDC", amount: "100.123456" },
+      output: { asset: "USDT" },
+      source: {
+        type: TransferPartyType.VAULT,
+        id: "vault-id",
+        chain: "ETHEREUM",
+      },
+      destination: {
+        type: TransferPartyType.VAULT,
+        id: "vault-id",
+        chain: "POLYGON",
+      },
+      slippage: "0.50",
+    };
+    const response: QuoteResponse = {
+      quotes: [{ quoteId: "swap-quote-id", ...intent }],
+    };
+    const created: Transaction = {
+      ...transaction,
+      category: TransactionCategory.SWAP,
+      subCategory: TransactionSubCategory.MARKET_TRADE,
+      quoteResponse: response.quotes[0],
+    };
+    post.mockResolvedValueOnce(response).mockResolvedValueOnce(created);
+
+    const quoted = await client.getQuote({ intent });
+    expect(quoted.quotes[0].slippage).toBe("0.50");
+    expect(post).toHaveBeenNthCalledWith(
+      1,
+      "/api/external/transactions/v2/quote/",
+      { intent },
+    );
+
+    const result = await client.createTransactionFromIntent({
+      intent,
+      quoteId: quoted.quotes[0].quoteId,
+    });
+    expect(result).toBe(created);
+    expect(result.quoteResponse?.slippage).toBe("0.50");
+    expect(post).toHaveBeenNthCalledWith(
+      2,
+      "/api/external/transactions/intent/create/",
+      {
+        intent,
+        quoteId: "swap-quote-id",
+        externalId: undefined,
+        memo: undefined,
+      },
+    );
+  });
+
+  test("reads completed swaps without a saved quote ID or slippage", async () => {
+    const { client, get } = createMockClient();
+    const completed: Transaction = {
+      ...transaction,
+      category: TransactionCategory.SWAP,
+      subCategory: TransactionSubCategory.MARKET_TRADE,
+      status: TransactionStatus.COMPLETED,
+      quoteResponse: {
+        input: { asset: "USDC", amount: "10" },
+        output: { asset: "USDT", amount: "9.992028" },
+        rate: "0.9992028",
+        fees: null,
+        slippage: null,
+      },
+    };
+    const page: TransactionListResponse = {
+      results: [completed],
+      nextCursor: null,
+      hasNext: false,
+    };
+    get.mockResolvedValueOnce(page).mockResolvedValueOnce(completed);
+
+    expect(await client.getTransactions()).toBe(page);
+    expect(await client.getTransactionById(completed.id)).toBe(completed);
+    expect(get.mock.calls).toEqual([
+      ["/api/external/transactions/?limit=20&cursor="],
+      [`/api/external/transactions/${completed.id}/`],
+    ]);
+  });
+
+  test("executes an intent with a whitelisted bank account without a quote ID", async () => {
     const { client, post, get, sign } = createMockClient();
     const intent: TransactionIntentRequest = {
       input: { asset: "USDC", amount: "100.123456" },
@@ -122,12 +198,9 @@ describe("APIClient intent transactions", () => {
         chain: "ETHEREUM",
       },
       destination: {
-        type: TransferPartyType.EXTERNAL_BANK_ACCOUNT,
+        type: TransferPartyType.BANK_ACCOUNT,
+        id: "bank-account-id",
         paymentRail: "ACH",
-        bankDetails: {
-          bankName: "Example Bank",
-          accountNumber: "000123456789",
-        },
       },
     };
     post.mockResolvedValue(transaction);
@@ -247,8 +320,6 @@ describe("APIClient intent transactions", () => {
 function checkRemovedCurrencyFields(
   instructions: DepositInstructions,
   bank: BankDetails,
-  account: BankAccount,
-  request: CreateBankAccountRequest,
 ) {
   // @ts-expect-error DepositInstructions uses asset, not currency.
   instructions.currency;
@@ -256,8 +327,4 @@ function checkRemovedCurrencyFields(
   bank.currency;
   // @ts-expect-error Nested deposit bank details do not expose currency.
   instructions.bankDetails?.currency;
-  // @ts-expect-error BankAccount does not expose currency.
-  account.currency;
-  // @ts-expect-error CreateBankAccountRequest does not accept currency.
-  request.currency;
 }

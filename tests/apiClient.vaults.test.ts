@@ -1,5 +1,6 @@
 import {
   GetVaultDepositInstructionsRequest,
+  PaymentRail,
   TransferPartyType,
   Vault,
   VaultDepositInstructionsResponse,
@@ -12,15 +13,27 @@ const bankInstructions: VaultDepositInstructionsResponse = {
     {
       type: TransferPartyType.EXTERNAL_BANK_ACCOUNT,
       asset: "USD",
-      paymentRail: "WIRE",
+      paymentRail: PaymentRail.WIRE,
       memo: "deposit-reference",
       bankDetails: {
-        bankName: "Example Bank",
-        bankCode: "001",
-        accountNumber: "000123456789",
-        accountNumberMasked: "******6789",
-        beneficiaryAddress: "123 Example Street",
-        swiftBic: "EXAMPLE0XXX",
+        bankAccountInfo: {
+          bankName: "Example Bank",
+          country: "US",
+          bankAddress: "1 Bank Street",
+          accountType: "CHECKING",
+          routingNumber: "021000021",
+          accountNumber: "000123456789",
+          bic: "EXAMPLE0XXX",
+        },
+        beneficiary: {
+          name: "PrimeVault Inc",
+          address: {
+            streetLine1: "123 Example Street",
+            city: "New York",
+            state: "NY",
+            zip: "10001",
+          },
+        },
       },
     },
   ],
@@ -57,7 +70,7 @@ describe("Vault APIs", () => {
     const { client, get } = createMockClient();
     const request: GetVaultDepositInstructionsRequest = {
       asset: "USD",
-      paymentRail: "WIRE",
+      paymentRail: PaymentRail.WIRE,
     };
     get.mockResolvedValue(bankInstructions);
 
@@ -70,5 +83,34 @@ describe("Vault APIs", () => {
     );
     expect(Object.keys(result)).toEqual(["results"]);
     expect(result.results).toBe(bankInstructions.results);
+    expect(result.results[0].bankDetails?.bankAccountInfo?.country).toBe("US");
+    expect(result.results[0].bankDetails).not.toHaveProperty("country");
+
+    const pixInstructions: VaultDepositInstructionsResponse = {
+      results: [
+        {
+          asset: "BRL",
+          paymentRail: PaymentRail.PIX,
+          bankDetails: {
+            bankAccountInfo: {
+              country: "BR",
+              pixKey: "00123456789",
+              pixKeyType: "CPF",
+            },
+          },
+        },
+      ],
+    };
+    get.mockResolvedValueOnce(pixInstructions);
+    const pix = await client.getVaultDepositInstructions(vault.id, {
+      asset: "BRL",
+      paymentRail: PaymentRail.PIX,
+    });
+    expect(pix.results[0].bankDetails?.bankAccountInfo).toEqual({
+      country: "BR",
+      pixKey: "00123456789",
+      pixKeyType: "CPF",
+    });
+    expect(pix.results[0].bankDetails).not.toHaveProperty("pixKey");
   });
 });

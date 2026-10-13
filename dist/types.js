@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ApprovalAction = exports.BankAccountStatus = exports.ResourceType = exports.PaymentMethod = exports.TransactionOperationStatus = exports.TransactionOperationType = exports.TransactionFeeTier = exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.SubOrgControlMode = exports.VaultType = exports.TransferPartyType = void 0;
+exports.ApprovalAction = exports.BankAccountStatus = exports.ResourceType = exports.PaymentRail = exports.TransactionOperationStatus = exports.TransactionOperationType = exports.TransactionFeeTier = exports.TransactionStatus = exports.TransactionSubCategory = exports.TransactionCategory = exports.TransactionType = exports.ContactStatus = exports.SubOrgControlMode = exports.VaultType = exports.TransferPartyType = void 0;
 var TransferPartyType;
 (function (TransferPartyType) {
     TransferPartyType["CONTACT"] = "CONTACT";
@@ -52,7 +52,6 @@ var TransactionSubCategory;
     TransactionSubCategory["INCOMING_TRANSFER"] = "INCOMING_TRANSFER";
     TransactionSubCategory["EXTERNAL_TRANSFER"] = "EXTERNAL_TRANSFER";
     TransactionSubCategory["INTERNAL_TRANSFER"] = "INTERNAL_TRANSFER";
-    TransactionSubCategory["LIMIT_TRADE"] = "LIMIT_TRADE";
     TransactionSubCategory["MARKET_TRADE"] = "MARKET_TRADE";
     TransactionSubCategory["APPROVE_TOKEN_ALLOWANCE"] = "APPROVE_TOKEN_ALLOWANCE";
     TransactionSubCategory["CUSTOM_MESSAGE"] = "CUSTOM_MESSAGE";
@@ -104,14 +103,17 @@ var TransactionOperationStatus;
     TransactionOperationStatus["CANCELLED"] = "CANCELLED";
     TransactionOperationStatus["REVERSED"] = "REVERSED";
 })(TransactionOperationStatus || (exports.TransactionOperationStatus = TransactionOperationStatus = {}));
-var PaymentMethod;
-(function (PaymentMethod) {
-    PaymentMethod["ACH"] = "ACH";
-    PaymentMethod["WIRE"] = "WIRE";
-    PaymentMethod["SEPA"] = "SEPA";
-    PaymentMethod["SWIFT"] = "SWIFT";
-    PaymentMethod["BANK_TRANSFER"] = "BANK_TRANSFER";
-})(PaymentMethod || (exports.PaymentMethod = PaymentMethod = {}));
+var PaymentRail;
+(function (PaymentRail) {
+    PaymentRail["ACH"] = "ACH";
+    PaymentRail["WIRE"] = "WIRE";
+    PaymentRail["SEPA"] = "SEPA";
+    PaymentRail["SWIFT"] = "SWIFT";
+    PaymentRail["FPS"] = "FPS";
+    PaymentRail["NIP"] = "NIP";
+    PaymentRail["PIX"] = "PIX";
+    PaymentRail["UAEFTS"] = "UAEFTS";
+})(PaymentRail || (exports.PaymentRail = PaymentRail = {}));
 var ResourceType;
 (function (ResourceType) {
     ResourceType["TRON_ENERGY"] = "TRON_ENERGY";

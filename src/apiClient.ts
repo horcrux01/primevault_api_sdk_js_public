@@ -5,7 +5,6 @@ import {
   ApprovalActionResponse,
   Asset,
   BalanceResponse,
-  BankDetails,
   BankAccount,
   BankAccountListResponse,
   ChainData,
@@ -45,40 +44,12 @@ import {
   ContactListResponse,
 } from "./types";
 
-// accountNumberMasked and swiftBic only appear in deposit instructions; the
-// backend BankDetails request contract has no such fields.
-function buildBankDetailsData(bank: BankDetails): Record<string, any> {
-  return {
-    ...(bank.bankAccountId === undefined ? {} : { bankAccountId: bank.bankAccountId }),
-    ...(bank.bankName === undefined ? {} : { bankName: bank.bankName }),
-    ...(bank.bankCode === undefined ? {} : { bankCode: bank.bankCode }),
-    ...(bank.beneficiaryName === undefined
-      ? {}
-      : { beneficiaryName: bank.beneficiaryName }),
-    ...(bank.accountName === undefined ? {} : { accountName: bank.accountName }),
-    ...(bank.accountNumber === undefined ? {} : { accountNumber: bank.accountNumber }),
-    ...(bank.routingNumber === undefined ? {} : { routingNumber: bank.routingNumber }),
-    ...(bank.paymentRail === undefined ? {} : { paymentRail: bank.paymentRail }),
-    ...(bank.bankAddress === undefined ? {} : { bankAddress: bank.bankAddress }),
-    ...(bank.beneficiaryAddress === undefined
-      ? {}
-      : { beneficiaryAddress: bank.beneficiaryAddress }),
-    ...(bank.swiftCode === undefined ? {} : { swiftCode: bank.swiftCode }),
-    ...(bank.iban === undefined ? {} : { iban: bank.iban }),
-    ...(bank.country === undefined ? {} : { country: bank.country }),
-  };
-}
-
 function buildTransferPartyData(party: TransferPartyData): Record<string, any> {
   return {
     type: party.type,
     ...(party.id === undefined ? {} : { id: party.id }),
     ...(party.name === undefined ? {} : { name: party.name }),
     ...(party.address === undefined ? {} : { address: party.address }),
-    ...(party.provider === undefined ? {} : { provider: party.provider }),
-    ...(party.bankDetails === undefined
-      ? {}
-      : { bankDetails: buildBankDetailsData(party.bankDetails) }),
     ...(party.chain === undefined ? {} : { chain: party.chain }),
     ...(party.paymentRail === undefined ? {} : { paymentRail: party.paymentRail }),
   };
@@ -108,6 +79,7 @@ function buildTransactionIntentData(
     ...(request.destination === undefined
       ? {}
       : { destination: buildTransferPartyData(request.destination) }),
+    ...(request.slippage === undefined ? {} : { slippage: request.slippage }),
   };
 }
 

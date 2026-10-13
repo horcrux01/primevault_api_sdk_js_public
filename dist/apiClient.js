@@ -12,19 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.APIClient = void 0;
 const baseApiClient_1 = require("./baseApiClient");
 const types_1 = require("./types");
-// accountNumberMasked and swiftBic only appear in deposit instructions; the
-// backend BankDetails request contract has no such fields.
-function buildBankDetailsData(bank) {
-    return Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (bank.bankAccountId === undefined ? {} : { bankAccountId: bank.bankAccountId })), (bank.bankName === undefined ? {} : { bankName: bank.bankName })), (bank.bankCode === undefined ? {} : { bankCode: bank.bankCode })), (bank.beneficiaryName === undefined
-        ? {}
-        : { beneficiaryName: bank.beneficiaryName })), (bank.accountName === undefined ? {} : { accountName: bank.accountName })), (bank.accountNumber === undefined ? {} : { accountNumber: bank.accountNumber })), (bank.routingNumber === undefined ? {} : { routingNumber: bank.routingNumber })), (bank.paymentRail === undefined ? {} : { paymentRail: bank.paymentRail })), (bank.bankAddress === undefined ? {} : { bankAddress: bank.bankAddress })), (bank.beneficiaryAddress === undefined
-        ? {}
-        : { beneficiaryAddress: bank.beneficiaryAddress })), (bank.swiftCode === undefined ? {} : { swiftCode: bank.swiftCode })), (bank.iban === undefined ? {} : { iban: bank.iban })), (bank.country === undefined ? {} : { country: bank.country }));
-}
 function buildTransferPartyData(party) {
-    return Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ type: party.type }, (party.id === undefined ? {} : { id: party.id })), (party.name === undefined ? {} : { name: party.name })), (party.address === undefined ? {} : { address: party.address })), (party.provider === undefined ? {} : { provider: party.provider })), (party.bankDetails === undefined
-        ? {}
-        : { bankDetails: buildBankDetailsData(party.bankDetails) })), (party.chain === undefined ? {} : { chain: party.chain })), (party.paymentRail === undefined ? {} : { paymentRail: party.paymentRail }));
+    return Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ type: party.type }, (party.id === undefined ? {} : { id: party.id })), (party.name === undefined ? {} : { name: party.name })), (party.address === undefined ? {} : { address: party.address })), (party.chain === undefined ? {} : { chain: party.chain })), (party.paymentRail === undefined ? {} : { paymentRail: party.paymentRail }));
 }
 function buildIntentAssetData(asset) {
     return Object.assign(Object.assign({ asset: asset.asset }, (asset.amount === undefined ? {} : { amount: asset.amount })), (asset.vaultId === undefined ? {} : { vaultId: asset.vaultId }));
@@ -33,11 +22,11 @@ function buildTransactionIntentData(request) {
     if (!request) {
         return null;
     }
-    return Object.assign(Object.assign({ input: buildIntentAssetData(request.input), output: buildIntentAssetData(request.output) }, (request.source === undefined
+    return Object.assign(Object.assign(Object.assign({ input: buildIntentAssetData(request.input), output: buildIntentAssetData(request.output) }, (request.source === undefined
         ? {}
         : { source: buildTransferPartyData(request.source) })), (request.destination === undefined
         ? {}
-        : { destination: buildTransferPartyData(request.destination) }));
+        : { destination: buildTransferPartyData(request.destination) })), (request.slippage === undefined ? {} : { slippage: request.slippage }));
 }
 class APIClient extends baseApiClient_1.BaseAPIClient {
     getAssetsData() {

@@ -9,6 +9,7 @@ import {
   SignedTransaction,
   postAptosFullNode,
   MimeType,
+  PendingTransactionResponse,
 } from '@aptos-labs/ts-sdk';
 
 import { TransactionStatus, APIClient } from '../src';
@@ -51,6 +52,12 @@ async function aptosTransfer(apiClient: APIClient) {
     }
     await new Promise((resolve) => setTimeout(resolve, 3000));
   }
+  if (
+    txnResponse.status !== TransactionStatus.COMPLETED ||
+    !txnResponse.txnSignature
+  ) {
+    throw new Error(`PrimeVault signing did not complete: ${txnResponse.status}`);
+  }
 
   // Step 4: Create signed transaction with Ed25519 authenticator and submit to Aptos network
   const txnAuthenticator = new TransactionAuthenticatorEd25519(
@@ -64,7 +71,7 @@ async function aptosTransfer(apiClient: APIClient) {
     transaction.rawTransaction,
     txnAuthenticator
   ).bcsToBytes();
-  const { data } = await postAptosFullNode({
+  const { data } = await postAptosFullNode<Uint8Array, PendingTransactionResponse>({
     aptosConfig: config,
     body: signedTransaction,
     path: 'transactions',

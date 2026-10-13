@@ -1,4 +1,4 @@
-import { APIClient, ApprovalAction } from "../src";
+import { APIClient, ApprovalAction, PaymentRail } from "../src";
 import type { BankAccount, BankAccountListResponse, CreateBankAccountRequest } from "../src";
 
 /**
@@ -12,30 +12,46 @@ const createAndApproveBankAccount = async (
   apiClient: APIClient,
 ): Promise<BankAccount> => {
   const request: CreateBankAccountRequest = {
-    accountNumber: "123456789",
     accountName: "Treasury Account",
-    routingNumber: "021000021",
-    paymentMethod: "ACH",
-    bankName: "Chase",
-    streetLine: "123 Main St",
-    city: "New York",
-    state: "NY",
-    postalCode: "10001",
-    country: "US",
+    bankAccountInfo: {
+      accountNumber: "123456789",
+      routingNumber: "021000021",
+      bankName: "Chase",
+      country: "US",
+      accountType: "CHECKING",
+    },
+    paymentRails: [PaymentRail.ACH],
+    currency: "USD",
+    externalId: "treasury-usd-001",
+    beneficiary: {
+      entityType: "BUSINESS",
+      business: { legalName: "Acme Treasury LLC", registrationCountry: "US" },
+      address: {
+        streetLine1: "123 Main St",
+        city: "New York",
+        state: "NY",
+        zip: "10001",
+        country: "US",
+      },
+      identifications: [{ type: "TAX_ID", value: "12-3456789" }],
+    },
     tags: ["treasury", "payroll"],
   };
 
   const bankAccount = await apiClient.createBankAccountWithApproval(request);
 
-  // The response contains all fields at the top level:
+  // The bank details and the beneficiary come back nested:
   //
   //   bankAccount.id
-  //   bankAccount.status          // "APPROVED"
-  //   bankAccount.accountName     // "Treasury Account"
-  //   bankAccount.accountNumber   // "123456789"
-  //   bankAccount.routingNumber   // "021000021"
-  //   bankAccount.bankName        // "Chase"
-  //   bankAccount.city            // "New York"
+  //   bankAccount.status                           // "APPROVED"
+  //   bankAccount.accountName                      // "Treasury Account"
+  //   bankAccount.bankAccountInfo?.accountNumber   // "123456789"
+  //   bankAccount.bankAccountInfo?.routingNumber   // "021000021"
+  //   bankAccount.bankAccountInfo?.bankName        // "Chase"
+  //   bankAccount.paymentRails                     // ["ACH"]
+  //   bankAccount.currency                         // "USD"
+  //   bankAccount.externalId                       // "treasury-usd-001"
+  //   bankAccount.beneficiary?.address.city        // "New York"
   console.log(
     `Created and approved: ${bankAccount.id} status=${bankAccount.status}`,
   );
@@ -76,4 +92,17 @@ const listBankAccounts = async (apiClient: APIClient) => {
     console.log(`Total bank accounts: ${allAccounts.length}`);
 }
 
-export { createAndApproveBankAccount, declineBankAccount, listBankAccounts };
+const findBankAccountByExternalId = async (
+  apiClient: APIClient,
+  externalId: string,
+): Promise<BankAccount | undefined> => {
+  const response = await apiClient.getBankAccounts({ externalId });
+  return response.results[0];
+};
+
+export {
+  createAndApproveBankAccount,
+  declineBankAccount,
+  findBankAccountByExternalId,
+  listBankAccounts,
+};

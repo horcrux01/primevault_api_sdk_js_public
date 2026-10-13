@@ -1,4 +1,4 @@
-import {APIClient, DetailedBalanceResponse, Vault, VaultListResponse} from "../src";
+import {APIClient, DetailedBalanceResponse, PaymentRail, Vault, VaultListResponse} from "../src";
 import {BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError, TooManyRequestsError, InternalServerError} from "../src/baseApiClient";
 
 const createVault = async (apiClient: APIClient) => {
@@ -92,7 +92,7 @@ const getVaultDepositInstructions = async (
     // Supply exactly one payment rail for bank deposits or one chain for crypto.
     const bank = await apiClient.getVaultDepositInstructions(fiatVaultId, {
         asset: "USD",
-        paymentRail: "WIRE",
+        paymentRail: PaymentRail.WIRE,
     });
     console.log("Bank deposit instructions:", bank.results);
 

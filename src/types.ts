@@ -18,22 +18,16 @@ export enum TransferPartyType {
   BANK_ACCOUNT = "BANK_ACCOUNT",
 }
 
+export interface DepositInstructionBeneficiary {
+  name?: string;
+  // Bank account beneficiary address fields; a provider may give only some.
+  address?: Partial<BankAccountBeneficiaryAddress>;
+}
+
 export interface BankDetails {
-  bankAccountId?: string;
-  bankName?: string;
-  bankCode?: string;
-  beneficiaryName?: string;
   accountName?: string;
-  accountNumber?: string;
-  accountNumberMasked?: string;
-  routingNumber?: string;
-  paymentRail?: string;
-  bankAddress?: string;
-  beneficiaryAddress?: string;
-  swiftCode?: string;
-  swiftBic?: string;
-  iban?: string;
-  country?: string;
+  bankAccountInfo?: BankAccountInfo;
+  beneficiary?: DepositInstructionBeneficiary;
 }
 
 export interface DepositInstructions {
@@ -51,8 +45,6 @@ export interface TransferPartyData {
   id?: string;
   name?: string;
   address?: string;
-  provider?: string;
-  bankDetails?: BankDetails;
   chain?: string;
   paymentRail?: string;
 }
@@ -152,7 +144,6 @@ export enum TransactionSubCategory {
   INCOMING_TRANSFER = "INCOMING_TRANSFER",
   EXTERNAL_TRANSFER = "EXTERNAL_TRANSFER",
   INTERNAL_TRANSFER = "INTERNAL_TRANSFER",
-  LIMIT_TRADE = "LIMIT_TRADE",
   MARKET_TRADE = "MARKET_TRADE",
   APPROVE_TOKEN_ALLOWANCE = "APPROVE_TOKEN_ALLOWANCE",
   CUSTOM_MESSAGE = "CUSTOM_MESSAGE",
@@ -222,8 +213,6 @@ export interface TransactionSourceData {
   subOrgId?: string;
   name?: string;
   address?: string;
-  provider?: string;
-  bankDetails?: BankDetails;
   chain?: string;
   paymentRail?: string;
 }
@@ -264,6 +253,7 @@ export interface QuoteResponseItem {
   output?: IntentAsset;
   source?: TransferPartyData;
   destination?: TransferPartyData;
+  slippage?: string | null;
   expiresAt?: string;
 }
 
@@ -283,6 +273,8 @@ export interface TransactionIntentRequest {
   output: IntentAsset;
   source?: TransferPartyData;
   destination?: TransferPartyData;
+  // Crypto swaps require a percentage string, such as "1" for 1%.
+  slippage?: string;
 }
 
 export interface GetQuoteRequest {
@@ -321,7 +313,8 @@ export interface Transaction {
   dAppId?: string;
   source?: TransactionSourceData;
   destination?: TransactionSourceData;
-  quoteResponse?: QuoteResponseItem;
+  // Historical swaps can have quote details without a saved quoteId.
+  quoteResponse?: Partial<QuoteResponseItem>;
   depositInstructions?: DepositInstructions;
   operations?: TransactionOperation[];
   balanceChanges?: TransactionOperationBalanceChanges | null;
@@ -422,12 +415,15 @@ export type GetVaultDepositInstructionsRequest = {
   | { chain?: never; paymentRail: string }
 );
 
-export enum PaymentMethod {
+export enum PaymentRail {
   ACH = "ACH",
   WIRE = "WIRE",
   SEPA = "SEPA",
   SWIFT = "SWIFT",
-  BANK_TRANSFER = "BANK_TRANSFER",
+  FPS = "FPS",
+  NIP = "NIP",
+  PIX = "PIX",
+  UAEFTS = "UAEFTS",
 }
 
 export interface CreateContactRequest {
@@ -532,6 +528,81 @@ export enum BankAccountStatus {
   DECLINED = "DECLINED",
 }
 
+export interface BankAccountBeneficiaryAddress {
+  streetLine1: string;
+  streetLine2?: string | null;
+  city: string;
+  // state is required for US and CA addresses.
+  state?: string | null;
+  zip: string;
+  // Two-letter ISO country code, such as GB.
+  country: string;
+}
+
+export interface BusinessBeneficiaryIdentification {
+  type: "COMPANY_REGISTRATION" | "LEI" | "TAX_ID";
+  value: string;
+  issuingCountry?: string | null;
+}
+
+export interface IndividualBeneficiaryIdentification {
+  type: "PASSPORT" | "NATIONAL_ID" | "TAX_ID";
+  value: string;
+  issuingCountry?: string | null;
+}
+
+interface BankAccountBeneficiaryDetails {
+  name?: string | null;
+  address: BankAccountBeneficiaryAddress;
+  email?: string | null;
+  phoneNumber?: string | null;
+}
+
+export interface BusinessBankAccountBeneficiary
+  extends BankAccountBeneficiaryDetails {
+  entityType: "BUSINESS";
+  business: {
+    legalName: string;
+    registrationCountry?: string | null;
+  };
+  identifications?: BusinessBeneficiaryIdentification[];
+}
+
+export interface IndividualBankAccountBeneficiary
+  extends BankAccountBeneficiaryDetails {
+  entityType: "INDIVIDUAL";
+  individual: {
+    firstName: string;
+    middleName?: string | null;
+    lastName: string;
+    // YYYY-MM-DD
+    dateOfBirth?: string | null;
+    // Two-letter ISO country code, such as GB.
+    nationality?: string | null;
+    gender?: string | null;
+    occupation?: string | null;
+  };
+  identifications?: IndividualBeneficiaryIdentification[];
+}
+
+export type BankAccountBeneficiary =
+  | BusinessBankAccountBeneficiary
+  | IndividualBankAccountBeneficiary;
+
+export interface BankAccountInfo {
+  // Two-letter ISO code, such as GB; required for FPS, SEPA and SWIFT.
+  country?: string | null;
+  accountNumber?: string | null;
+  routingNumber?: string | null;
+  bankName?: string | null;
+  bankAddress?: string | null;
+  pixKey?: string | null;
+  pixKeyType?: string | null;
+  iban?: string | null;
+  bic?: string | null;
+  accountType?: "CHECKING" | "SAVINGS" | null;
+}
+
 export interface BankAccount {
   id: string;
   orgId: string;
@@ -542,17 +613,13 @@ export interface BankAccount {
   updatedAt: string;
   isDeleted: boolean;
   status: BankAccountStatus;
-  accountNumber?: string;
-  accountName?: string;
-  routingNumber?: string;
-  clientBankAccountId?: string;
-  paymentMethod?: string;
-  bankName?: string;
-  streetLine?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  country?: string;
+  // The PrimeVault display name; payout providers get the beneficiary's name.
+  accountName: string | null;
+  bankAccountInfo?: BankAccountInfo | null;
+  paymentRails: string[];
+  beneficiary?: BankAccountBeneficiary | null;
+  currency: string | null;
+  externalId: string | null;
   tags?: string[];
 }
 
@@ -618,17 +685,15 @@ export interface BankAccountListResponse {
 
 export interface CreateBankAccountRequest {
   subOrgId?: string;
-  accountNumber?: string;
-  accountName?: string;
-  routingNumber?: string;
-  clientBankAccountId?: string;
-  paymentMethod?: string;
-  bankName?: string;
-  streetLine?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  country?: string;
+  // The PrimeVault display name; payout providers get the beneficiary's name.
+  accountName: string;
+  // Which other bankAccountInfo fields are required depends on paymentRails.
+  bankAccountInfo: BankAccountInfo;
+  paymentRails: string[];
+  beneficiary?: BankAccountBeneficiary;
+  // Three-letter uppercase ISO 4217 code, such as GBP.
+  currency: string;
+  externalId?: string;
   tags?: string[];
 }
 

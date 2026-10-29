@@ -139,6 +139,7 @@ export enum TransactionSubCategory {
   CLAIM = "CLAIM",
   ON_RAMP = "ON_RAMP",
   OFF_RAMP = "OFF_RAMP",
+  ACTIVATION = "ACTIVATION",
 }
 
 export enum TransactionStatus {
@@ -257,7 +258,17 @@ export interface AlephiumContractCallData {
   params: Record<string, any>;
 }
 
-export type ContractCallData = EVMContractCallData | ICPCanisterCallData | RawSigningData | AlephiumContractCallData;
+// Stellar custom transactions only enable (add a trustline for) an issued asset on the vault.
+export interface StellarActivationData {
+  activateAsset: string;
+}
+
+export type ContractCallData =
+  | EVMContractCallData
+  | ICPCanisterCallData
+  | RawSigningData
+  | AlephiumContractCallData
+  | StellarActivationData;
 
 export interface CreateContractCallTransactionRequest {
   vaultId: string;
@@ -267,6 +278,7 @@ export interface CreateContractCallTransactionRequest {
   externalId?: string;
   gasParams?: TransactionCreationGasParams;
   creationOptions?: TransactionCreationOptions;
+  feePayer?: FeePayer;               // only used on Stellar; ignored on other chains
 }
 
 export interface ReplaceTransactionRequest {

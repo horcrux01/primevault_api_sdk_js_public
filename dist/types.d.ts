@@ -127,7 +127,8 @@ export declare enum TransactionSubCategory {
     UNSTAKE = "UNSTAKE",
     CLAIM = "CLAIM",
     ON_RAMP = "ON_RAMP",
-    OFF_RAMP = "OFF_RAMP"
+    OFF_RAMP = "OFF_RAMP",
+    ACTIVATION = "ACTIVATION"
 }
 export declare enum TransactionStatus {
     DRAFT = "DRAFT",
@@ -230,7 +231,10 @@ export interface AlephiumContractCallData {
     method: string;
     params: Record<string, any>;
 }
-export type ContractCallData = EVMContractCallData | ICPCanisterCallData | RawSigningData | AlephiumContractCallData;
+export interface StellarActivationData {
+    activateAsset: string;
+}
+export type ContractCallData = EVMContractCallData | ICPCanisterCallData | RawSigningData | AlephiumContractCallData | StellarActivationData;
 export interface CreateContractCallTransactionRequest {
     vaultId: string;
     chain: string;
@@ -239,6 +243,7 @@ export interface CreateContractCallTransactionRequest {
     externalId?: string;
     gasParams?: TransactionCreationGasParams;
     creationOptions?: TransactionCreationOptions;
+    feePayer?: FeePayer;
 }
 export interface ReplaceTransactionRequest {
     transactionId: string;

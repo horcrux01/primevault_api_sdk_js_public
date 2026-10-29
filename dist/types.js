@@ -54,6 +54,7 @@ var TransactionSubCategory;
     TransactionSubCategory["CLAIM"] = "CLAIM";
     TransactionSubCategory["ON_RAMP"] = "ON_RAMP";
     TransactionSubCategory["OFF_RAMP"] = "OFF_RAMP";
+    TransactionSubCategory["ACTIVATION"] = "ACTIVATION";
 })(TransactionSubCategory || (exports.TransactionSubCategory = TransactionSubCategory = {}));
 var TransactionStatus;
 (function (TransactionStatus) {

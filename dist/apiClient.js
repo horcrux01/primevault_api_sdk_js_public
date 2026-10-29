@@ -87,6 +87,7 @@ class APIClient extends baseApiClient_1.BaseAPIClient {
                 externalId: request.externalId,
                 gasParams: request.gasParams,
                 creationOptions: request.creationOptions,
+                feePayer: request.feePayer,
             };
             return yield this.post("/api/external/transactions/", data);
         });
